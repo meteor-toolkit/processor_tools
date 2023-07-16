@@ -24,6 +24,8 @@ class BaseProcessorFactory:
     Base class for containers of set of processor objects
     """
 
+    _required_baseclass: Type = BaseProcessor
+
     @property
     def _module_name(self) -> Union[None, str, List[str]]:
         """Name (or list of names) of submodule(s) to find processor classes in (e.g. ``package.processors``)"""
@@ -32,7 +34,7 @@ class BaseProcessorFactory:
     def __init__(self) -> None:
 
         # find processor classes
-        self._processors: Dict[str, Type[BaseProcessor]] = (
+        self._processors: Dict[str, Type] = (
             self._find_processors(self._module_name)
             if self._module_name is not None
             else {}
@@ -40,7 +42,7 @@ class BaseProcessorFactory:
 
     def _find_processors(
         self, module_name: Union[str, List[str]]
-    ) -> Dict[str, Type[BaseProcessor]]:
+    ) -> Dict[str, Type]:
         """
         Returns dictionary of ````processor_tools.processor.BaseProcessor```` subclasses contained within a defined module (or set of modules)
 
@@ -48,8 +50,6 @@ class BaseProcessorFactory:
 
         :return: processor classes
         """
-
-        required_baseclass = BaseProcessor
 
         if type(module_name) == str:
             module_name = [module_name]
@@ -72,16 +72,16 @@ class BaseProcessorFactory:
                 ):
                     omit_classes.append(cls_name)
 
-                if required_baseclass is not None:
-                    if not issubclass(cls, required_baseclass):
+                if self._required_baseclass is not None:
+                    if not issubclass(cls, self._required_baseclass):
                         omit_classes.append(cls_name)
 
             for o_cls in omit_classes:
                 del mod_classes[o_cls]
 
             # Remove baseclass if in dictionary
-            if required_baseclass.__name__ in mod_classes:
-                del mod_classes[required_baseclass.__name__]
+            if self._required_baseclass.__name__ in mod_classes:
+                del mod_classes[self._required_baseclass.__name__]
 
             # store in dict
             processors.update(mod_classes)
@@ -96,7 +96,7 @@ class BaseProcessorFactory:
         """
         return list(self._processors.keys())
 
-    def __getitem__(self, name: str) -> Union[None, Type[BaseProcessor]]:
+    def __getitem__(self, name: str) -> Union[None, Type]:
         """
         Returns named processor contained within the object
 
@@ -114,7 +114,7 @@ class BaseProcessorFactory:
             cls_name = cls_names[lower_cls_names.index(name.lower())]
             return self._processors[cls_name]
 
-    def __setitem__(self, name: str, cls: Type[BaseProcessor]) -> None:
+    def __setitem__(self, name: str, cls: Type) -> None:
         """
         Adds item to container
 
@@ -122,13 +122,11 @@ class BaseProcessorFactory:
         :param cls: processor class object, must be subclass of ``processor_tools.processor.BaseProcessor``
         """
 
-        required_baseclass = BaseProcessor
-
         # check if class of required baseclass (if set)
-        if required_baseclass is not None:
-            if not issubclass(cls, required_baseclass):
+        if self._required_baseclass is not None:
+            if not issubclass(cls, self._required_baseclass):
                 raise ValueError(
-                    str(cls) + "must be subclass of " + str(required_baseclass)
+                    str(cls) + "must be subclass of " + str(self._required_baseclass)
                 )
 
         self._processors[name] = cls
