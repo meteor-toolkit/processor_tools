@@ -1,7 +1,7 @@
 """processor_tools.processor_builder - tools for building configurable processors"""
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = []
+__all__ = ["ProcessorBuilder", "BaseProcessorFactory"]
 
 
 class ProcessorBuilder:

@@ -1,7 +1,7 @@
 """processor_tools.processor - processor class definition"""
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = []
+__all__ = ["BaseProcessor"]
 
 
 class BaseProcessor:
