@@ -6,7 +6,7 @@ import string
 import random
 import os
 from processor_tools.processor import BaseProcessor
-from processor_tools.processor import BaseProcessorFactory
+from processor_tools.processor import ProcessorFactory
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -64,11 +64,7 @@ class Test4(BaseProcessor):
         self.mod1_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod1"])
         self.mod2_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod2"])
 
-        class TestFactory(BaseProcessorFactory):
-            _module_name = [self.mod1_name, self.mod2_name]
-
-        self.TestFactory = TestFactory
-        self.test_factory = TestFactory()
+        self.test_factory = ProcessorFactory([self.mod1_name, self.mod2_name])
 
     def test__find_processors_1mod(self):
         classes = self.test_factory._find_processors(self.mod1_name)
@@ -85,13 +81,13 @@ class Test4(BaseProcessor):
         class Test5(BaseProcessor):
             pass
 
-        test_factory = self.TestFactory()
+        test_factory = ProcessorFactory()
         test_factory["test"] = Test5
         self.assertTrue(("test" in test_factory._processors))
 
     def test__delitem__(self):
 
-        test_factory = self.TestFactory()
+        test_factory = ProcessorFactory(self.mod1_name)
         del test_factory["Test2"]
         self.assertTrue(("Test2" not in test_factory._processors))
 

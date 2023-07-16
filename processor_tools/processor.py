@@ -7,7 +7,7 @@ import importlib
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["BaseProcessor"]
+__all__ = ["BaseProcessor", "ProcessorFactory"]
 
 
 class BaseProcessor:
@@ -25,26 +25,27 @@ class BaseProcessor:
         self.context = context if context is not None else {}
 
 
-class BaseProcessorFactory:
+class ProcessorFactory:
     """
-    Base class for containers of set of processor objects
+    Container for sets of processor objects
+
+    :param module_name: Name (or list of names) of submodule(s) to find processor classes to populate factory with (e.g. ``package.processors``)
+    :param required_baseclass: filter for classes that only subclass this class
     """
 
-    _required_baseclass: Type = BaseProcessor
+    def __init__(
+            self,
+            module_name: Optional[Union[str, List[str]]] = None,
+            required_baseclass: Optional[Type] = BaseProcessor
+    ) -> None:
 
-    @property
-    def _module_name(self) -> Union[None, str, List[str]]:
-        """Name (or list of names) of submodule(s) to find processor classes in (e.g. ``package.processors``)"""
-        return None
-
-    def __init__(self) -> None:
+        self._processors: Dict[str, Type] = {}
+        self._module_name: Union[None, str, List[str]] = module_name
+        self._required_baseclass: Type = required_baseclass
 
         # find processor classes
-        self._processors: Dict[str, Type] = (
-            self._find_processors(self._module_name)
-            if self._module_name is not None
-            else {}
-        )
+        if self._module_name is not None:
+            self._processors = self._find_processors(self._module_name)
 
     def _find_processors(
         self, module_name: Union[str, List[str]]
@@ -73,10 +74,6 @@ class BaseProcessorFactory:
             # omit factory classes and classes not of required baseclass (if set)
             omit_classes = []
             for cls_name, cls in mod_classes.items():
-                if issubclass(cls, self.__class__.__base__) or (
-                    cls == self.__class__.__base__
-                ):
-                    omit_classes.append(cls_name)
 
                 if self._required_baseclass is not None:
                     if not issubclass(cls, self._required_baseclass):
