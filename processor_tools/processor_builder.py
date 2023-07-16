@@ -8,15 +8,7 @@ import importlib
 from processor_tools.processor import BaseProcessor
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["ProcessorBuilder", "BaseProcessorFactory"]
-
-
-class ProcessorBuilder:
-    """
-    Class that assembles processor from set of configurable sub-processors
-    """
-
-    pass
+__all__ = ["BaseProcessorFactory"]
 
 
 class BaseProcessorFactory:

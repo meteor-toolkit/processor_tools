@@ -15,10 +15,6 @@ __all__ = []
 this_directory = os.path.dirname(__file__)
 
 
-class TestProcessorBuilder(unittest.TestCase):
-    pass
-
-
 class TestBaseProcessorFactory(unittest.TestCase):
     def setUp(self) -> None:
 
