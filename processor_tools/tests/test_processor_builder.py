@@ -5,5 +5,18 @@ import unittest
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 __all__ = []
 
-if __name__ == "__main__":
+
+class TestProcessorBuilder(unittest.TestCase):
     pass
+
+
+class TestBaseProcessorFactory(unittest.TestCase):
+    pass
+
+
+class TestBaseProcessor(unittest.TestCase):
+    pass
+
+
+if __name__ == "__main__":
+    unittest.main()

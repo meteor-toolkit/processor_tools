@@ -3,5 +3,30 @@
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 __all__ = []
 
+
+class ProcessorBuilder:
+    """
+    Class that assembles processor from set of configurable sub-processors
+    """
+
+    pass
+
+
+class BaseProcessorFactory:
+    """
+    Base class for containers of set of processor objects
+    """
+
+    pass
+
+
+class BaseProcessor:
+    """
+    Base class for processor implementations
+    """
+
+    pass
+
+
 if __name__ == "__main__":
     pass
