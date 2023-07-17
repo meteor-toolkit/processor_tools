@@ -15,14 +15,94 @@ class BaseProcessor:
     Base class for processor implementations
 
     :param context: container object storing configuration values that define the processor state
+    :param processor_path: location of processor name in subprocessor tree
     """
 
-    def __init__(self, context: Optional[Any] = None):
+    cls_subprocessors: Union[
+        None,
+        Dict[str, Union["BaseProcessor", Type["BaseProcessor"], "ProcessorFactory"]],
+    ] = None
+    """Default set of subprocessors for processor objects of this class"""
+
+    cls_processor_name: Union[None, str] = None
+    """Name for processor objects of this class (accessed via ``processor_name`` property - will default to the name of the class is if this class attribute is unset.)"""
+
+    def __init__(
+        self,
+        context: Optional[Any] = None,
+        processor_path: Optional[str] = None,
+    ):
         """
         Constructor method
         """
 
-        self.context = context if context is not None else {}
+        # define attributes
+        self.context: Optional[Any] = context if context is not None else {}
+        self.processor_path = processor_path
+        self.subprocessors: Dict[str, "BaseProcessor"] = {}
+
+        # if cls_subprocessor set append defined subprocessors to self.subprocessors
+        if self.cls_subprocessors is not None:
+            for sp_name, sp_obj in self.cls_subprocessors.items():
+                self.append_subprocessor(sp_name, sp_obj)
+
+    @property
+    def processor_name(self) -> str:
+        """Returns processor name"""
+
+        # return class attribute for processor name if set
+        if self.cls_processor_name is not None:
+            return self.cls_processor_name
+
+        # default to the name of the class is if this class attribute is unset
+        return self.__class__.__name__
+
+    def append_subprocessor(
+        self,
+        sp_name: str,
+        sp_obj: Union["BaseProcessor", Type["BaseProcessor"], "ProcessorFactory"],
+    ) -> None:
+        """
+        Appends instantiation of processor to ``subprocessors`` attribute.
+
+        If subprocessor object is provided as:
+
+        * object - processor object (with updated ``processor_path`` attribute) added to ``subprocessors``.
+        * class - class is instantiated, with resultant object added ``subprocessors``
+        * factory - class selected from factory - using value from ``self.context`` for target ``processor_path`` - and instantiated, with resultant object added ``subprocessors``
+
+        :param sp_name: name of subprocessor
+        :param sp_obj: subprocessor object
+        """
+
+        # determine location of processor in subprocessor tree
+        if self.processor_path is None:
+            sp_path = sp_name
+        else:
+            sp_path = ".".join([self.processor_path, sp_name])
+
+        # handle subprocessor depending on how it is defined:
+        # * factory - class selected from factory and instantiated, with resultant object added subprocessors
+        if isinstance(sp_obj, ProcessorFactory):
+            self.subprocessors[sp_name] = sp_obj[self.context[sp_path]](
+                context=self.context, processor_path=sp_path
+            )
+
+        # * if object - processor object add to subprocessors
+        elif isinstance(sp_obj, BaseProcessor):
+            sp_obj.processor_path = sp_path
+            self.subprocessors[sp_name] = sp_obj
+
+        # * if class - class is instantiated, with resultant object added ``subprocessors``
+        elif issubclass(sp_obj, BaseProcessor):
+            self.subprocessors[sp_name] = sp_obj(
+                context=self.context, processor_path=sp_path
+            )
+
+        else:
+            raise TypeError(
+                "subprocessor object must be of type: ['BaseProcessor', Type['BaseProcessor'], 'ProcessorFactory']"
+            )
 
 
 class ProcessorFactory:
@@ -34,9 +114,9 @@ class ProcessorFactory:
     """
 
     def __init__(
-            self,
-            module_name: Optional[Union[str, List[str]]] = None,
-            required_baseclass: Optional[Type] = BaseProcessor
+        self,
+        module_name: Optional[Union[str, List[str]]] = None,
+        required_baseclass: Optional[Type] = BaseProcessor,
     ) -> None:
 
         self._processors: Dict[str, Type] = {}
@@ -47,9 +127,7 @@ class ProcessorFactory:
         if self._module_name is not None:
             self._processors = self._find_processors(self._module_name)
 
-    def _find_processors(
-        self, module_name: Union[str, List[str]]
-    ) -> Dict[str, Type]:
+    def _find_processors(self, module_name: Union[str, List[str]]) -> Dict[str, Type]:
         """
         Returns dictionary of ````processor_tools.processor.BaseProcessor```` subclasses contained within a defined module (or set of modules)
 
