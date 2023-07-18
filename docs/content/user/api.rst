@@ -12,5 +12,11 @@ documentation.
 
 .. add package's API's functions, classes, methods etc. to the below toctree
 
+Processor
+=========
+
 .. autosummary::
    :toctree: generated/
+   :nosignatures:
+
+   processor
