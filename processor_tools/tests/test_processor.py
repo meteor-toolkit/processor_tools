@@ -29,8 +29,8 @@ class TestBaseProcessor(unittest.TestCase):
             pass
 
         test_factory = ProcessorFactory()
-        test_factory["option1"] = Option1
-        test_factory["option2"] = Option2
+        test_factory.add_processor(Option1)
+        test_factory.add_processor(Option2)
 
         self.TestProcessor = TestProcessor
         self.test_processor = self.TestProcessor()
@@ -56,7 +56,6 @@ class TestBaseProcessor(unittest.TestCase):
         mock_append.assert_has_calls([call("sp1", "a"), call("sp2", "b")])
 
     def test_processor_name_set__name(self):
-
         p = self.TestProcessor()
         p.cls_processor_name = "test"
         self.assertEqual(p.processor_name, "test")
@@ -66,7 +65,6 @@ class TestBaseProcessor(unittest.TestCase):
         self.assertEqual(p.processor_name, "TestProcessor")
 
     def test_append_subprocessor_obj(self):
-
         test_processor = self.TestProcessor()
         test_subprocessor = self.TestProcessor()
 
@@ -81,7 +79,6 @@ class TestBaseProcessor(unittest.TestCase):
         )
 
     def test_append_subsubprocessor_obj(self):
-
         test_processor = self.TestProcessor()
         test_subprocessor = self.TestProcessor()
         test_subprocessor.append_subprocessor("subprocessor1a", self.TestProcessor)
@@ -90,17 +87,21 @@ class TestBaseProcessor(unittest.TestCase):
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor1"])
         self.assertEqual(
-            test_processor.subprocessors["subprocessor1"].processor_name, "TestProcessor"
+            test_processor.subprocessors["subprocessor1"].processor_name,
+            "TestProcessor",
         )
         self.assertEqual(
-            test_processor.subprocessors["subprocessor1"].processor_path, "subprocessor1"
+            test_processor.subprocessors["subprocessor1"].processor_path,
+            "subprocessor1",
         )
         self.assertEqual(
-            test_processor.subprocessors["subprocessor1"].subprocessors["subprocessor1a"].processor_path, "subprocessor1.subprocessor1a"
+            test_processor.subprocessors["subprocessor1"]
+            .subprocessors["subprocessor1a"]
+            .processor_path,
+            "subprocessor1.subprocessor1a",
         )
 
     def test_append_subprocessor_cls(self):
-
         test_processor = self.TestProcessor()
 
         test_processor.append_subprocessor("subprocessor", self.TestProcessor)
@@ -114,7 +115,6 @@ class TestBaseProcessor(unittest.TestCase):
         )
 
     def test_append_subprocessor_factory(self):
-
         test_processor = self.TestProcessor(context={"subprocessor": "option1"})
 
         test_processor.append_subprocessor("subprocessor", self.test_factory)
@@ -168,9 +168,8 @@ class TestBaseProcessor(unittest.TestCase):
         self.assertEqual(("p2a", "p2b"), val)
 
 
-class TestBaseProcessorFactory(unittest.TestCase):
+class TestProcessorFactory(unittest.TestCase):
     def setUp(self) -> None:
-
         # Create temporary module
         letters = string.ascii_lowercase
         self.tmp_mod = "tmp_" + "".join(random.choice(letters) for i in range(5))
@@ -226,7 +225,6 @@ class Test4(BaseProcessor):
         self.assertTrue(("test" in test_factory._processors))
 
     def test__delitem__(self):
-
         test_factory = ProcessorFactory(self.mod1_name)
         del test_factory["Test2"]
         self.assertTrue(("Test2" not in test_factory._processors))

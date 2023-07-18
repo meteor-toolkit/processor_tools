@@ -135,15 +135,12 @@ class BaseProcessor:
         # if defined run subprocessors in order
 
         if self.subprocessors is not None:
-
             # output of previous subprocessor feeds into next, initialise with input value
             proc_args_i = deepcopy(args)
 
             for sp_name, sp in self.subprocessors.items():
-
                 # handle splat operator correctly for different arg types
                 if isinstance(proc_args_i, tuple):
-
                     if len(proc_args_i) == 1:
                         proc_args_i = sp.run(proc_args_i[0])
 
@@ -169,7 +166,6 @@ class ProcessorFactory:
         module_name: Optional[Union[str, List[str]]] = None,
         required_baseclass: Optional[Type] = None,
     ) -> None:
-
         self._processors: Dict[str, Type] = {}
         self._module_name: Union[None, str, List[str]] = module_name
         self._required_baseclass: Type = (
@@ -205,7 +201,6 @@ class ProcessorFactory:
             # omit factory classes and classes not of required baseclass (if set)
             omit_classes = []
             for cls_name, cls in mod_classes.items():
-
                 if self._required_baseclass is not None:
                     if not issubclass(cls, self._required_baseclass):
                         omit_classes.append(cls_name)
@@ -262,7 +257,11 @@ class ProcessorFactory:
                     str(cls) + "must be subclass of " + str(self._required_baseclass)
                 )
 
-        cls_name = cls.cls_processor_name if cls.cls_processor_name is not None else cls.__name__
+        cls_name = (
+            cls.cls_processor_name
+            if cls.cls_processor_name is not None
+            else cls.__name__
+        )
 
         self._processors[cls_name] = cls
 
