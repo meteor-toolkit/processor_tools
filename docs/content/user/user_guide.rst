@@ -9,7 +9,6 @@ In this user guide, you will find detailed descriptions and examples that descri
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
    quickstart
-
+   processor_build
