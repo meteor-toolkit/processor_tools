@@ -38,7 +38,7 @@ class BaseProcessor:
         """
 
         # define attributes
-        self.context: Optional[Any] = context if context is not None else {}
+        self.context: Any = context if context is not None else {}
         self.processor_path = processor_path
         self.subprocessors: Dict[str, "BaseProcessor"] = {}
 
@@ -148,12 +148,12 @@ class ProcessorFactory:
     def __init__(
         self,
         module_name: Optional[Union[str, List[str]]] = None,
-        required_baseclass: Optional[Type] = BaseProcessor,
+        required_baseclass: Optional[Type] = None,
     ) -> None:
 
         self._processors: Dict[str, Type] = {}
         self._module_name: Union[None, str, List[str]] = module_name
-        self._required_baseclass: Type = required_baseclass
+        self._required_baseclass: Type = required_baseclass if required_baseclass is not None else BaseProcessor
 
         # find processor classes
         if self._module_name is not None:
@@ -209,7 +209,7 @@ class ProcessorFactory:
         """
         return list(self._processors.keys())
 
-    def __getitem__(self, name: str) -> Union[None, Type]:
+    def __getitem__(self, name: str) -> Type:
         """
         Returns named processor contained within the object
 
@@ -222,7 +222,7 @@ class ProcessorFactory:
         lower_cls_names = [c.lower() for c in cls_names]
 
         if name.lower() not in lower_cls_names:
-            return None
+            raise KeyError(name)
         else:
             cls_name = cls_names[lower_cls_names.index(name.lower())]
             return self._processors[cls_name]

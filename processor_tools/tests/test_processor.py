@@ -73,8 +73,12 @@ class TestBaseProcessor(unittest.TestCase):
         test_processor.append_subprocessor("subprocessor", test_subprocessor)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor")
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor"
+        )
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
+        )
 
     def test_append_subprocessor_cls(self):
 
@@ -83,8 +87,12 @@ class TestBaseProcessor(unittest.TestCase):
         test_processor.append_subprocessor("subprocessor", self.TestProcessor)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor")
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor"
+        )
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
+        )
 
     def test_append_subprocessor_factory(self):
 
@@ -93,8 +101,12 @@ class TestBaseProcessor(unittest.TestCase):
         test_processor.append_subprocessor("subprocessor", self.test_factory)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "Option1")
-        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_name, "Option1"
+        )
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
+        )
 
     def test_run_1arg(self):
         test_processor = self.TestProcessor()
@@ -105,7 +117,10 @@ class TestBaseProcessor(unittest.TestCase):
         processor2 = MagicMock()
         processor2.run.return_value = "p2"
 
-        test_processor.subprocessors = {"processor1": processor1, "processor2": processor2}
+        test_processor.subprocessors = {
+            "processor1": processor1,
+            "processor2": processor2,
+        }
 
         val = test_processor.run("p0")
 
@@ -122,7 +137,10 @@ class TestBaseProcessor(unittest.TestCase):
         processor2 = MagicMock()
         processor2.run.return_value = ("p2a", "p2b")
 
-        test_processor.subprocessors = {"processor1": processor1, "processor2": processor2}
+        test_processor.subprocessors = {
+            "processor1": processor1,
+            "processor2": processor2,
+        }
 
         val = test_processor.run("p0a", "p0b")
 
