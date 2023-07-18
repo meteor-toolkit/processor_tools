@@ -2,7 +2,7 @@
 
 import shutil
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch, call, MagicMock
 import string
 import random
 import os
@@ -95,6 +95,40 @@ class TestBaseProcessor(unittest.TestCase):
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
         self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "Option1")
         self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
+
+    def test_run_1arg(self):
+        test_processor = self.TestProcessor()
+
+        processor1 = MagicMock()
+        processor1.run.return_value = "p1"
+
+        processor2 = MagicMock()
+        processor2.run.return_value = "p2"
+
+        test_processor.subprocessors = {"processor1": processor1, "processor2": processor2}
+
+        val = test_processor.run("p0")
+
+        processor1.run.assert_called_once_with("p0")
+        processor2.run.assert_called_once_with("p1")
+        self.assertEqual("p2", val)
+
+    def test_run_2arg(self):
+        test_processor = self.TestProcessor()
+
+        processor1 = MagicMock()
+        processor1.run.return_value = ("p1a", "p1b")
+
+        processor2 = MagicMock()
+        processor2.run.return_value = ("p2a", "p2b")
+
+        test_processor.subprocessors = {"processor1": processor1, "processor2": processor2}
+
+        val = test_processor.run("p0a", "p0b")
+
+        processor1.run.assert_called_once_with("p0a", "p0b")
+        processor2.run.assert_called_once_with("p1a", "p1b")
+        self.assertEqual(("p2a", "p2b"), val)
 
 
 class TestBaseProcessorFactory(unittest.TestCase):

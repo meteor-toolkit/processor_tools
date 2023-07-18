@@ -4,6 +4,7 @@ from typing import Optional, Type, Dict, Union, List, Any
 import inspect
 import sys
 import importlib
+from copy import deepcopy
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -103,6 +104,37 @@ class BaseProcessor:
             raise TypeError(
                 "subprocessor object must be of type: ['BaseProcessor', Type['BaseProcessor'], 'ProcessorFactory']"
             )
+
+    def run(self, *args: Any) -> Any:
+        """
+        Runs processor subprocessors sequentially in order, output of each feeding into the next
+
+        :param args: processor input arguments
+        :return: output values of final processor
+        """
+
+        # if defined run subprocessors in order
+
+        if self.subprocessors is not None:
+
+            # output of previous subprocessor feeds into next, initialise with input value
+            proc_args_i = deepcopy(args)
+
+            for sp_name, sp in self.subprocessors.items():
+
+                # handle splat operator correctly for different arg types
+                if isinstance(proc_args_i, tuple):
+
+                    if len(proc_args_i) == 1:
+                        proc_args_i = sp.run(proc_args_i[0])
+
+                    else:
+                        proc_args_i = sp.run(*proc_args_i)
+
+                else:
+                    proc_args_i = sp.run(proc_args_i)
+
+            return proc_args_i
 
 
 class ProcessorFactory:
