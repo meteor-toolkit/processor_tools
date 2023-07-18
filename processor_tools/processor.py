@@ -153,7 +153,9 @@ class ProcessorFactory:
 
         self._processors: Dict[str, Type] = {}
         self._module_name: Union[None, str, List[str]] = module_name
-        self._required_baseclass: Type = required_baseclass if required_baseclass is not None else BaseProcessor
+        self._required_baseclass: Type = (
+            required_baseclass if required_baseclass is not None else BaseProcessor
+        )
 
         # find processor classes
         if self._module_name is not None:
