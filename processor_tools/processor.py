@@ -39,13 +39,23 @@ class BaseProcessor:
 
         # define attributes
         self.context: Any = context if context is not None else {}
-        self.processor_path = processor_path
+        self.processor_path: Optional[str] = processor_path
         self.subprocessors: Dict[str, "BaseProcessor"] = {}
 
         # if cls_subprocessor set append defined subprocessors to self.subprocessors
         if self.cls_subprocessors is not None:
             for sp_name, sp_obj in self.cls_subprocessors.items():
                 self.append_subprocessor(sp_name, sp_obj)
+
+    def __str__(self):
+        """Custom __str__"""
+        return "<Processor: {}>".format(
+            self.processor_name,
+        )
+
+    def __repr__(self):
+        """Custom  __repr__"""
+        return str(self)
 
     @property
     def processor_name(self) -> str:
@@ -91,7 +101,7 @@ class BaseProcessor:
 
         # * if object - processor object add to subprocessors
         elif isinstance(sp_obj, BaseProcessor):
-            sp_obj.processor_path = sp_path
+            sp_obj._prepend_processor_path(sp_path)
             self.subprocessors[sp_name] = sp_obj
 
         # * if class - class is instantiated, with resultant object added ``subprocessors``
@@ -104,6 +114,15 @@ class BaseProcessor:
             raise TypeError(
                 "subprocessor object must be of type: ['BaseProcessor', Type['BaseProcessor'], 'ProcessorFactory']"
             )
+
+    def _prepend_processor_path(self, path: str):
+        self.processor_path = path
+        self._prepend_subprocessor_path(path, self)
+
+    def _prepend_subprocessor_path(self, path: str, obj):
+        for sp_name, sp_cls in obj.subprocessors.items():
+            sp_cls.processor_path = ".".join([path, sp_cls.processor_path])
+            self._prepend_subprocessor_path(path, sp_cls)
 
     def run(self, *args: Any) -> Any:
         """

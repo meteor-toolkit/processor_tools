@@ -80,6 +80,25 @@ class TestBaseProcessor(unittest.TestCase):
             test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
         )
 
+    def test_append_subsubprocessor_obj(self):
+
+        test_processor = self.TestProcessor()
+        test_subprocessor = self.TestProcessor()
+        test_subprocessor.append_subprocessor("subprocessor1a", self.TestProcessor)
+
+        test_processor.append_subprocessor("subprocessor1", test_subprocessor)
+
+        self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor1"])
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor1"].processor_name, "TestProcessor"
+        )
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor1"].processor_path, "subprocessor1"
+        )
+        self.assertEqual(
+            test_processor.subprocessors["subprocessor1"].subprocessors["subprocessor1a"].processor_path, "subprocessor1.subprocessor1a"
+        )
+
     def test_append_subprocessor_cls(self):
 
         test_processor = self.TestProcessor()
