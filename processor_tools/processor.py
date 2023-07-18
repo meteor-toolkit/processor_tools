@@ -248,11 +248,10 @@ class ProcessorFactory:
             cls_name = cls_names[lower_cls_names.index(name.lower())]
             return self._processors[cls_name]
 
-    def __setitem__(self, name: str, cls: Type) -> None:
+    def add_processor(self, cls: Type[BaseProcessor]) -> None:
         """
         Adds item to container
 
-        :param name: processor class name
         :param cls: processor class object, must be subclass of ``processor_tools.processor.BaseProcessor``
         """
 
@@ -263,7 +262,9 @@ class ProcessorFactory:
                     str(cls) + "must be subclass of " + str(self._required_baseclass)
                 )
 
-        self._processors[name] = cls
+        cls_name = cls.cls_processor_name if cls.cls_processor_name is not None else cls.__name__
+
+        self._processors[cls_name] = cls
 
     def __delitem__(self, name: str) -> None:
         """

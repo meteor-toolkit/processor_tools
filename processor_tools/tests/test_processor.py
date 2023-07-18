@@ -217,12 +217,12 @@ class Test4(BaseProcessor):
     def test_keys(self):
         self.assertEqual(self.test_factory.keys(), ["Test2", "Test4"])
 
-    def test___setitem__(self):
+    def test_add_processor(self):
         class Test5(BaseProcessor):
-            pass
+            cls_processor_name = "test"
 
         test_factory = ProcessorFactory()
-        test_factory["test"] = Test5
+        test_factory.add_processor(Test5)
         self.assertTrue(("test" in test_factory._processors))
 
     def test__delitem__(self):
