@@ -185,7 +185,7 @@ class ProcessorFactory:
         :return: processor classes
         """
 
-        if type(module_name) == str:
+        if isinstance(module_name, str):
             module_name = [module_name]
 
         processors = {}
