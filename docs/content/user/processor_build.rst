@@ -127,6 +127,14 @@ These factories can be used to define the set of optional implementations for a 
    proc_with_opts.append_subprocessor("opt_algo", algo_factory)
    print(proc_with_opts.subprocessors)
 
+If all the processors required for a factory are in one or more package modules, you can point to that module(s) when building the class.
+
+.. code-block:: python
+
+   mod_algo_factory = processor_tools.ProcessorFactory("package.subpackage.module")
+
+So ``mod_algo_factory`` would now contain all ``BaseProcessor`` subclasses in the module ``package.subpackage.module``.
+
 Defining processor class default subprocessors
 ----------------------------------------------
 
