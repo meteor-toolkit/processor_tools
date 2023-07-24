@@ -28,11 +28,13 @@ setup(
     install_requires=[],
     extras_require={
         "dev": [
+            "numpy",
             "pre-commit",
             "tox",
             "sphinx",
             "sphinx_book_theme",
             "sphinx_design",
+            "sphinx_automodapi",
             "ipython",
         ]
     },
