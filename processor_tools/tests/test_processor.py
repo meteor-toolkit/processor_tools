@@ -233,7 +233,7 @@ class Test4(BaseProcessor):
         self.assertTrue(("test" in test_factory._processors))
 
     def test__delitem__(self):
-        test_factory = ProcessorFactory(self.mod1_name)
+        test_factory = ProcessorFactory(module_name=self.mod1_name)
         del test_factory["Test2"]
         self.assertTrue(("Test2" not in test_factory._processors))
 
