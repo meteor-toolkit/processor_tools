@@ -203,7 +203,15 @@ class Test4(BaseProcessor):
         self.mod1_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod1"])
         self.mod2_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod2"])
 
-        self.test_factory = ProcessorFactory([self.mod1_name, self.mod2_name])
+        self.test_factory = ProcessorFactory(
+            module_name=[self.mod1_name, self.mod2_name]
+        )
+
+    @patch("processor_tools.processor.ProcessorFactory.add_processor")
+    def test_init_with_processors(self, mock_pf):
+        p = ProcessorFactory(["a", "b"])
+
+        mock_pf.assert_has_calls([call("a"), call("b")])
 
     def test__find_processors_1mod(self):
         classes = self.test_factory._find_processors(self.mod1_name)

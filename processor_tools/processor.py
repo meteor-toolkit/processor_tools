@@ -157,12 +157,14 @@ class ProcessorFactory:
     """
     Container for sets of processor objects
 
+    :param processors: list of processors to add to factory
     :param module_name: Name (or list of names) of submodule(s) to find processor classes to populate factory with (e.g. ``package.processors``)
     :param required_baseclass: filter for classes that only subclass this class
     """
 
     def __init__(
         self,
+        processors: Optional[List[Type[BaseProcessor]]] = None,
         module_name: Optional[Union[str, List[str]]] = None,
         required_baseclass: Optional[Type] = None,
     ) -> None:
@@ -172,7 +174,12 @@ class ProcessorFactory:
             required_baseclass if required_baseclass is not None else BaseProcessor
         )
 
-        # find processor classes
+        # add processors
+        if processors is not None:
+            for processor in processors:
+                self.add_processor(processor)
+
+        # find processor classes in module
         if self._module_name is not None:
             self._processors = self._find_processors(self._module_name)
 
