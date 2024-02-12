@@ -29,7 +29,9 @@ class BaseProcessor:
     """Name for processor objects of this class (accessed via ``processor_name`` property - will default to the name of the class is if this class attribute is unset.)"""
 
     def __init__(
-        self, context: Optional[Any] = None, processor_path: Optional[str] = None,
+        self,
+        context: Optional[Any] = None,
+        processor_path: Optional[str] = None,
     ):
         """
         Constructor method
@@ -47,7 +49,9 @@ class BaseProcessor:
 
     def __str__(self):
         """Custom __str__"""
-        return "<Processor: {}>".format(self.processor_name,)
+        return "<Processor: {}>".format(
+            self.processor_name,
+        )
 
     def __repr__(self):
         """Custom  __repr__"""
@@ -286,7 +290,11 @@ class NullProcessor(BaseProcessor):
 
     cls_processor_name = "null_processor"
 
-    def run(self, *args, **kwargs,) -> Any:
+    def run(
+        self,
+        *args,
+        **kwargs,
+    ) -> Any:
         return args
 
 
