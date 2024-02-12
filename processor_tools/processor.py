@@ -195,6 +195,7 @@ class ProcessorFactory:
         if isinstance(module_name, str):
             module_name = [module_name]
 
+        module_name.append("processor_tools.processor")
         processors = {}
 
         # find processors per module
