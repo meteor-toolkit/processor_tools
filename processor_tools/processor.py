@@ -7,8 +7,8 @@ import importlib
 from copy import deepcopy
 
 
-__author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["BaseProcessor", "ProcessorFactory"]
+__author__ = ["Sam Hunt <sam.hunt@npl.co.uk>", "Maddie Stedman"]
+__all__ = ["BaseProcessor", "ProcessorFactory", "NullProcessor"]
 
 
 class BaseProcessor:
@@ -281,6 +281,21 @@ class ProcessorFactory:
 
         # use functionality from dict
         del self._processors[name]
+
+
+class NullProcessor(BaseProcessor):
+    """
+    Null processor for processing variables where no processing is required.
+    """
+
+    cls_processor_name = "null_processor"
+
+    def run(
+            self,
+            *args,
+            **kwargs,
+    ) -> Any:
+        return args
 
 
 if __name__ == "__main__":
