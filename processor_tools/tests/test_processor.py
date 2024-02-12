@@ -217,14 +217,14 @@ class Test4(BaseProcessor):
 
     def test__find_processors_1mod(self):
         classes = self.test_factory._find_processors(self.mod1_name)
-        self.assertCountEqual(classes.keys(), ["Test2"])
+        self.assertCountEqual(classes.keys(), ["Test2", "NullProcessor"])
 
     def test__find_processors_2mod(self):
         classes = self.test_factory._find_processors([self.mod1_name, self.mod2_name])
-        self.assertCountEqual(classes.keys(), ["Test2", "Test4"])
+        self.assertCountEqual(classes.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_keys(self):
-        self.assertEqual(self.test_factory.keys(), ["Test2", "Test4"])
+        self.assertEqual(self.test_factory.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_add_processor(self):
         class Test5(BaseProcessor):
