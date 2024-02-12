@@ -250,8 +250,10 @@ class TestNullProcessor(unittest.TestCase):
     def test_run(self):
         p = NullProcessor()
         self.assertEqual(p.run(None), (None,))
-        self.assertEqual(p.run(None, 'test'), (None, 'test'))
-        np.testing.assert_array_equal(p.run(np.array([0,1,2,3]))[0], np.array([0,1,2,3]))
+        self.assertEqual(p.run(None, "test"), (None, "test"))
+        np.testing.assert_array_equal(
+            p.run(np.array([0, 1, 2, 3]))[0], np.array([0, 1, 2, 3])
+        )
 
 
 if __name__ == "__main__":
