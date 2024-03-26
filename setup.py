@@ -25,7 +25,9 @@ setup(
     description="Tools to support the developing of processing pipelines",
     long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=[],
+    install_requires=[
+        "numpy",
+    ],
     extras_require={
         "dev": [
             "numpy",

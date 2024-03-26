@@ -6,11 +6,13 @@ from unittest.mock import patch, call, MagicMock
 import string
 import random
 import os
+import numpy as np
 from processor_tools.processor import BaseProcessor
 from processor_tools.processor import ProcessorFactory
+from processor_tools.processor import NullProcessor
 
 
-__author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
+__author__ = ["Sam Hunt <sam.hunt@npl.co.uk>", "Maddie Stedman"]
 __all__ = []
 
 
@@ -215,14 +217,14 @@ class Test4(BaseProcessor):
 
     def test__find_processors_1mod(self):
         classes = self.test_factory._find_processors(self.mod1_name)
-        self.assertCountEqual(classes.keys(), ["Test2"])
+        self.assertCountEqual(classes.keys(), ["Test2", "NullProcessor"])
 
     def test__find_processors_2mod(self):
         classes = self.test_factory._find_processors([self.mod1_name, self.mod2_name])
-        self.assertCountEqual(classes.keys(), ["Test2", "Test4"])
+        self.assertCountEqual(classes.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_keys(self):
-        self.assertEqual(self.test_factory.keys(), ["Test2", "Test4"])
+        self.assertEqual(self.test_factory.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_add_processor(self):
         class Test5(BaseProcessor):
@@ -242,6 +244,16 @@ class Test4(BaseProcessor):
 
     def tearDown(self):
         shutil.rmtree(self.tmp_mod_dir)
+
+
+class TestNullProcessor(unittest.TestCase):
+    def test_run(self):
+        p = NullProcessor()
+        self.assertEqual(p.run(None), (None,))
+        self.assertEqual(p.run(None, "test"), (None, "test"))
+        np.testing.assert_array_equal(
+            p.run(np.array([0, 1, 2, 3]))[0], np.array([0, 1, 2, 3])
+        )
 
 
 if __name__ == "__main__":
