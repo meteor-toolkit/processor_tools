@@ -27,6 +27,7 @@ setup(
     packages=find_packages(exclude=("tests",)),
     install_requires=[
         "numpy",
+        "pyyaml"
     ],
     extras_require={
         "dev": [
