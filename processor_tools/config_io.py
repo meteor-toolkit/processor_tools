@@ -1,4 +1,4 @@
-"""processor_tools.utils.config_io - handling of reading/writing config files"""
+"""processor_tools.config_io - reading/writing config files"""
 
 import os
 import yaml
