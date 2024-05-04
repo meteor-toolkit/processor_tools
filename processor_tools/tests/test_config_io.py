@@ -1,4 +1,4 @@
-"""matchmaker.tests.test_context - tests for matchmaker.context module"""
+"""processor_tools.tests.test_config_io - tests for processor_tools.config_io module"""
 
 import unittest
 import random
