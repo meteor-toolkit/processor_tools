@@ -27,11 +27,14 @@ setup(
     packages=find_packages(exclude=("tests",)),
     install_requires=[
         "numpy",
-        "pyyaml"
+        "pyyaml",
+        "sqlalchemy",
+        "sqlalchemy_utils",
+        "shapely",
+        "geoalchemy2"
     ],
     extras_require={
         "dev": [
-            "numpy",
             "pre-commit",
             "tox",
             "sphinx",
