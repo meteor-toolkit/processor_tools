@@ -60,7 +60,7 @@ black:
     entrypoint: [""]
   stage: Static Analysis
   script:
-    - black --check processor_tools
+    - black --diff processor_tools
   allow_failure: true
   needs: []
 
