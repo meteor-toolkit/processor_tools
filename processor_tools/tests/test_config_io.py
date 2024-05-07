@@ -7,7 +7,13 @@ import shutil
 from unittest.mock import patch
 import os
 from configparser import RawConfigParser
-from processor_tools.config_io import BaseConfigReader, ConfigReader, YAMLReader, ConfigReaderFactory, read_config
+from processor_tools.config_io import (
+    BaseConfigReader,
+    ConfigReader,
+    YAMLReader,
+    ConfigReaderFactory,
+    read_config,
+)
 
 
 this_directory = os.path.dirname(__file__)
@@ -99,7 +105,7 @@ class TestConfigReader(unittest.TestCase):
         config = RawConfigParser()
         config["section"] = {"key": "True"}
 
-        val =ConfigReader._extract_config_value(config, "section", "key", dtype=bool)
+        val = ConfigReader._extract_config_value(config, "section", "key", dtype=bool)
         self.assertEqual(type(val), bool)
         self.assertEqual(val, True)
 
@@ -131,21 +137,9 @@ class TestYAMLReaderFactory(unittest.TestCase):
         self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         os.makedirs(self.tmp_dir)
 
-        yml_str = (
-            "test:\n"
-            "   entry1: value1\n"
-            "   entry2: false\n"
-            "   entry3: 1.2"
-        )
+        yml_str = "test:\n" "   entry1: value1\n" "   entry2: false\n" "   entry3: 1.2"
 
-        self.exp_config = {
-            "test":
-                {
-                    "entry1": "value1",
-                    "entry2": False,
-                    "entry3": 1.2
-                }
-        }
+        self.exp_config = {"test": {"entry1": "value1", "entry2": False, "entry3": 1.2}}
 
         self.yml_path = os.path.join(self.tmp_dir, "test.yaml")
 
@@ -157,10 +151,7 @@ class TestYAMLReaderFactory(unittest.TestCase):
         config = reader.read(self.yml_path)
 
         self.assertEqual(type(config), dict)
-        self.assertDictEqual(
-            config,
-            self.exp_config
-        )
+        self.assertDictEqual(config, self.exp_config)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
@@ -172,34 +163,25 @@ class TestConfigReaderFactory(unittest.TestCase):
 
         crf = ConfigReaderFactory()
         self.assertEqual(
-            type(crf.get_reader("test/file/path.config")),
-            type(ConfigReader())
+            type(crf.get_reader("test/file/path.config")), type(ConfigReader())
         )
 
     def test_get_reader_yaml(self):
 
         crf = ConfigReaderFactory()
         self.assertEqual(
-            type(crf.get_reader("test/file/path.yaml")),
-            type(YAMLReader())
+            type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
         )
 
     def test_get_reader_invalid(self):
 
         crf = ConfigReaderFactory()
-        self.assertRaises(
-            ValueError,
-            crf.get_reader,
-            "test/file/path.invalid"
-        )
+        self.assertRaises(ValueError, crf.get_reader, "test/file/path.invalid")
 
     def test_get_file_extension(self):
 
         path = "test/file/path.extension"
-        self.assertEqual(
-            ConfigReaderFactory._get_file_extension(path),
-            "extension"
-        )
+        self.assertEqual(ConfigReaderFactory._get_file_extension(path), "extension")
 
 
 class ReadConfFactory(unittest.TestCase):
@@ -208,11 +190,12 @@ class ReadConfFactory(unittest.TestCase):
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
         mock_reader.return_value.get_reader.assert_called_once_with("test.path")
-        mock_reader.return_value.get_reader.return_value.read.assert_called_once_with("test.path")
+        mock_reader.return_value.get_reader.return_value.read.assert_called_once_with(
+            "test.path"
+        )
 
         self.assertEqual(
-            cfg,
-            mock_reader.return_value.get_reader.return_value.read.return_value
+            cfg, mock_reader.return_value.get_reader.return_value.read.return_value
         )
         pass
 
