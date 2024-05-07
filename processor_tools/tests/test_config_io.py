@@ -34,7 +34,6 @@ def create_config_file(fname, values=None):
 
 
 class TestBaseConfigReader(unittest.TestCase):
-
     def test__infer_dtype_str(self):
         dtype = BaseConfigReader._infer_dtype("string")
         self.assertEqual(dtype, str)
@@ -53,7 +52,6 @@ class TestBaseConfigReader(unittest.TestCase):
 
 
 class TestConfigReader(unittest.TestCase):
-
     def setUp(self) -> None:
         self.config = RawConfigParser()
         self.config["Default"] = {"entry1": "value1", "entry2": "value2"}
@@ -134,7 +132,6 @@ class TestConfigReader(unittest.TestCase):
 
 
 class TestYAMLReaderFactory(unittest.TestCase):
-
     def setUp(self) -> None:
         self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         os.makedirs(self.tmp_dir)
@@ -160,34 +157,28 @@ class TestYAMLReaderFactory(unittest.TestCase):
 
 
 class TestConfigReaderFactory(unittest.TestCase):
-
     def test_get_reader_config(self):
-
         crf = ConfigReaderFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.config")), type(ConfigReader())
         )
 
     def test_get_reader_yaml(self):
-
         crf = ConfigReaderFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
         )
 
     def test_get_reader_invalid(self):
-
         crf = ConfigReaderFactory()
         self.assertRaises(ValueError, crf.get_reader, "test/file/path.invalid")
 
     def test_get_file_extension(self):
-
         path = "test/file/path.extension"
         self.assertEqual(ConfigReaderFactory._get_file_extension(path), "extension")
 
 
 class ReadConfFactory(unittest.TestCase):
-
     @patch("processor_tools.config_io.ConfigReaderFactory")
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")

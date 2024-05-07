@@ -87,7 +87,6 @@ class ConfigReader(BaseConfigReader):
         config.read(path)
 
         for section in config.sections():
-
             config_values[section] = dict()
             for key in config[section].keys():
                 config_values[section][key] = self._extract_config_value(
