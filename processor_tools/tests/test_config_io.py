@@ -53,6 +53,7 @@ class TestBaseConfigReader(unittest.TestCase):
 
 
 class TestConfigReader(unittest.TestCase):
+
     def setUp(self) -> None:
         self.config = RawConfigParser()
         self.config["Default"] = {"entry1": "value1", "entry2": "value2"}
@@ -133,6 +134,7 @@ class TestConfigReader(unittest.TestCase):
 
 
 class TestYAMLReaderFactory(unittest.TestCase):
+
     def setUp(self) -> None:
         self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         os.makedirs(self.tmp_dir)
@@ -197,7 +199,6 @@ class ReadConfFactory(unittest.TestCase):
         self.assertEqual(
             cfg, mock_reader.return_value.get_reader.return_value.read.return_value
         )
-        pass
 
 
 if __name__ == "__main__":
