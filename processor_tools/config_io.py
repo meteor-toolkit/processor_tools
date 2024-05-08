@@ -175,7 +175,7 @@ class ConfigReaderFactory:
         """
         Config file path
 
-        :param path:
+        :param path: config file path
         :return: config reader
         """
 
