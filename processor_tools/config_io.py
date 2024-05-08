@@ -16,10 +16,10 @@ class BaseConfigReader(ABC):
     """
     Base class for config file readers.
 
-    Implementations should infer types of values and convert to appropriate python objects, i.e.:
+    Implementations should infer types of values and convert to appropriate python objects for the following:
 
-    * "1" -> float(1)
-    * "true" -> bool(True)
+    * floats -- "1" -> float(1)
+    * bools -- "true" -> bool(True)
     """
 
     @abstractmethod
@@ -168,7 +168,7 @@ class ConfigReaderFactory:
     * default python (with file extensions `["config", "cfg", "conf"]`)
     * yaml file (with file extensions `["yml", "yaml"]`)
 
-    Can be extended to include more file formats in future (e.g., yaml)
+    Can be extended to include more file formats in future
     """
 
     def get_reader(self, path: str) -> BaseConfigReader:
