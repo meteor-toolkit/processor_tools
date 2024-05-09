@@ -25,9 +25,7 @@ setup(
     description="Tools to support the developing of processing pipelines",
     long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=[
-        "numpy",
-    ],
+    install_requires=["numpy", "pyyaml"],
     extras_require={
         "dev": [
             "numpy",
@@ -38,6 +36,7 @@ setup(
             "sphinx_design",
             "sphinx_automodapi",
             "ipython",
+            "types-PyYAML",
         ]
     },
     classifiers=[
