@@ -30,8 +30,10 @@ setup(
         "pyyaml",
         "sqlalchemy",
         "sqlalchemy_utils",
+        "psycopg2",
         "shapely",
-        "geoalchemy2"
+        "geoalchemy2",
+        "dataset",
     ],
     extras_require={
         "dev": [

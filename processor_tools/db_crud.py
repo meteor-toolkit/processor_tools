@@ -1,11 +1,16 @@
 """processor_tools.db_crud - utilities for creating, reading, updating and deleting databases"""
 
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import create_engine
+from copy import copy, deepcopy
+import inspect
+from typing import Optional, Dict, Union, Type, Tuple
+from datetime import date, datetime
+import sqlalchemy
+from sqlalchemy.orm import DeclarativeBase, mapped_column
+from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.engine.url import make_url
 from sqlalchemy_utils import drop_database, database_exists, create_database
-from copy import copy
-from typing import Optional, Dict, Union, Type
+from geoalchemy2 import Geometry
+import shapely
 from processor_tools import read_config
 
 
@@ -13,9 +18,24 @@ __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 __all__ = ["DatabaseCRUD"]
 
 
+GEOM_STRINGS = [
+    "GEOMETRY",
+    "POINT",
+    "LINESTRING",
+    "POLYGON",
+    "MULTIPOINT",
+    "MULTILINESTRING",
+    "MULTIPOLYGON",
+    "GEOMETRYCOLLECTION",
+    "CURVE",
+]
+
+
 class DatabaseCRUD:
     """
     Class containing utilities for creating, reading, updating and deleting databases.
+
+    Wraps sqlalchemy to simplify using databases.
     """
 
     def __init__(self, url: str, model_def: Optional[Union[str, dict]]):
@@ -31,29 +51,31 @@ class DatabaseCRUD:
             pass
 
         # init attributes
-        self.DBBase = DBBase
-        self.url = copy(make_url(url))
-        self.engine = None
-        self._model_def: Dict = read_config(model_def) if isinstance(model_def, str) else model_def
-        self._model: Optional[Dict[str, Type[DBBase]]] = None
+        self.DBBase: Type[DeclarativeBase] = DBBase
+        self.url: sqlalchemy.engine.url.URL = copy(make_url(url))
+        self._model_def: Dict = (
+            read_config(model_def) if isinstance(model_def, str) else model_def
+        )
+        self._model: Optional[Dict[str, Type[DeclarativeBase]]] = None
 
         # check url valid
         if self.url.drivername.startswith("sqlite"):
             pass
 
         elif self.url.drivername.startswith("postgres"):
-            create_database(url)
-        else:
-            raise NameError("invalid url - engine must be either sqlite or postgresql")
+            pass
 
-        self.engine = create_engine(self.url)
+        else:
+            raise ValueError("invalid url - engine must be either sqlite or postgresql")
+
+        self.engine: sqlalchemy.engine.Engine = create_engine(self.url)
 
     @property
-    def model(self) -> Dict[str, Type["DBBase"]]:
+    def model(self) -> Dict[str, Type[DeclarativeBase]]:
         """
         Database sqlalchemy declarative database model classes
 
-        :return:
+        :return: dictionary of sqlalchemy declarative classes for model tables
         """
 
         if self._model is not None:
@@ -63,32 +85,169 @@ class DatabaseCRUD:
 
         return self._model
 
-    @staticmethod
-    def _create_model(model: Dict) -> Dict[str, Type["DBBase"]]:
+    def _create_model(self, model_def: Dict) -> Dict[str, Type[DeclarativeBase]]:
         """
         Create sqlalchemy declarative database model classes for defined schema
 
-        :param model: database schema definition
+        :param model_def: database schema definition
         :return: model dictionary
         """
 
-        model = dict()
+        DBBase = self.DBBase
 
-        # todo - add create model code
+        model: Dict[str, Type[DBBase]] = dict()
+
+        for table_name, table_def in model_def.items():
+            table_attrs = {"__tablename__": table_name}
+
+            for column_name, column_def in table_def.items():
+                table_attrs[column_name] = self._return_mapped_column(column_def)
+
+            table_class = type(table_name, (self.DBBase,), table_attrs)
+
+            model[table_name] = table_class
 
         return model
+
+    @staticmethod
+    def _return_mapped_column(column_def: dict) -> sqlalchemy.orm.MappedColumn:
+        """
+        Returns a :py:class:`sqlalchemy.orm.MappedColumn`object based on definition dictionary, which has entries:
+
+        * `"type"` - column type as python type or string
+        * `"foreign_key"` (*str*) - (*optional*) foreign key mapping (e.g. as `"other_table.other_column"`)
+        * + other *kwargs* and values for :py:func:`sqlalchemy.orm.mapped_column`
+
+        :param column_def: column definition dictionary
+        :return: sqlalchemy mapped column object
+        """
+
+        column_def = deepcopy(column_def)
+
+        mc_args = []
+
+        # add type to args
+        column_type = column_def.pop("type")
+        mc_args.append(DatabaseCRUD._map_column_type(column_type))
+
+        # add foreign key to args
+        if "foreign_key" in column_def:
+            foreign_key = column_def.pop("foreign_key")
+            mc_args.append(ForeignKey(foreign_key))
+
+        return mapped_column(*mc_args, **column_def)
+
+    @staticmethod
+    def _map_column_type(
+        python_type: Union[Type, str],
+    ) -> Union[sqlalchemy.types.TypeEngine, type(Geometry)]:
+        """
+        Returns sqlalchemy type equivalent to given python type or type string
+
+        :param python_type: python type or type string (i.e. `"int"`), from:
+
+        * :py:class:`sqlalchemy.types.Boolean` - either as :py:class:`bool` or `"bool"
+        * :py:class:`sqlalchemy.types.Integer` - either as :py:class:`int` or `"int"`
+        * :py:class:`sqlalchemy.types.Float` - either as :py:class:`float` or `"float"`
+        * :py:class:`sqlalchemy.types.String` - either as :py:class:`str` or `"str"`
+        * :py:class:`sqlalchemy.types.DateTime` - either as `datetime.datetime` or `"datetime"`
+        * :py:class:`sqlalchemy.types.Date` - either as :py:class:`datetime.date` or `"date"`
+        * :py:class:`sqlalchemy.types.Date` - either as :py:class:`datetime.date` or `"date"`
+        * :py:class:`geoalchemy2.Geometry` - either as :py:class:`shapely.geometry.base.BaseGeometry` (see `shapely documentation <https://shapely.readthedocs.io/en/stable/geometry.html>`_ for options) or geometry type string (see `geoalchemy2 documentation <https://geoalchemy-2.readthedocs.io/en/0.2.5/types.html#geoalchemy2.types._GISType>`_ for options)
+
+        :return: equivalent sqlalchemy type
+        """
+
+        # if python_type string set to uppercase
+        if isinstance(python_type, str):
+            python_type = python_type.upper()
+
+        # if python_type shapely.geometry set to geom_type string
+        if inspect.isclass(python_type):
+            if issubclass(python_type, shapely.geometry.base.BaseGeometry):
+                python_type = python_type().geom_type.upper()
+
+        # map python_type object to sqlalchemy/geoalchemy2 object
+        if python_type == bool or python_type == "BOOL":
+            return sqlalchemy.types.Boolean
+        elif python_type == int or python_type == "INT":
+            return sqlalchemy.types.Integer
+        elif python_type == float or python_type == "FLOAT":
+            return sqlalchemy.types.Float
+        elif python_type == str or python_type == "STR":
+            return sqlalchemy.types.String
+        elif python_type == datetime or python_type == "DATETIME":
+            return sqlalchemy.types.DateTime
+        elif python_type == date or python_type == "DATE":
+            return sqlalchemy.types.Date
+        if python_type in GEOM_STRINGS:
+            return Geometry(python_type)
+        else:
+            raise ValueError("Unknown type: " + str(python_type))
+
+    @staticmethod
+    def _get_model_def_types(model_def: Dict) -> list:
+        """
+        Returns list of column types in database model definition
+
+        :param model: database schema definition
+        :return: database column types
+        """
+
+        model_types = []
+        for table in model_def.keys():
+            for column in model_def[table].keys():
+                model_types.append(model_def[table][column]["type"])
+
+        return list(set(model_types))
+
+    def _get_model_types(self):
+        """
+        Returns list of column types in database model
+
+        :param model: database schema definition
+        :return: database column types
+        """
+
+        model_types = []
+
+        for table in self.model.keys():
+            for column in self.model[table].__table__.columns.keys():
+                model_types.append(
+                    self.model[table].__table__.columns[column].type.__class__
+                )
+
+        return list(set(model_types))
+
+    def _is_postgis(self):
+        return any([t == Geometry for t in self._get_model_types()])
 
     def create(self) -> None:
         """
         Create database
         """
 
+        # create database if it doesn't already exist
         if not database_exists(self.url):
             create_database(self.url)
-
         else:
             raise ValueError("Database already exists: " + str(self.url))
 
+        # check if postgis extension necessary
+        if self._is_postgis():
+            if self.url.drivername.startswith("postgres"):
+                with self.engine.connect() as connection:
+                    connection.execute(sqlalchemy.text("CREATE EXTENSION postgis"))
+                    connection.commit()
+            else:
+                raise ValueError(
+                    "Invalid URL for schema with postgis types: " + str(self.url)
+                )
+
+        # initialise model
+        self.model
+
+        # create tables
         self.DBBase.metadata.create_all(self.engine)
 
     def delete(self) -> None:

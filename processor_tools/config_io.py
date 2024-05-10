@@ -91,9 +91,7 @@ class ConfigReader(BaseConfigReader):
             config_values[section] = dict()
             for key in config[section].keys():
                 config_values[section][key] = self._extract_config_value(
-                    config,
-                    section,
-                    key
+                    config, section, key
                 )
 
         os.chdir(cwd)
@@ -158,7 +156,7 @@ class YAMLReader(BaseConfigReader):
         :return: configuration values dictionary
         """
 
-        with open(path, 'r') as stream:
+        with open(path, "r") as stream:
             config_values = yaml.safe_load(stream)
 
         return config_values
