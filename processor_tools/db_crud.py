@@ -217,7 +217,12 @@ class DatabaseCRUD:
 
         return list(set(model_types))
 
-    def _is_postgis(self):
+    def _is_postgis(self) -> bool:
+        """
+        Returns True if database requires PostGIS extension, otherwise False
+
+        :return: PostGIS flag
+        """
         return any([t == Geometry for t in self._get_model_types()])
 
     def create(self) -> None:
