@@ -75,7 +75,7 @@ class ConfigReader(BaseConfigReader):
         :return: configuration values dictionary
         """
 
-        config_values = dict()
+        config_values: Dict[Any, Any] = dict()
 
         # Allows handling of relative paths to path
         cwd = os.getcwd()

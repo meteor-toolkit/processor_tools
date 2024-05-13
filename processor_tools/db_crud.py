@@ -2,7 +2,7 @@
 
 from copy import copy, deepcopy
 import inspect
-from typing import Optional, Dict, Union, Type, Tuple
+from typing import Optional, Dict, Union, Type, List, Any
 from datetime import date, datetime
 import sqlalchemy
 from sqlalchemy.orm import DeclarativeBase, mapped_column
@@ -18,7 +18,7 @@ __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 __all__ = ["DatabaseCRUD"]
 
 
-GEOM_STRINGS = [
+GEOM_STRINGS: List[str] = [
     "GEOMETRY",
     "POINT",
     "LINESTRING",
@@ -38,7 +38,7 @@ class DatabaseCRUD:
     Wraps sqlalchemy to simplify using databases.
     """
 
-    def __init__(self, url: str, model_def: Optional[Union[str, dict]]):
+    def __init__(self, url: str, model_def: Union[str, dict]):
         """
         Create database at defined url
 
@@ -93,9 +93,7 @@ class DatabaseCRUD:
         :return: model dictionary
         """
 
-        DBBase = self.DBBase
-
-        model: Dict[str, Type[DBBase]] = dict()
+        model: Dict[str, Type[DeclarativeBase]] = dict()
 
         for table_name, table_def in model_def.items():
             table_attrs = {"__tablename__": table_name}
@@ -124,7 +122,7 @@ class DatabaseCRUD:
 
         column_def = deepcopy(column_def)
 
-        mc_args = []
+        mc_args: List[Any] = []
 
         # add type to args
         column_type = column_def.pop("type")
@@ -140,7 +138,7 @@ class DatabaseCRUD:
     @staticmethod
     def _map_column_type(
         python_type: Union[Type, str],
-    ) -> Union[sqlalchemy.types.TypeEngine, type(Geometry)]:
+    ) -> Union[Type[sqlalchemy.types.TypeEngine], Geometry]:
         """
         Returns sqlalchemy type equivalent to given python type or type string
 
@@ -180,7 +178,7 @@ class DatabaseCRUD:
             return sqlalchemy.types.DateTime
         elif python_type == date or python_type == "DATE":
             return sqlalchemy.types.Date
-        if python_type in GEOM_STRINGS:
+        if isinstance(python_type, str) and python_type in GEOM_STRINGS:
             return Geometry(python_type)
         else:
             raise ValueError("Unknown type: " + str(python_type))
