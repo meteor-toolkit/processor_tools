@@ -45,7 +45,7 @@ TEST_MODEL_GEO = {
 
 # POSTGRES_URL_STUB = "postgresql+psycopg2://localhost/"
 # if "GILAB_CI" in os.environ:
-POSTGRES_URL_STUB = "postgresql+psycopg2://test:password@localhost/"
+POSTGRES_URL_STUB = "postgresql+psycopg2://test:password@postgis-postgis/"
 
 
 class TestDatabaseCRUD(unittest.TestCase):
