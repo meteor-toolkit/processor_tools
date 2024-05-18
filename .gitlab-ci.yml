@@ -4,6 +4,19 @@ image: "uninen/python-postgis"
 services:
   - postgis/postgis:latest
 
+### Setup cache ###
+# See https://docs.gitlab.com/ee/ci/caching/index.html
+#
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DATABASE_HOST: postgres
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: username
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST_AUTH_METHOD: trust
+
 stages:
   - Static Analysis
   - Readthedocs Documentation
@@ -13,19 +26,6 @@ stages:
   #- Full test
   - Publish test report
   - Combine quality documentation
-
-
-### Setup cache ###
-# See https://docs.gitlab.com/ee/ci/caching/index.html
-#
-# Change pip's cache directory to be inside the project directory since we can
-# only cache local items.
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  POSTGRES_HOST: postgres
-  POSTGRES_USER: username
-  POSTGRES_PASSWORD: password
-  POSTGRES_HOST_AUTH_METHOD: trust
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
