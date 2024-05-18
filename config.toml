@@ -1,0 +1,4 @@
+[[runners]]
+  executor = "docker"
+  [runners.feature_flags]
+    FF_NETWORK_PER_BUILD = true
