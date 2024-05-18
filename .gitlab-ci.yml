@@ -25,6 +25,7 @@ variables:
   POSTGRES_HOST: postgres
   POSTGRES_USER: username
   POSTGRES_PASSWORD: password
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
