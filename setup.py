@@ -43,6 +43,7 @@ setup(
             "sphinx_design",
             "sphinx_automodapi",
             "ipython",
+            "types-PyYAML",
         ]
     },
     classifiers=[
