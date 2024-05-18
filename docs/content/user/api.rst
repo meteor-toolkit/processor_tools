@@ -20,3 +20,12 @@ Processor
    :nosignatures:
 
    processor
+
+Database CRUD
+=============
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   db_crud
