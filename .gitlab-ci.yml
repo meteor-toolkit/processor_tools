@@ -2,7 +2,7 @@
 image: "python:3.11"
 
 services:
-  - postgis:latest
+  - postgis/postgis:latest
 
 stages:
   - Static Analysis
@@ -67,7 +67,7 @@ black:
     entrypoint: [""]
   stage: Static Analysis
   script:
-    - black --check processor_tools
+    - black --check --diff processor_tools
   allow_failure: true
   needs: []
 
