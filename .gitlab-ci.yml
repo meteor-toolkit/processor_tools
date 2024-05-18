@@ -11,9 +11,9 @@ services:
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  DATABASE_HOST: postgres
-  POSTGRES_HOST: postgres
-  POSTGRES_USER: username
+  DATABASE_HOST: localhost
+  POSTGRES_HOST: localhost
+  POSTGRES_USER: test
   POSTGRES_PASSWORD: password
   POSTGRES_HOST_AUTH_METHOD: trust
 
