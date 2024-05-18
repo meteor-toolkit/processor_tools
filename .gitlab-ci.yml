@@ -42,6 +42,7 @@ cache:
 # Make a template for steps that use a python virtual env
 .py_venv:
   before_script:
+    - sudo -i -u postgres psql
     # Store the CI_JOB_TOKEN so that jobs can access other repositories with the access rights of the triggering user:
     - echo -e "machine gitlab.npl.co.uk\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
     # Debug output
