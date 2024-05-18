@@ -1,6 +1,9 @@
 # Default image, if not specified
 image: "python:3.11"
 
+services:
+  - postgres:latest
+
 stages:
   - Static Analysis
   - Readthedocs Documentation
@@ -19,6 +22,8 @@ stages:
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POSTGRES_USER: username
+  POSTGRES_PASSWORD: password
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching

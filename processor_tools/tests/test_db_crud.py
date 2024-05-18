@@ -2,7 +2,7 @@
 
 import unittest
 import sqlalchemy.orm
-from sqlalchemy.engine.url import make_url
+from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy import inspect
 from processor_tools.db_crud import DatabaseCRUD
 import geoalchemy2
@@ -43,6 +43,9 @@ TEST_MODEL_GEO = {
     }
 }
 
+POSTGRES_URL_STUB = "postgresql://localhost/"
+if "GILAB_CI" in os.environ:
+    POSTGRES_URL_STUB = "postgresql+psycopg2://username:password@postgres/"
 
 class TestDatabaseCRUD(unittest.TestCase):
     def setUp(self) -> None:
@@ -63,7 +66,7 @@ class TestDatabaseCRUD(unittest.TestCase):
 
     def test___init___dict_postgres(self):
         temp_name = "".join(random.choices(string.ascii_lowercase, k=6)) + ".db"
-        url = "postgresql:///" + self.tmp_dir_path + "/" + temp_name
+        url = POSTGRES_URL_STUB + temp_name
 
         db_crud = DatabaseCRUD(url, TEST_MODEL)
 
@@ -234,7 +237,7 @@ class TestDatabaseCRUD(unittest.TestCase):
     def test_create_postgresql(self):
         temp_name = "".join(random.choices(string.ascii_lowercase, k=6))
 
-        url = "postgresql://localhost/" + temp_name
+        url = POSTGRES_URL_STUB + temp_name
 
         db_crud = DatabaseCRUD(url, TEST_MODEL)
 
@@ -249,7 +252,7 @@ class TestDatabaseCRUD(unittest.TestCase):
     def test_create_postgresql_postgis(self):
         temp_name = "".join(random.choices(string.ascii_lowercase, k=6))
 
-        url = "postgresql://localhost/" + temp_name
+        url = POSTGRES_URL_STUB + temp_name
 
         db_crud = DatabaseCRUD(url, TEST_MODEL_GEO)
 
