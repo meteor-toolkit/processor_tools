@@ -36,14 +36,14 @@ class DatabaseCRUD:
     Class containing utilities for creating, reading, updating and deleting databases.
 
     Wraps sqlalchemy to simplify using databases.
+
+    :param url: url of database to create (sqlite or postgresql)
+    :param model_def: path of config file or dictionary that defines schema - see :ref:`user guide <db-model>` for description of database model definition syntax
     """
 
     def __init__(self, url: str, model_def: Union[str, dict]):
         """
         Create database at defined url
-
-        :param url: url of database to create (sqlite or postgresql)
-        :param model_def : path of config file or dictionary that defines schema
         """
 
         # init declarative base baseclass
@@ -57,6 +57,7 @@ class DatabaseCRUD:
             read_config(model_def) if isinstance(model_def, str) else model_def
         )
         self._model: Optional[Dict[str, Type[DeclarativeBase]]] = None
+        self._engine: Optional[sqlalchemy.engine.Engine] = None
 
         # check url valid
         if self.url.drivername.startswith("sqlite"):
@@ -67,8 +68,6 @@ class DatabaseCRUD:
 
         else:
             raise ValueError("invalid url - engine must be either sqlite or postgresql")
-
-        self.engine: sqlalchemy.engine.Engine = create_engine(self.url)
 
     @property
     def model(self) -> Dict[str, Type[DeclarativeBase]]:
@@ -85,9 +84,24 @@ class DatabaseCRUD:
 
         return self._model
 
+    @property
+    def engine(self) -> sqlalchemy.engine.Engine:
+        """
+        Returns sqlalchemy database engine
+
+        :return: sqlalchemy database engine
+        """
+
+        if self._engine is not None:
+            return self._engine
+
+        self._engine = create_engine(self.url)
+
+        return self._engine
+
     def _create_model(self, model_def: Dict) -> Dict[str, Type[DeclarativeBase]]:
         """
-        Create sqlalchemy declarative database model classes for defined schema
+        Create sqlalchemy declarative database model classes for defined schema - see :ref:`user guide <db-model>` for description of database model definition syntax
 
         :param model_def: database schema definition
         :return: model dictionary
@@ -110,11 +124,7 @@ class DatabaseCRUD:
     @staticmethod
     def _return_mapped_column(column_def: dict) -> sqlalchemy.orm.MappedColumn:
         """
-        Returns a :py:class:`sqlalchemy.orm.MappedColumn`object based on definition dictionary, which has entries:
-
-        * `"type"` - column type as python type or string
-        * `"foreign_key"` (*str*) - (*optional*) foreign key mapping (e.g. as `"other_table.other_column"`)
-        * + other *kwargs* and values for :py:func:`sqlalchemy.orm.mapped_column`
+        Returns a :py:class:`sqlalchemy.orm.MappedColumn`object based on definition dictionary - see :ref:`user guide <db-model>` for description of database model definition syntax
 
         :param column_def: column definition dictionary
         :return: sqlalchemy mapped column object
@@ -142,16 +152,7 @@ class DatabaseCRUD:
         """
         Returns sqlalchemy type equivalent to given python type or type string
 
-        :param python_type: python type or type string (i.e. `"int"`), from:
-
-        * :py:class:`sqlalchemy.types.Boolean` - either as :py:class:`bool` or `"bool"
-        * :py:class:`sqlalchemy.types.Integer` - either as :py:class:`int` or `"int"`
-        * :py:class:`sqlalchemy.types.Float` - either as :py:class:`float` or `"float"`
-        * :py:class:`sqlalchemy.types.String` - either as :py:class:`str` or `"str"`
-        * :py:class:`sqlalchemy.types.DateTime` - either as `datetime.datetime` or `"datetime"`
-        * :py:class:`sqlalchemy.types.Date` - either as :py:class:`datetime.date` or `"date"`
-        * :py:class:`sqlalchemy.types.Date` - either as :py:class:`datetime.date` or `"date"`
-        * :py:class:`geoalchemy2.Geometry` - either as :py:class:`shapely.geometry.base.BaseGeometry` (see `shapely documentation <https://shapely.readthedocs.io/en/stable/geometry.html>`_ for options) or geometry type string (see `geoalchemy2 documentation <https://geoalchemy-2.readthedocs.io/en/0.2.5/types.html#geoalchemy2.types._GISType>`_ for options)
+        :param python_type: python type or type string (i.e. `"int"`) - see :ref:`user guide <db-model-types>` for description of database model definition syntax
 
         :return: equivalent sqlalchemy type
         """
@@ -224,6 +225,15 @@ class DatabaseCRUD:
         :return: PostGIS flag
         """
         return any([t == Geometry for t in self._get_model_types()])
+
+    def create_session(self) -> sqlalchemy.orm.Session:
+        """
+        Returns :py:class:`~sqlalchemy.orm.Session` object for database transactions, using self.engine
+
+        :return: sqlalchemy session object
+        """
+
+        return sqlalchemy.orm.Session(self.engine)
 
     def create(self) -> None:
         """

@@ -2,6 +2,7 @@
 
 import unittest
 import sqlalchemy.orm
+from sqlalchemy.engine.url import make_url
 from sqlalchemy import inspect
 from processor_tools.db_crud import DatabaseCRUD
 import geoalchemy2
@@ -12,9 +13,7 @@ import random
 from datetime import date, datetime
 import os
 import shutil
-from copy import deepcopy
-from sqlalchemy import String, Float, INTEGER, Integer, Boolean, Date, DateTime
-from geoalchemy2 import Geometry
+from sqlalchemy import String, Float, Integer, Boolean, Date, DateTime
 from sqlalchemy_utils import drop_database
 
 
@@ -110,6 +109,21 @@ class TestDatabaseCRUD(unittest.TestCase):
         self.assertEqual(db_crud._model, mock_cm.return_value)
 
         self.assertEqual(model, mock_cm.return_value)
+
+    @patch("processor_tools.db_crud.create_engine")
+    def test__engine(self, mock_eng):
+        temp_name = "".join(random.choices(string.ascii_lowercase, k=6)) + ".db"
+        url = "sqlite:///" + self.tmp_dir_path + "/" + temp_name
+
+        db_crud = DatabaseCRUD(url, TEST_MODEL)
+        self.assertIsNone(db_crud._engine)
+
+        engine = db_crud.engine
+
+        mock_eng.assert_called_once_with(make_url(url))
+        self.assertEqual(db_crud._engine, mock_eng.return_value)
+
+        self.assertEqual(engine, mock_eng.return_value)
 
     @patch(
         "processor_tools.db_crud.DatabaseCRUD._map_column_type", return_value=Integer
@@ -246,6 +260,16 @@ class TestDatabaseCRUD(unittest.TestCase):
         self.assertCountEqual(insp.get_table_names(), ["table1", "spatial_ref_sys"])
 
         drop_database(url)
+
+    def test_create_session(self):
+        temp_name = "".join(random.choices(string.ascii_lowercase, k=6)) + ".db"
+        url = "sqlite:///" + self.tmp_dir_path + "/" + temp_name
+
+        db_crud = DatabaseCRUD(url, TEST_MODEL)
+
+        session = db_crud.create_session()
+
+        self.assertEqual(db_crud.engine, session.bind.engine)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir_path)
