@@ -72,7 +72,7 @@ class TestDatabaseCRUD(unittest.TestCase):
         db_crud = DatabaseCRUD(url, TEST_MODEL)
 
         self.assertEqual(db_crud._model_def, TEST_MODEL)
-        self.assertEqual(str(db_crud.engine.url), url)
+        self.assertEqual(db_crud.engine.url, make_url(url))
         self.assertIsNone(db_crud._model)
 
     def test___init___dict_invalidurl(self):
