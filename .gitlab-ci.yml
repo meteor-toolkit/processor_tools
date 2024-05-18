@@ -1,5 +1,5 @@
 # Default image, if not specified
-image: "python:3.8"
+image: "python:3.11"
 
 stages:
   - Static Analysis
@@ -98,26 +98,18 @@ mypy:
       junit: cov_report.xml
     expire_in: 1 hour
 
-tox-3.7:
+tox-3.10:
   extends: ".tox"
   stage: "Test"
-  image: "python:3.7"
+  image: "python:3.10"
   rules:
     - if: '$CI_COMMIT_TAG'
       when: always
 
-tox-3.8:
+tox-3.11:
   extends: ".tox"
   stage: "Test"
-  image: "python:3.8"
-
-tox-3.9:
-  extends: ".tox"
-  stage: "Test"
-  image: "python:3.9"
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: always
+  image: "python:3.11"
   
 # tox_slowtests:
 #     extends: .py_venv
@@ -146,7 +138,7 @@ tox-3.9:
 #     needs: []
 
 test_report:
-  needs: ["tox-3.8"]
+  needs: ["tox-3.11"]
   stage: Publish test report
   image: 
      name: oberonamsterdam/wkhtmltopdf
