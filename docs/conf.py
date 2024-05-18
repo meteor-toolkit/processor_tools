@@ -94,10 +94,10 @@ todo_include_todos = False
 html_theme = "sphinx_book_theme"
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'sqlalchemy': ('https://docs.sqlalchemy.org/en/20/', None),
-    'shapely': ('https://shapely.readthedocs.io/en/stable/reference', None),
-    'geomalchemy2': ('https://geoalchemy-2.readthedocs.io/en/latest/', None),
+    "python": ("https://docs.python.org/3/", None),
+    "sqlalchemy": ("https://docs.sqlalchemy.org/en/20/", None),
+    "shapely": ("https://shapely.readthedocs.io/en/stable/reference", None),
+    "geomalchemy2": ("https://geoalchemy-2.readthedocs.io/en/latest/", None),
 }
 
 # Theme options are theme-specific and customize the look and feel of a
