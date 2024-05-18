@@ -43,9 +43,10 @@ TEST_MODEL_GEO = {
     }
 }
 
-POSTGRES_URL_STUB = "postgresql://localhost/"
+POSTGRES_URL_STUB = "postgresql+psycopg2://localhost/"
 if "GILAB_CI" in os.environ:
     POSTGRES_URL_STUB = "postgresql+psycopg2://username:password@postgres/"
+
 
 class TestDatabaseCRUD(unittest.TestCase):
     def setUp(self) -> None:

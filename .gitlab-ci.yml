@@ -22,6 +22,7 @@ stages:
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POSTGRES_HOST: postgres
   POSTGRES_USER: username
   POSTGRES_PASSWORD: password
 
