@@ -163,7 +163,7 @@ class DatabaseCRUD:
             if issubclass(python_type, shapely.geometry.base.BaseGeometry):  # type: ignore
                 python_type = python_type().geom_type  # type: ignore
 
-        if isinstance(python_type, types.GenericAlias): # type: ignore
+        if isinstance(python_type, types.GenericAlias):  # type: ignore
             if isinstance(python_type(), list):  # type: ignore
                 python_type = str(python_type).replace("list", "array")
 
