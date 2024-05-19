@@ -44,11 +44,10 @@ TEST_MODEL_GEO = {
 }
 
 POSTGRES_URL_STUB = "postgresql+psycopg2://test:password@localhost/"
-print(os.environ.get("GITLAB_CI"))
 if os.environ.get("GITLAB_CI") is not None:
     POSTGRES_URL_STUB = "postgresql+psycopg2://test:password@postgis-postgis/"
 
-print(POSTGRES_URL_STUB)
+
 class TestDatabaseCRUD(unittest.TestCase):
     def setUp(self) -> None:
         letters = string.ascii_lowercase

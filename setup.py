@@ -32,7 +32,7 @@ setup(
         "sqlalchemy_utils",
         "psycopg2",
         "shapely",
-        "geoalchemy2"
+        "geoalchemy2",
     ],
     extras_require={
         "dev": [
