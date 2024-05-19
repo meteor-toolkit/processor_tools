@@ -147,7 +147,7 @@ class DatabaseCRUD:
 
     @staticmethod
     def _map_column_type(
-        python_type: Union[Type, str],
+        python_type: Union[type, str],
     ) -> Union[Type[sqlalchemy.types.TypeEngine], Geometry]:
         """
         Returns sqlalchemy type equivalent to given python type or type string
@@ -163,8 +163,8 @@ class DatabaseCRUD:
 
         # if python_type shapely.geometry set to geom_type string
         if inspect.isclass(python_type):
-            if issubclass(python_type, shapely.geometry.base.BaseGeometry):
-                python_type = python_type().geom_type.upper()
+            if issubclass(python_type, shapely.geometry.base.BaseGeometry):  # type: ignore
+                python_type = python_type().geom_type.upper()  # type: ignore
 
         # map python_type object to sqlalchemy/geoalchemy2 object
         if python_type == bool or python_type == "BOOL":
