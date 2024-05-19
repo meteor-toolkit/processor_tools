@@ -4,7 +4,6 @@ from copy import copy, deepcopy
 import inspect
 from typing import Optional, Dict, Union, Type, List, Any
 from datetime import date, datetime
-import numpy as np
 import sqlalchemy
 from sqlalchemy.orm import DeclarativeBase, mapped_column
 from sqlalchemy import create_engine, ForeignKey
@@ -180,8 +179,6 @@ class DatabaseCRUD:
             return sqlalchemy.types.DateTime
         elif python_type == date or python_type == "DATE":
             return sqlalchemy.types.Date
-        elif python_type == np.ndarray or python_type == "ARRAY":
-            return sqlalchemy.types.ARRAY
         if isinstance(python_type, str) and python_type in GEOM_STRINGS:
             return Geometry(python_type)
         else:
