@@ -1,5 +1,5 @@
 # Default image, if not specified
-image: "uninen/python-postgis"
+image: "python:3.11"
 
 services:
   - postgis/postgis:latest
