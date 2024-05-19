@@ -142,32 +142,77 @@ class TestDatabaseCRUD(unittest.TestCase):
         self.assertTrue(isinstance(mapped_column.column.type, Integer))
         self.assertEqual(len(mapped_column.column.foreign_keys), 1)
 
-    def test__map_column_type(self):
+    def test__map_column_type_bool_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(bool), Boolean)
+
+    def test__map_column_type_bool_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("bool"), Boolean)
+
+    def test__map_column_type_int_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(int), Integer)
+
+    def test__map_column_type_int_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("int"), Integer)
+
+    def test__map_column_type_float_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(float), Float)
+
+    def test__map_column_type_float_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("float"), Float)
+
+    def test__map_column_type_str_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(str), String)
+
+    def test__map_column_type_str_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("str"), String)
+
+    def test__map_column_type_date_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(date), Date)
+
+    def test__map_column_type_date_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("date"), Date)
+
+    def test__map_column_type_datetime_type(self):
         self.assertEqual(DatabaseCRUD._map_column_type(datetime), DateTime)
+
+    def test__map_column_type_datetime_str(self):
         self.assertEqual(DatabaseCRUD._map_column_type("datetime"), DateTime)
+
+    def test__map_column_type_geometry_type(self):
         self.assertTrue(
             isinstance(
                 DatabaseCRUD._map_column_type(shapely.geometry.Point),
                 geoalchemy2.Geometry,
             )
         )
+
+    def test__map_column_type_geometry_str_linestring(self):
         self.assertEqual(
             DatabaseCRUD._map_column_type(shapely.geometry.LineString).geometry_type,
             "LINESTRING",
         )
+
+    def test__map_column_type_geometry_str_polygon(self):
         self.assertEqual(
             DatabaseCRUD._map_column_type("polygon").geometry_type, "POLYGON"
         )
+
+    def test__map_column_type_array_type(self):
+        self.assertEqual(
+            str(DatabaseCRUD._map_column_type(list[int])),
+            str(sqlalchemy.types.ARRAY(sqlalchemy.types.Integer)),
+        )
+
+    def test__map_column_type_array_str(self):
+        self.assertEqual(
+            str(DatabaseCRUD._map_column_type("array[float]")),
+            str(sqlalchemy.types.ARRAY(sqlalchemy.types.Float)),
+        )
+
+    def test__map_column_type_array_str_no_dtype(self):
+        self.assertRaises(ValueError, DatabaseCRUD._map_column_type, "array")
+
+    def test__map_column_type_unknown(self):
         self.assertRaises(ValueError, DatabaseCRUD._map_column_type, "hello")
 
     def test__create_model(self):

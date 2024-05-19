@@ -94,6 +94,7 @@ The following `sqlalchemy column types <https://docs.sqlalchemy.org/en/20/core/t
 * sqlalchemy :py:class:`~sqlalchemy.types.String` - defined in the definition syntax either as string `"str"` or :py:class:`str` type object.
 * sqlalchemy :py:class:`~sqlalchemy.types.DateTime` - defined in the definition syntax either as string `"datetime"` or :py:class:`~datatime.datetime` type.
 * sqlalchemy :py:class:`~sqlalchemy.types.Date` - defined in the definition syntax either as string `"date"` or :py:class:`~datatime.date` type object.
+* sqlalchemy :py:class:`~sqlalchemy.types.ARRAY` `(TYPE)` -  defined in the definition syntax either as a string `"array[TYPE]"` or a list type object `list[TYPE]` - where `TYPE` is one of the other valid types from this list, for example `"array[float]"` or `list[int]`.
 * geoalchemy2 :py:class:`~geoalchemy2.types.Geometry` -  defined in the definition syntax either as a geometry type string (see `geoalchemy2 documentation <https://geoalchemy-2.readthedocs.io/en/0.2.5/types.html#geoalchemy2.types._GISType>`_ for options) or a `shapely Geometry <https://shapely.readthedocs.io/en/stable/geometry.html>`_ class (e.g., :py:class:`~shapely.Point`).
 
 Initialising the DatabaseCRUD object

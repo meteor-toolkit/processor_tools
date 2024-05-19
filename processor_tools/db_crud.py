@@ -2,6 +2,7 @@
 
 from copy import copy, deepcopy
 import inspect
+import types
 from typing import Optional, Dict, Union, Type, List, Any
 from datetime import date, datetime
 import sqlalchemy
@@ -148,7 +149,7 @@ class DatabaseCRUD:
     @staticmethod
     def _map_column_type(
         python_type: Union[type, str],
-    ) -> Union[Type[sqlalchemy.types.TypeEngine], Geometry]:
+    ) -> Union[Type[sqlalchemy.types.TypeEngine], sqlalchemy.types.ARRAY, Geometry]:
         """
         Returns sqlalchemy type equivalent to given python type or type string
 
@@ -157,14 +158,18 @@ class DatabaseCRUD:
         :return: equivalent sqlalchemy type
         """
 
-        # if python_type string set to uppercase
-        if isinstance(python_type, str):
-            python_type = python_type.upper()
-
         # if python_type shapely.geometry set to geom_type string
         if inspect.isclass(python_type):
             if issubclass(python_type, shapely.geometry.base.BaseGeometry):  # type: ignore
-                python_type = python_type().geom_type.upper()  # type: ignore
+                python_type = python_type().geom_type  # type: ignore
+
+        if isinstance(python_type, types.GenericAlias):
+            if isinstance(python_type(), list):  # type: ignore
+                python_type = str(python_type).replace("list", "array")
+
+        # if python_type string set to uppercase
+        if isinstance(python_type, str):
+            python_type = python_type.upper()
 
         # map python_type object to sqlalchemy/geoalchemy2 object
         if python_type == bool or python_type == "BOOL":
@@ -179,8 +184,24 @@ class DatabaseCRUD:
             return sqlalchemy.types.DateTime
         elif python_type == date or python_type == "DATE":
             return sqlalchemy.types.Date
-        if isinstance(python_type, str) and python_type in GEOM_STRINGS:
+        elif isinstance(python_type, str) and python_type in GEOM_STRINGS:
             return Geometry(python_type)
+        elif isinstance(python_type, str):
+            if python_type[:5] == "ARRAY":
+                array_dtype_str = python_type[6:-1]
+
+                if array_dtype_str == "":
+                    raise ValueError(
+                        "Must define dtype of array - e.g., array[int] - not: "
+                        + python_type
+                    )
+
+                array_dtype = DatabaseCRUD._map_column_type(array_dtype_str)
+                return sqlalchemy.types.ARRAY(array_dtype)
+
+            else:
+                raise ValueError("Unknown type: " + str(python_type))
+
         else:
             raise ValueError("Unknown type: " + str(python_type))
 
