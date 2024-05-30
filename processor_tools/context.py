@@ -1,7 +1,7 @@
 """processor.context - customer container from processing state"""
 
 
-from typing import Optional, Any, List, Union
+from typing import Optional, Dict, Any, List, Union
 from processor_tools import read_config
 
 
@@ -22,7 +22,7 @@ class Context:
     DEFAULT_CONFIG_PATH: Optional[str] = None
 
     def __init__(self, config: Optional[Union[str, List[str], dict]] = None) -> None:
-        self._config_values = {}
+        self._config_values: Dict[str, Any] = {}
 
         # open default config values
         if self.DEFAULT_CONFIG_PATH is not None:
