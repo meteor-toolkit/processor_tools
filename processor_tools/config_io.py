@@ -161,9 +161,9 @@ class YAMLReader(BaseConfigReader):
         return config_values
 
 
-class ConfigReaderFactory:
+class ConfigIOFactory:
     """
-    Class to return config file reader object suitable for given config file formats, supports:
+    Class to return config file reader/writer object suitable for given config file formats, supports:
 
     * default python (with file extensions `["config", "cfg", "conf"]`)
     * yaml file (with file extensions `["yml", "yaml"]`)
@@ -189,6 +189,16 @@ class ConfigReaderFactory:
 
         else:
             raise ValueError("Invalid file extension: " + ext)
+
+    def get_writer(self, path: str, config_dict: dict):
+        """
+        Config file path
+
+        :param path: config file path
+        :param config_dict: configuration values dictionary
+        """
+
+        pass
 
     @staticmethod
     def _get_file_extension(path: str) -> str:
@@ -216,7 +226,7 @@ def read_config(path: str) -> dict:
     """
 
     # get correct reader
-    factory = ConfigReaderFactory()
+    factory = ConfigIOFactory()
     reader = factory.get_reader(path)
 
     return reader.read(path)

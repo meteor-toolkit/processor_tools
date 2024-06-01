@@ -11,7 +11,7 @@ from processor_tools.config_io import (
     BaseConfigReader,
     ConfigReader,
     YAMLReader,
-    ConfigReaderFactory,
+    ConfigIOFactory,
     read_config,
 )
 
@@ -156,30 +156,30 @@ class TestYAMLReaderFactory(unittest.TestCase):
         shutil.rmtree(self.tmp_dir)
 
 
-class TestConfigReaderFactory(unittest.TestCase):
+class TestConfigIOFactory(unittest.TestCase):
     def test_get_reader_config(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.config")), type(ConfigReader())
         )
 
     def test_get_reader_yaml(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
         )
 
     def test_get_reader_invalid(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertRaises(ValueError, crf.get_reader, "test/file/path.invalid")
 
     def test_get_file_extension(self):
         path = "test/file/path.extension"
-        self.assertEqual(ConfigReaderFactory._get_file_extension(path), "extension")
+        self.assertEqual(ConfigIOFactory._get_file_extension(path), "extension")
 
 
 class ReadConfFactory(unittest.TestCase):
-    @patch("processor_tools.config_io.ConfigReaderFactory")
+    @patch("processor_tools.config_io.ConfigIOFactory")
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
         mock_reader.return_value.get_reader.assert_called_once_with("test.path")
