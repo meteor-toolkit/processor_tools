@@ -164,12 +164,6 @@ class YAMLReader(BaseConfigReader):
 class BaseConfigWriter(ABC):
     """
     Base class for config file writers.
-
-    Ensures Python types are correctly handled:
-
-    * `datetime.datetime` objects to ISO format strings
-    * `None` type objects to empty string, `""`.
-    * `shapely.geometry.Geometry` subclasses to WKT
     """
 
     @abstractmethod
@@ -184,11 +178,28 @@ class BaseConfigWriter(ABC):
         pass
 
 
+class YAMLWriter(BaseConfigWriter):
+    """
+    YAML file writer
+    """
+
+    def write(self, path: str, config_dict: dict):
+        """
+        Writes information to yaml file
+
+        :param path: path of yaml file
+        :param config_dict: configuration values dictionary
+        """
+
+        with open(path, 'w') as f:
+            yaml.dump(config_dict, f, default_flow_style=False)
+
+
 class ConfigIOFactory:
     """
     Class to return config file reader/writer object suitable for given config file formats, supports:
 
-    * default python (with file extensions `["config", "cfg", "conf"]`)
+    * default python (with file extensions `["config", "cfg", "conf"]`) - read only
     * yaml file (with file extensions `["yml", "yaml"]`)
 
     Can be extended to include more file formats in future
@@ -259,13 +270,7 @@ def write_config(path: str, config_dict: dict):
     """
     Write configuration file, supported file types:
 
-    * ...
-
-    Ensures Python types are correctly handled:
-
-    * `datetime.datetime` objects to ISO format strings
-    * `None` type objects to empty string, `""`.
-    * `shapely.geometry.Geometry` subclasses to WKT
+    * yaml
 
     :param path: configuration file path
     :param config_dict: configuration values dictionary

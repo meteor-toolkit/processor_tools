@@ -11,6 +11,7 @@ from processor_tools.config_io import (
     BaseConfigReader,
     ConfigReader,
     YAMLReader,
+    YAMLWriter,
     ConfigIOFactory,
     read_config,
     write_config
@@ -152,6 +153,31 @@ class TestYAMLReaderFactory(unittest.TestCase):
 
         self.assertEqual(type(config), dict)
         self.assertDictEqual(config, self.exp_config)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+
+class TestYAMLWriter(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        os.makedirs(self.tmp_dir)
+
+    def test_write(self):
+        yml_path = os.path.join(self.tmp_dir, "test.yaml")
+        config_dict = {"test": {"entry1": "value1", "entry2": False, "entry3": 1.2}}
+
+        writer = YAMLWriter()
+        writer.write(yml_path, config_dict)
+
+        self.assertTrue(os.path.exists(yml_path))
+
+        with open(yml_path, "r") as f:
+            yml_str = f.read()
+
+        exp_yml_str = "test:\n" "  entry1: value1\n" "  entry2: false\n" "  entry3: 1.2\n"
+
+        self.assertEqual(yml_str, exp_yml_str)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
