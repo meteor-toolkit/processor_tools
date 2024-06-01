@@ -5,7 +5,7 @@ __all__ = ["BaseProcessor", "ProcessorFactory", "NullProcessor", "read_config"]
 
 from ._version import get_versions
 from processor_tools.processor import BaseProcessor, ProcessorFactory, NullProcessor
-from processor_tools.config_io import read_config
+from processor_tools.config_io import read_config, write_config
 
 __version__ = get_versions()["version"]
 del get_versions

@@ -9,7 +9,7 @@ import configparser
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["read_config"]
+__all__ = ["read_config", "write_config"]
 
 
 class BaseConfigReader(ABC):
@@ -190,12 +190,12 @@ class ConfigIOFactory:
         else:
             raise ValueError("Invalid file extension: " + ext)
 
-    def get_writer(self, path: str, config_dict: dict):
+    def get_writer(self, path: str):
         """
         Config file path
 
         :param path: config file path
-        :param config_dict: configuration values dictionary
+        :return: config writer
         """
 
         pass
@@ -219,7 +219,7 @@ def read_config(path: str) -> dict:
     * default python
     * yaml
 
-    Ensures strings, floats and booleans are returns in the correct Python types.
+    Ensures strings, floats and booleans are returned in the correct Python types.
 
     :param path: configuration file path
     :return: configuration values dictionary
@@ -230,6 +230,29 @@ def read_config(path: str) -> dict:
     reader = factory.get_reader(path)
 
     return reader.read(path)
+
+
+def write_config(path: str, config_dict: dict):
+    """
+    Write configuration file, supported file types:
+
+    * ...
+
+    Ensures Python types are correctly handled:
+
+    * `datetime.datetime` objects to ISO format strings
+    * `None` type objects to empty string, `""`.
+    * `shapely.geometry.Geometry` subclasses to WKT
+
+    :param path: configuration file path
+    :param config_dict: configuration values dictionary
+    """
+
+    # get correct reader
+    factory = ConfigIOFactory()
+    writer = factory.get_writer(path)
+
+    return writer.write(path, config_dict)
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ from processor_tools.config_io import (
     YAMLReader,
     ConfigIOFactory,
     read_config,
+    write_config
 )
 
 
@@ -189,6 +190,20 @@ class ReadConfFactory(unittest.TestCase):
 
         self.assertEqual(
             cfg, mock_reader.return_value.get_reader.return_value.read.return_value
+        )
+
+
+class WriteConfFactory(unittest.TestCase):
+    @patch("processor_tools.config_io.ConfigIOFactory")
+    def test_write_config(self, mock_reader):
+        cfg = write_config("test.path", "dict")
+        mock_reader.return_value.get_writer.assert_called_once_with("test.path")
+        mock_reader.return_value.get_writer.return_value.write.assert_called_once_with(
+            "test.path", "dict"
+        )
+
+        self.assertEqual(
+            cfg, mock_reader.return_value.get_writer.return_value.write.return_value
         )
 
 
