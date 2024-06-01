@@ -161,6 +161,29 @@ class YAMLReader(BaseConfigReader):
         return config_values
 
 
+class BaseConfigWriter(ABC):
+    """
+    Base class for config file writers.
+
+    Ensures Python types are correctly handled:
+
+    * `datetime.datetime` objects to ISO format strings
+    * `None` type objects to empty string, `""`.
+    * `shapely.geometry.Geometry` subclasses to WKT
+    """
+
+    @abstractmethod
+    def write(self, path: str, config_dict: dict):
+        """
+        Writes information to configuration file
+
+        :param path: path of configuration file
+        :param config_dict: configuration values dictionary
+        """
+
+        pass
+
+
 class ConfigIOFactory:
     """
     Class to return config file reader/writer object suitable for given config file formats, supports:
@@ -190,7 +213,7 @@ class ConfigIOFactory:
         else:
             raise ValueError("Invalid file extension: " + ext)
 
-    def get_writer(self, path: str):
+    def get_writer(self, path: str) -> BaseConfigWriter:
         """
         Config file path
 
