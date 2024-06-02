@@ -14,6 +14,9 @@ __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 __all__ = []
 
 
+"""___Helper Functions___"""
+
+
 def create_test_package(path: str, package_name: str, setup_str: Optional[str]):
     """
     Creates test python package
@@ -75,37 +78,178 @@ def uninstall_package(package_name: str):
     subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", package_name])
 
 
-class TestSetupUserConfig(unittest.TestCase):
+"""___Test Classes___"""
 
-    def setUp(self):
-        self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
-        os.makedirs(self.tmp_dir)
 
-        self.package_name = "test"
+class TestCustomCmdClassUtils(unittest.TestCase):
 
-        setup_str = ("from processor_tools.setup_utils import SetupUserConfigDevelop, SetupUserConfigInstall"
+    def test_build_setup_cmdclass_preinstall_postinstall(self):
+
+        # this is the key test that proves custom command classes are working, everything else mocks this use
+        # of this function
+
+        tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        os.makedirs(tmp_dir)
+
+        package_name = "test"
+
+        # define a setup.py that builds a custom cmdclass with:
+        # * a preinstall function the writes a file "file1.txt" with content "hello"
+        # * a postinstall function the writes a file "file2.txt" with content "goodbye"
+
+        file1_path = os.path.join(os.path.abspath(tmp_dir), "file1.txt")
+        file1_content = "hello"
+        file2_path = os.path.join(os.path.abspath(tmp_dir), "file2.txt")
+        file2_content = "goodbye"
+
+        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
+                     "\nfrom setuptools.command.install import install"
                      "\nfrom setuptools import setup"
-                     "\n\nsetup("
-                     "\n\tname='" + self.package_name + "',"
+                     "\n\n\ndef test_func(path, content):"
+                     "\n\twith open(path, 'w+') as f:"
+                     "\n\t\tf.write(content)"
+                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
+                     "\n\n\nsetup("
+                     "\n\tname='" + package_name + "',"
                      "\n\tcmdclass={"
-                     "\n\t\t'develop': SetupUserConfigDevelop,"
-                     "\n\t\t'install': SetupUserConfigInstall,"
+                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t\tinstall,"                      
+                     "\n\t\t\tpreinstall=test_func,"
+                     "\n\t\t\tpre_args=['" + file1_path + "'],"
+                     "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
+                     "\n\t\t\tpostinstall=test_func,"
+                     "\n\t\t\tpost_args=['" + file2_path + "'],"
+                     "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
+                     "\n\t\t)"                                     
                      "\n\t},"
                      "\n\tversion='1.0',"
                      "\n\tauthors=''"
                      "\n)\n")
 
-        create_test_package(self.tmp_dir, self.package_name, setup_str=setup_str)
+        create_test_package(tmp_dir, package_name, setup_str=setup_str)
 
-    def tearDown(self):
-        shutil.rmtree(self.tmp_dir)
+        install_package(tmp_dir)
 
-    def test_run(self):
-        install_package(self.tmp_dir)
+        # test file1 created correctly preinstall
+        self.assertTrue(os.path.exists(file1_path))
+        with open(file1_path, "r") as f:
+            file1_line = f.read()
+        self.assertEqual(file1_content, file1_line)
 
-        # test if config directories setup properly
+        # test file2 created correctly postinstall
+        self.assertTrue(os.path.exists(file2_path))
+        with open(file2_path, "r") as f:
+            file2_line = f.read()
+        self.assertEqual(file2_content, file2_line)
 
-        uninstall_package(self.package_name)
+        uninstall_package(package_name)
+
+        # to see what package is created and installed comment this line, so it is not removed after test is run
+        shutil.rmtree(tmp_dir)
+
+    def test_build_setup_cmdclass_preinstall_only(self):
+
+        # this is the key test that proves custom command classes are working, everything else mocks this use
+        # of this function
+
+        tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        os.makedirs(tmp_dir)
+
+        package_name = "test"
+
+        # define a setup.py that builds a custom cmdclass with:
+        # * a preinstall function the writes a file "file1.txt" with content "hello"
+
+        file1_path = os.path.join(os.path.abspath(tmp_dir), "file1.txt")
+        file1_content = "hello"
+
+        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
+                     "\nfrom setuptools.command.install import install"
+                     "\nfrom setuptools import setup"
+                     "\n\n\ndef test_func(path, content):"
+                     "\n\twith open(path, 'w+') as f:"
+                     "\n\t\tf.write(content)"
+                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
+                     "\n\n\nsetup("
+                     "\n\tname='" + package_name + "',"
+                     "\n\tcmdclass={"
+                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t\tinstall,"                      
+                     "\n\t\t\tpreinstall=test_func,"
+                     "\n\t\t\tpre_args=['" + file1_path + "'],"
+                     "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
+                     "\n\t\t)"                                     
+                     "\n\t},"
+                     "\n\tversion='1.0',"
+                     "\n\tauthors=''"
+                     "\n)\n")
+
+        create_test_package(tmp_dir, package_name, setup_str=setup_str)
+
+        install_package(tmp_dir)
+
+        # test file1 created correctly preinstall
+        self.assertTrue(os.path.exists(file1_path))
+        with open(file1_path, "r") as f:
+            file1_line = f.read()
+        self.assertEqual(file1_content, file1_line)
+
+        uninstall_package(package_name)
+
+        # to see what package is created and installed comment this line, so it is not removed after test is run
+        shutil.rmtree(tmp_dir)
+
+    def test_build_setup_cmdclass_postinstall_only(self):
+
+        # this is the key test that proves custom command classes are working, everything else mocks this use
+        # of this function
+
+        tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        os.makedirs(tmp_dir)
+
+        package_name = "test"
+
+        # define a setup.py that builds a custom cmdclass with:
+        # * a postinstall function the writes a file "file2.txt" with content "goodbye"
+
+        file2_path = os.path.join(os.path.abspath(tmp_dir), "file2.txt")
+        file2_content = "goodbye"
+
+        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
+                     "\nfrom setuptools.command.install import install"
+                     "\nfrom setuptools import setup"
+                     "\n\n\ndef test_func(path, content):"
+                     "\n\twith open(path, 'w+') as f:"
+                     "\n\t\tf.write(content)"
+                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
+                     "\n\n\nsetup("
+                     "\n\tname='" + package_name + "',"
+                     "\n\tcmdclass={"
+                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t\tinstall,"                      
+                     "\n\t\t\tpostinstall=test_func,"
+                     "\n\t\t\tpost_args=['" + file2_path + "'],"
+                     "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
+                     "\n\t\t)"                                     
+                     "\n\t},"
+                     "\n\tversion='1.0',"
+                     "\n\tauthors=''"
+                     "\n)\n")
+
+        create_test_package(tmp_dir, package_name, setup_str=setup_str)
+
+        install_package(tmp_dir)
+
+        # test file2 created correctly postinstall
+        self.assertTrue(os.path.exists(file2_path))
+        with open(file2_path, "r") as f:
+            file2_line = f.read()
+        self.assertEqual(file2_content, file2_line)
+
+        uninstall_package(package_name)
+
+        # to see what package is created and installed comment this line, so it is not removed after test is run
+        shutil.rmtree(tmp_dir)
 
 
 if __name__ == "__main__":
