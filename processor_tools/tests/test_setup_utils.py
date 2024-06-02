@@ -83,7 +83,7 @@ def uninstall_package(package_name: str):
 
 class TestCustomCmdClassUtils(unittest.TestCase):
 
-    def test_build_setup_cmdclass_preinstall_postinstall(self):
+    def test__build_setuptools_cmd_preinstall_postinstall(self):
 
         # this is the key test that proves custom command classes are working, everything else mocks this use
         # of this function
@@ -112,7 +112,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
                      "\n\n\nsetup("
                      "\n\tname='" + package_name + "',"
                      "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
                      "\n\t\t\tinstall,"                      
                      "\n\t\t\tpreinstall=test_func,"
                      "\n\t\t\tpre_args=['" + file1_path + "'],"
@@ -147,7 +147,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         # to see what package is created and installed comment this line, so it is not removed after test is run
         shutil.rmtree(tmp_dir)
 
-    def test_build_setup_cmdclass_preinstall_only(self):
+    def test__build_setuptools_cmd_preinstall_only(self):
 
         # this is the key test that proves custom command classes are working, everything else mocks this use
         # of this function
@@ -173,7 +173,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
                      "\n\n\nsetup("
                      "\n\tname='" + package_name + "',"
                      "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
                      "\n\t\t\tinstall,"                      
                      "\n\t\t\tpreinstall=test_func,"
                      "\n\t\t\tpre_args=['" + file1_path + "'],"
@@ -199,7 +199,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         # to see what package is created and installed comment this line, so it is not removed after test is run
         shutil.rmtree(tmp_dir)
 
-    def test_build_setup_cmdclass_postinstall_only(self):
+    def test__build_setuptools_cmd_postinstall_only(self):
 
         # this is the key test that proves custom command classes are working, everything else mocks this use
         # of this function
@@ -225,7 +225,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
                      "\n\n\nsetup("
                      "\n\tname='" + package_name + "',"
                      "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils.build_setup_cmdclass("
+                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
                      "\n\t\t\tinstall,"                      
                      "\n\t\t\tpostinstall=test_func,"
                      "\n\t\t\tpost_args=['" + file2_path + "'],"

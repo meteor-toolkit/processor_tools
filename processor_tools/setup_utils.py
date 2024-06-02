@@ -14,7 +14,7 @@ class CustomCmdClassUtils:
     Class for creating custom install cmd classes for setup, such that they can run defined functions before or after package installation
     """
 
-    def build_setup_cmdclass(
+    def _build_setuptools_cmd(
             self,
             cmd: Union[Type[install], Type[develop]],
             preinstall: Optional[Callable] = None,
