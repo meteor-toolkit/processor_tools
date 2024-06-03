@@ -1,6 +1,7 @@
 """processor_tools.tests.test_setup_utils - tests for processor_tools.setup_utils module"""
 
 import unittest
+from unittest.mock import patch
 from typing import Optional
 import os
 import random
@@ -8,6 +9,9 @@ import string
 import subprocess
 import sys
 import shutil
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+from processor_tools.setup_utils import CustomCmdClassUtils
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -250,6 +254,37 @@ class TestCustomCmdClassUtils(unittest.TestCase):
 
         # to see what package is created and installed comment this line, so it is not removed after test is run
         shutil.rmtree(tmp_dir)
+
+    @patch("processor_tools.setup_utils.CustomCmdClassUtils._build_setuptools_cmd", side_effect=["install", "develop"])
+    def test_build_cmdclass(self, mock_build):
+        cmd_util = CustomCmdClassUtils()
+
+        cmdclass = cmd_util.build_cmdclass(
+            preinstall="pre_func",
+            pre_args="pre_args",
+            pre_kwargs="pre_kwargs",
+            postinstall="post_func",
+            post_args="post_args",
+            post_kwargs="post_kwargs",
+        )
+
+        self.assertCountEqual(cmdclass.keys(), ["install", "develop"])
+        self.assertEqual(cmdclass["install"], "install")
+        self.assertEqual(cmdclass["develop"], "develop")
+
+        for call, setuptools_cmd in zip(mock_build.mock_calls, [install, develop]):
+            self.assertDictEqual(
+                call.kwargs,
+                {
+                    "cmd": setuptools_cmd,
+                    "preinstall": "pre_func",
+                    "pre_args": "pre_args",
+                    "pre_kwargs": "pre_kwargs",
+                    "postinstall": "post_func",
+                    "post_args": "post_args",
+                    "post_kwargs": "post_kwargs"
+                }
+            )
 
 
 if __name__ == "__main__":

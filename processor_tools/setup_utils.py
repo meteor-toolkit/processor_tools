@@ -13,6 +13,50 @@ class CustomCmdClassUtils:
     """
     Class for creating custom install cmd classes for setup, such that they can run defined functions before or after package installation
     """
+    
+    def build_cmdclass(
+        self,
+        preinstall: Optional[Callable] = None,
+        postinstall: Optional[Callable] = None,
+        pre_args: Optional[List[Any]] = None,
+        pre_kwargs: Optional[Dict[str, Any]] = None,
+        post_args: Optional[List[Any]] = None,
+        post_kwargs: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Type[Union[install, develop]]]:
+        """
+        Function to build the cmdclass argument for `setuptools.setup` so that a custom function is ran before or after package installation
+
+        :param preinstall: function to run before package installation
+        :param postinstall: function to run after package installation
+        :param pre_args: arguments for pre-installation function
+        :param pre_kwargs: keyword arguments for pre-installation function
+        :param post_args: arguments for post-installation function
+        :param post_kwargs: keyword arguments for post-installation function
+        :return: cmdclass argument for `setuptools.setup` - dictionary of custom setuptools commands as `{"install": custom_install, "develop": custom_develop}`
+        """
+
+        cmdclass_dict = {
+            "install": self._build_setuptools_cmd(
+                cmd=install,
+                preinstall=preinstall,
+                postinstall=postinstall,
+                pre_args=pre_args,
+                pre_kwargs=pre_kwargs,
+                post_args=post_args,
+                post_kwargs=post_kwargs
+            ),
+            "develop": self._build_setuptools_cmd(
+                cmd=develop,
+                preinstall=preinstall,
+                postinstall=postinstall,
+                pre_args=pre_args,
+                pre_kwargs=pre_kwargs,
+                post_args=post_args,
+                post_kwargs=post_kwargs
+            )
+        }
+
+        return cmdclass_dict
 
     def _build_setuptools_cmd(
             self,
