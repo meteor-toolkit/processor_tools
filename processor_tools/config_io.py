@@ -207,7 +207,7 @@ class ConfigIOFactory:
 
     def get_reader(self, path: str) -> BaseConfigReader:
         """
-        Config file path
+        Return config reader for file with given file extension
 
         :param path: config file path
         :return: config reader
@@ -226,13 +226,19 @@ class ConfigIOFactory:
 
     def get_writer(self, path: str) -> BaseConfigWriter:
         """
-        Config file path
+        Return config writer for file with given file extension
 
         :param path: config file path
         :return: config writer
         """
 
-        pass
+        ext = self._get_file_extension(path)
+
+        if ext in ["yml", "yaml"]:
+            return YAMLWriter()
+
+        else:
+            raise ValueError("Invalid file extension: " + ext)
 
     @staticmethod
     def _get_file_extension(path: str) -> str:

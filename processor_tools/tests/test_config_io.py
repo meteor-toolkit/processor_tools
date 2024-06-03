@@ -196,6 +196,12 @@ class TestConfigIOFactory(unittest.TestCase):
             type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
         )
 
+    def test_get_writer_yaml(self):
+        crf = ConfigIOFactory()
+        self.assertEqual(
+            type(crf.get_writer("test/file/path.yaml")), type(YAMLWriter())
+        )
+
     def test_get_reader_invalid(self):
         crf = ConfigIOFactory()
         self.assertRaises(ValueError, crf.get_reader, "test/file/path.invalid")
