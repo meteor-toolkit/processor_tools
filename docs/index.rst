@@ -51,7 +51,6 @@ Project status
    :caption: For users
 
    User Guide <content/user/user_guide>
-   ATBD <content/user/atbd>
    API Reference <content/user/api>
 
 .. toctree::
