@@ -1,7 +1,7 @@
 """processor_tools.tests.test_setup_utils - tests for processor_tools.setup_utils module"""
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 from typing import Optional
 import os
 import random
@@ -11,7 +11,8 @@ import sys
 import shutil
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from processor_tools.setup_utils import CustomCmdClassUtils
+from processor_tools.config_io import build_configdir
+from processor_tools.setup_utils import CustomCmdClassUtils, build_configdir_cmdclass
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -298,6 +299,92 @@ class TestCustomCmdClassUtils(unittest.TestCase):
                     "post_kwargs": "post_kwargs",
                 },
             )
+
+
+class TestBuildConfigDirCmdClass(unittest.TestCase):
+
+    @patch("processor_tools.config_io.os.path.expanduser", return_value="test")
+    @patch(
+        "processor_tools.setup_utils.CustomCmdClassUtils._build_setuptools_cmd",
+        side_effect=[
+            CustomCmdClassUtils._build_setuptools_cmd(install),
+            CustomCmdClassUtils._build_setuptools_cmd(develop),
+        ],
+    )
+    def test_build_configdir_cmdclass(self, mock_build, mock_expand):
+
+        package_name = "test_package"
+        configs = {"copied_config.yaml": "path/to/old_config.yaml"}
+        configdir_cmdclass = build_configdir_cmdclass(package_name, configs)
+
+        exp_mock_build_calls = [
+            call(
+                cmd=install,
+                preinstall=None,
+                postinstall=build_configdir,
+                pre_args=None,
+                pre_kwargs=None,
+                post_args=[os.path.join("test", "." + package_name), configs],
+                post_kwargs={"exists_skip": True},
+            ),
+            call(
+                cmd=develop,
+                preinstall=None,
+                postinstall=build_configdir,
+                pre_args=None,
+                pre_kwargs=None,
+                post_args=[os.path.join("test", "." + package_name), configs],
+                post_kwargs={"exists_skip": True},
+            ),
+        ]
+
+        mock_build.assert_has_calls(exp_mock_build_calls)
+
+        self.assertIsInstance(configdir_cmdclass["develop"].postinstall_args, property)
+
+    def test__build_configdir_cmdclass_install(self):
+
+        random_string = random.choices(string.ascii_lowercase, k=6)
+        tmp_dir = "tmp_" + "".join(random_string)
+        os.makedirs(tmp_dir)
+
+        package_name = "test_package"
+
+        package_dir = os.path.join(tmp_dir, package_name)
+        os.makedirs(package_dir)
+
+        config_dir = os.path.abspath(os.path.join(tmp_dir, "config"))
+
+        # define a setup.py that builds a custom cmdclass with:
+        # * a postinstall function the writes a file "file2.txt" with content "goodbye"
+
+        setup_str = (
+            "from processor_tools.setup_utils import build_configdir_cmdclass"
+            "\nfrom setuptools import setup"
+            "\n\n\ncmdclass = build_configdir_cmdclass('" + package_name + "', {'file1.yaml': {'entry1': 'value1'}})"
+            "\ncmdclass['install'].postinstall_args[0]= '" + config_dir + "'"                                                          
+            "\n\n\nsetup("
+            "\n\tname='" + package_name + "',"
+            "\n\tcmdclass=cmdclass,"
+            "\n\tversion='1.0',"
+            "\n\tauthors=''"
+            "\n)\n"
+        )
+
+        create_test_package(package_dir, package_name, setup_str=setup_str)
+
+        install_package(package_dir)
+
+        # # test file2 created correctly postinstall
+        # self.assertTrue(os.path.exists(file2_path))
+        # with open(file2_path, "r") as f:
+        #     file2_line = f.read()
+        # self.assertEqual(file2_content, file2_line)
+
+        uninstall_package(package_name)
+
+        # to see what package is created and installed comment this line, so it is not removed after test is run
+        # shutil.rmtree(tmp_dir)
 
 
 if __name__ == "__main__":
