@@ -259,6 +259,23 @@ class TestBuildConfigDir(unittest.TestCase):
             os.path.join("test", "new_config.yaml"), {"entry1": "value1"}
         )
 
+    @patch("processor_tools.config_io.write_config")
+    @patch("processor_tools.config_io.shutil.copyfile")
+    @patch("processor_tools.config_io.os.makedirs")
+    @patch("processor_tools.config_io.os.path.isdir", return_value=True)
+    def test_build_configdir_exists_skip(self, mock_exists, mock_mdir, mock_copy, mock_write):
+
+        configs = {
+            "copied_config.yaml": "path/to/old_config.yaml",
+            "new_config.yaml": {"entry1": "value1"},
+        }
+
+        build_configdir("test", configs, exists_skip=True)
+
+        mock_mdir.assert_not_called()
+        mock_copy.assert_not_called()
+        mock_write.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

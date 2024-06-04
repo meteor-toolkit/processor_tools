@@ -290,12 +290,15 @@ def write_config(path: str, config_dict: dict):
     return writer.write(path, config_dict)
 
 
-def build_configdir(path, configs: Dict[str, Union[str, dict]]):
+def build_configdir(
+    path, configs: Dict[str, Union[str, dict]], exists_skip: bool = False
+):
     """
     Writes set of configuration files to defined directory
 
     :param path: configuration directory path (created if doesn't exist)
     :param configs: definition of configuration files as a dictionary, with an entry per configuration file to write - where the key should be the filename to write and the value should define the file content, either as:
+    :param exists_skip: (default: False) option to bypass processing if path directory already exists
 
     * path of config file to copy to configuration directory
     * configuration values dictionary
@@ -309,6 +312,10 @@ def build_configdir(path, configs: Dict[str, Union[str, dict]]):
            "new_config.yaml": {"entry1": "value1"}
        }
     """
+
+    # skip process if config directory exists and chosen to exists_skip
+    if os.path.isdir(path) and exists_skip:
+        return
 
     os.makedirs(path, exist_ok=True)
 
