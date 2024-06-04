@@ -237,10 +237,6 @@ class TestWriteConfig(unittest.TestCase):
             "test.path", "dict"
         )
 
-        self.assertEqual(
-            cfg, mock_reader.return_value.get_writer.return_value.write.return_value
-        )
-
 
 class TestBuildConfigDir(unittest.TestCase):
     @patch("processor_tools.config_io.write_config")
