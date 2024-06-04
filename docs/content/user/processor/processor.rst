@@ -8,3 +8,4 @@ Processor
    :maxdepth: 2
 
    processor_build
+   context

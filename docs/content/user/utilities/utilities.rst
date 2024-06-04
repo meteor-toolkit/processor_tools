@@ -7,4 +7,5 @@ This section describes the additional utilities **processor_tools** offers to pr
 .. toctree::
    :maxdepth: 2
 
+   config_io
    setup_utils
