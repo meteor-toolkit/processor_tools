@@ -20,3 +20,12 @@ Processor
    :nosignatures:
 
    processor
+
+Setup Utilities
+===============
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   setup_utils
