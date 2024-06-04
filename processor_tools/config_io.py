@@ -1,6 +1,7 @@
 """processor_tools.config_io - reading/writing config files"""
 
 import os
+import shutil
 import yaml
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -9,7 +10,7 @@ import configparser
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["read_config", "write_config"]
+__all__ = ["read_config", "write_config", "build_configdir"]
 
 
 class BaseConfigReader(ABC):
@@ -287,6 +288,38 @@ def write_config(path: str, config_dict: dict):
     writer = factory.get_writer(path)
 
     return writer.write(path, config_dict)
+
+
+def build_configdir(path, configs: Dict[str, Union[str, dict]]):
+    """
+    Writes set of configuration files to defined directory
+
+    :param path: configuration directory path (created if doesn't exist)
+    :param configs: definition of configuration files as a dictionary, with an entry per configuration file to write - where the key should be the filename to write and the value should define the file content, either as:
+
+    * path of config file to copy to configuration directory
+    * configuration values dictionary
+
+    For example:
+
+    .. code-block:: python
+
+       configs = {
+           "copied_config.yaml": "path/to/old_config.yaml",
+           "new_config.yaml": {"entry1": "value1"}
+       }
+    """
+
+    os.makedirs(path, exist_ok=True)
+
+    for filename, config_def in configs.items():
+        filepath = os.path.join(path, filename)
+
+        if isinstance(config_def, str):
+            shutil.copyfile(config_def, filepath)
+
+        elif isinstance(config_def, dict):
+            write_config(filepath, config_def)
 
 
 if __name__ == "__main__":

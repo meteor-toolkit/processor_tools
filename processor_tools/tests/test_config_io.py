@@ -15,6 +15,7 @@ from processor_tools.config_io import (
     ConfigIOFactory,
     read_config,
     write_config,
+    build_configdir,
 )
 
 
@@ -213,7 +214,7 @@ class TestConfigIOFactory(unittest.TestCase):
         self.assertEqual(ConfigIOFactory._get_file_extension(path), "extension")
 
 
-class ReadConfFactory(unittest.TestCase):
+class TestReadConfig(unittest.TestCase):
     @patch("processor_tools.config_io.ConfigIOFactory")
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
@@ -227,10 +228,10 @@ class ReadConfFactory(unittest.TestCase):
         )
 
 
-class WriteConfFactory(unittest.TestCase):
+class TestWriteConfig(unittest.TestCase):
     @patch("processor_tools.config_io.ConfigIOFactory")
     def test_write_config(self, mock_reader):
-        cfg = write_config("test.path", "dict")
+        write_config("test.path", "dict")
         mock_reader.return_value.get_writer.assert_called_once_with("test.path")
         mock_reader.return_value.get_writer.return_value.write.assert_called_once_with(
             "test.path", "dict"
@@ -238,6 +239,28 @@ class WriteConfFactory(unittest.TestCase):
 
         self.assertEqual(
             cfg, mock_reader.return_value.get_writer.return_value.write.return_value
+        )
+
+
+class TestBuildConfigDir(unittest.TestCase):
+    @patch("processor_tools.config_io.write_config")
+    @patch("processor_tools.config_io.shutil.copyfile")
+    @patch("processor_tools.config_io.os.makedirs")
+    def test_build_configdir(self, mock_mdir, mock_copy, mock_write):
+
+        configs = {
+            "copied_config.yaml": "path/to/old_config.yaml",
+            "new_config.yaml": {"entry1": "value1"},
+        }
+
+        build_configdir("test", configs)
+
+        mock_mdir.assert_called_once_with("test", exist_ok=True)
+        mock_copy.assert_called_once_with(
+            "path/to/old_config.yaml", os.path.join("test", "copied_config.yaml")
+        )
+        mock_write.assert_called_once_with(
+            os.path.join("test", "new_config.yaml"), {"entry1": "value1"}
         )
 
 
