@@ -16,7 +16,7 @@ class Context:
     :param config: processing configuration data, either:
 
     * dictionary of configuration data
-    * path of configuration file, or list of paths (earlier in the list overwrites later in the list
+    * path of configuration file, or list of paths (earlier in the list overwrites later in the list)
     """
 
     DEFAULT_CONFIG_PATH: Optional[str] = None
