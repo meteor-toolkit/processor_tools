@@ -82,7 +82,7 @@ class CustomCmdClassUtils:
         """
 
         # Define custom setuptools command
-        class CustomCmdClass(cmd):
+        class CustomCmdClass(cmd):    # type: ignore
 
             # setup class variables to store args and kwargs
             preinstall_args: Optional[List[Any]] = pre_args
