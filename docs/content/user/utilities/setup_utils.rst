@@ -45,7 +45,7 @@ This can be built into a `cmdclass` for `setup() <https://setuptools.pypa.io/en/
        post_args="goodbye"           # post-install function args
    )
 
-Provide your `custom_cmdclass` to the `setup() <https://setuptools.pypa.io/en/latest/references/keywords.html>` function in your package's `setup.py` so that your custom code is run during installation.
+Provide your `custom_cmdclass` to the `setup() <https://setuptools.pypa.io/en/latest/references/keywords.html>`_ function in your package's `setup.py` so that your custom code is run during installation.
 
 .. code-block::
 
