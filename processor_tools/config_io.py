@@ -191,7 +191,7 @@ class YAMLWriter(BaseConfigWriter):
         :param config_dict: configuration values dictionary
         """
 
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             yaml.dump(config_dict, f, default_flow_style=False)
 
 

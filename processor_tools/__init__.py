@@ -1,7 +1,15 @@
 """processor_tools - Tools to support the developing of processing pipelines"""
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["BaseProcessor", "ProcessorFactory", "NullProcessor", "read_config", "write_config", "Context", "CustomCmdClassUtils"]
+__all__ = [
+    "BaseProcessor",
+    "ProcessorFactory",
+    "NullProcessor",
+    "read_config",
+    "write_config",
+    "Context",
+    "CustomCmdClassUtils",
+]
 
 from ._version import get_versions
 from processor_tools.processor import BaseProcessor, ProcessorFactory, NullProcessor

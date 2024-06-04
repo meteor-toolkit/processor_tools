@@ -30,20 +30,22 @@ def create_test_package(path: str, package_name: str, setup_str: Optional[str]):
     :param setup_str: content of setup.py file
     """
 
-    module_path = os.path.join(path, package_name)   # directory of test package
+    module_path = os.path.join(path, package_name)  # directory of test package
     module_init_path = os.path.join(module_path, "__init__.py")
     setup_path = os.path.join(path, "setup.py")
 
     os.makedirs(module_path)
 
     if setup_str is None:
-        setup_str = (""
-                     "\nfrom setuptools import setup"
-                     "\nsetup("
-                     "\n\tname='"+package_name+"',"
-                     "\n\tversion='1.0',"
-                     "\n\tauthors=''"
-                     "\n)")
+        setup_str = (
+            ""
+            "\nfrom setuptools import setup"
+            "\nsetup("
+            "\n\tname='" + package_name + "',"
+            "\n\tversion='1.0',"
+            "\n\tauthors=''"
+            "\n)"
+        )
 
     with open(setup_path, "w") as f:
         f.write(setup_str)
@@ -79,7 +81,9 @@ def uninstall_package(package_name: str):
     :param package_name: name of package to uninstall
     """
 
-    subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", package_name])
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "uninstall", "-y", package_name]
+    )
 
 
 """___Test Classes___"""
@@ -106,29 +110,31 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         file2_path = os.path.join(os.path.abspath(tmp_dir), "file2.txt")
         file2_content = "goodbye"
 
-        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
-                     "\nfrom setuptools.command.install import install"
-                     "\nfrom setuptools import setup"
-                     "\n\n\ndef test_func(path, content):"
-                     "\n\twith open(path, 'w+') as f:"
-                     "\n\t\tf.write(content)"
-                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
-                     "\n\n\nsetup("
-                     "\n\tname='" + package_name + "',"
-                     "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
-                     "\n\t\t\tinstall,"                      
-                     "\n\t\t\tpreinstall=test_func,"
-                     "\n\t\t\tpre_args=['" + file1_path + "'],"
-                     "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
-                     "\n\t\t\tpostinstall=test_func,"
-                     "\n\t\t\tpost_args=['" + file2_path + "'],"
-                     "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
-                     "\n\t\t)"                                     
-                     "\n\t},"
-                     "\n\tversion='1.0',"
-                     "\n\tauthors=''"
-                     "\n)\n")
+        setup_str = (
+            "from processor_tools.setup_utils import CustomCmdClassUtils"
+            "\nfrom setuptools.command.install import install"
+            "\nfrom setuptools import setup"
+            "\n\n\ndef test_func(path, content):"
+            "\n\twith open(path, 'w+') as f:"
+            "\n\t\tf.write(content)"
+            "\n\n\ncmd_utils = CustomCmdClassUtils()"
+            "\n\n\nsetup("
+            "\n\tname='" + package_name + "',"
+            "\n\tcmdclass={"
+            "\n\t\t'install': cmd_utils._build_setuptools_cmd("
+            "\n\t\t\tinstall,"
+            "\n\t\t\tpreinstall=test_func,"
+            "\n\t\t\tpre_args=['" + file1_path + "'],"
+            "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
+            "\n\t\t\tpostinstall=test_func,"
+            "\n\t\t\tpost_args=['" + file2_path + "'],"
+            "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
+            "\n\t\t)"
+            "\n\t},"
+            "\n\tversion='1.0',"
+            "\n\tauthors=''"
+            "\n)\n"
+        )
 
         create_test_package(tmp_dir, package_name, setup_str=setup_str)
 
@@ -167,26 +173,28 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         file1_path = os.path.join(os.path.abspath(tmp_dir), "file1.txt")
         file1_content = "hello"
 
-        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
-                     "\nfrom setuptools.command.install import install"
-                     "\nfrom setuptools import setup"
-                     "\n\n\ndef test_func(path, content):"
-                     "\n\twith open(path, 'w+') as f:"
-                     "\n\t\tf.write(content)"
-                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
-                     "\n\n\nsetup("
-                     "\n\tname='" + package_name + "',"
-                     "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
-                     "\n\t\t\tinstall,"                      
-                     "\n\t\t\tpreinstall=test_func,"
-                     "\n\t\t\tpre_args=['" + file1_path + "'],"
-                     "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
-                     "\n\t\t)"                                     
-                     "\n\t},"
-                     "\n\tversion='1.0',"
-                     "\n\tauthors=''"
-                     "\n)\n")
+        setup_str = (
+            "from processor_tools.setup_utils import CustomCmdClassUtils"
+            "\nfrom setuptools.command.install import install"
+            "\nfrom setuptools import setup"
+            "\n\n\ndef test_func(path, content):"
+            "\n\twith open(path, 'w+') as f:"
+            "\n\t\tf.write(content)"
+            "\n\n\ncmd_utils = CustomCmdClassUtils()"
+            "\n\n\nsetup("
+            "\n\tname='" + package_name + "',"
+            "\n\tcmdclass={"
+            "\n\t\t'install': cmd_utils._build_setuptools_cmd("
+            "\n\t\t\tinstall,"
+            "\n\t\t\tpreinstall=test_func,"
+            "\n\t\t\tpre_args=['" + file1_path + "'],"
+            "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
+            "\n\t\t)"
+            "\n\t},"
+            "\n\tversion='1.0',"
+            "\n\tauthors=''"
+            "\n)\n"
+        )
 
         create_test_package(tmp_dir, package_name, setup_str=setup_str)
 
@@ -219,26 +227,28 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         file2_path = os.path.join(os.path.abspath(tmp_dir), "file2.txt")
         file2_content = "goodbye"
 
-        setup_str = ("from processor_tools.setup_utils import CustomCmdClassUtils"
-                     "\nfrom setuptools.command.install import install"
-                     "\nfrom setuptools import setup"
-                     "\n\n\ndef test_func(path, content):"
-                     "\n\twith open(path, 'w+') as f:"
-                     "\n\t\tf.write(content)"
-                     "\n\n\ncmd_utils = CustomCmdClassUtils()"
-                     "\n\n\nsetup("
-                     "\n\tname='" + package_name + "',"
-                     "\n\tcmdclass={"
-                     "\n\t\t'install': cmd_utils._build_setuptools_cmd("
-                     "\n\t\t\tinstall,"                      
-                     "\n\t\t\tpostinstall=test_func,"
-                     "\n\t\t\tpost_args=['" + file2_path + "'],"
-                     "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
-                     "\n\t\t)"                                     
-                     "\n\t},"
-                     "\n\tversion='1.0',"
-                     "\n\tauthors=''"
-                     "\n)\n")
+        setup_str = (
+            "from processor_tools.setup_utils import CustomCmdClassUtils"
+            "\nfrom setuptools.command.install import install"
+            "\nfrom setuptools import setup"
+            "\n\n\ndef test_func(path, content):"
+            "\n\twith open(path, 'w+') as f:"
+            "\n\t\tf.write(content)"
+            "\n\n\ncmd_utils = CustomCmdClassUtils()"
+            "\n\n\nsetup("
+            "\n\tname='" + package_name + "',"
+            "\n\tcmdclass={"
+            "\n\t\t'install': cmd_utils._build_setuptools_cmd("
+            "\n\t\t\tinstall,"
+            "\n\t\t\tpostinstall=test_func,"
+            "\n\t\t\tpost_args=['" + file2_path + "'],"
+            "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
+            "\n\t\t)"
+            "\n\t},"
+            "\n\tversion='1.0',"
+            "\n\tauthors=''"
+            "\n)\n"
+        )
 
         create_test_package(tmp_dir, package_name, setup_str=setup_str)
 
@@ -255,7 +265,10 @@ class TestCustomCmdClassUtils(unittest.TestCase):
         # to see what package is created and installed comment this line, so it is not removed after test is run
         shutil.rmtree(tmp_dir)
 
-    @patch("processor_tools.setup_utils.CustomCmdClassUtils._build_setuptools_cmd", side_effect=["install", "develop"])
+    @patch(
+        "processor_tools.setup_utils.CustomCmdClassUtils._build_setuptools_cmd",
+        side_effect=["install", "develop"],
+    )
     def test_build_cmdclass(self, mock_build):
         cmd_util = CustomCmdClassUtils()
 
@@ -282,8 +295,8 @@ class TestCustomCmdClassUtils(unittest.TestCase):
                     "pre_kwargs": "pre_kwargs",
                     "postinstall": "post_func",
                     "post_args": "post_args",
-                    "post_kwargs": "post_kwargs"
-                }
+                    "post_kwargs": "post_kwargs",
+                },
             )
 
 

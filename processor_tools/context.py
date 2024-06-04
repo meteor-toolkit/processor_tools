@@ -1,6 +1,5 @@
 """processor.context - customer container from processing state"""
 
-
 from typing import Optional, Dict, Any, List, Union
 from processor_tools import read_config
 

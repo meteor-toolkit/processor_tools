@@ -14,7 +14,7 @@ from processor_tools.config_io import (
     YAMLWriter,
     ConfigIOFactory,
     read_config,
-    write_config
+    write_config,
 )
 
 
@@ -175,7 +175,9 @@ class TestYAMLWriter(unittest.TestCase):
         with open(yml_path, "r") as f:
             yml_str = f.read()
 
-        exp_yml_str = "test:\n" "  entry1: value1\n" "  entry2: false\n" "  entry3: 1.2\n"
+        exp_yml_str = (
+            "test:\n" "  entry1: value1\n" "  entry2: false\n" "  entry3: 1.2\n"
+        )
 
         self.assertEqual(yml_str, exp_yml_str)
 
