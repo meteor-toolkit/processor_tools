@@ -52,4 +52,4 @@ This supports file types:
    :suppress:
 
    import os
-   # os.remove(path)
+   os.remove(path)

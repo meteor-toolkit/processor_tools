@@ -32,6 +32,9 @@ Defining Configuration Values
 
 Configuration values can be provided when the processor class is initialised with a ``context`` object. The context object should be a container (such as a :py:class:`dict`) with the necessary values defined. Within an initialised processor object, the ``context`` object can be accessed as an instance attribute.
 
+
+:ref:`more <context>`
+
 .. ipython:: python
 
    class Exponentiate(processor_tools.BaseProcessor):
