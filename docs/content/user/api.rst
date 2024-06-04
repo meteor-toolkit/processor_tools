@@ -33,4 +33,5 @@ Utilities
 
    config_io.read_config
    config_io.write_config
+   config_io.build_configdir
    setup_utils.CustomCmdClassUtils

@@ -53,3 +53,22 @@ This supports file types:
 
    import os
    os.remove(path)
+
+Writing Configuration Directory
+===============================
+
+The :py:func:`build_configdir <processor_tools.config_io.build_configdir>` function provides the capability to write a directory of configuration files by defining:
+
+* path - configuration directory path (created if doesn't exist)
+* configs -  definition of configuration files as a dictionary, with an entry per configuration file to write - where the key should be the filename to write and the value should define the file content, either as:
+    * path of config file to copy to configuration directory
+    * configuration values dictionary
+
+For example:
+
+.. code-block:: python
+
+   configs = {
+       "copied_config.yaml": "path/to/old_config.yaml",
+       "new_config.yaml": {"entry1": "value1"}
+   }
