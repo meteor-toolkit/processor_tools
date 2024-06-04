@@ -263,7 +263,9 @@ class TestBuildConfigDir(unittest.TestCase):
     @patch("processor_tools.config_io.shutil.copyfile")
     @patch("processor_tools.config_io.os.makedirs")
     @patch("processor_tools.config_io.os.path.isdir", return_value=True)
-    def test_build_configdir_exists_skip(self, mock_exists, mock_mdir, mock_copy, mock_write):
+    def test_build_configdir_exists_skip(
+        self, mock_exists, mock_mdir, mock_copy, mock_write
+    ):
 
         configs = {
             "copied_config.yaml": "path/to/old_config.yaml",
