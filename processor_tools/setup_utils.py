@@ -100,14 +100,61 @@ class CustomCmdClassUtils:
 
                 # if preinstall defined run first
                 if preinstall is not None:
-                    preinstall(*self.preinstall_args, **self.preinstall_kwargs)
+                    preinstall(
+                        *self.get_preinstall_args(), **self.get_preinstall_kwargs()
+                    )
 
                 # run standard install process
-                install.run(self)
+                cmd.run(self)
 
                 # if postinstall defined run last
                 if postinstall is not None:
-                    postinstall(*self.postinstall_args, **self.postinstall_kwargs)
+                    postinstall(
+                        *self.get_postinstall_args(), **self.get_postinstall_kwargs()
+                    )
+
+            def get_preinstall_args(self) -> Optional[List[Any]]:
+                """
+                Return pre-installation function arguments
+
+                Override to allow dynamic definition.
+
+                :return: preinstall args
+                """
+
+                return self.preinstall_args
+
+            def get_preinstall_kwargs(self) -> Optional[Dict[str, Any]]:
+                """
+                Return pre-installation function key word arguments
+
+                Override to allow dynamic definition.
+
+                :return: preinstall kwargs
+                """
+                return self.preinstall_kwargs
+
+            def get_postinstall_args(self) -> Optional[List[Any]]:
+                """
+                Return post-installation function arguments
+
+                Override to allow dynamic definition.
+
+                :return: post install args
+                """
+
+                return self.postinstall_args
+
+            def get_postinstall_kwargs(self) -> Optional[Dict[str, Any]]:
+                """
+                Return post-installation function key word arguments
+
+                Override to allow dynamic definition.
+
+                :return: postinstall kwargs
+                """
+
+                return self.postinstall_kwargs
 
         return CustomCmdClass
 
@@ -133,21 +180,19 @@ def build_configdir_cmdclass(package_name, configs):
     cmdutil = CustomCmdClassUtils()
     configdir_cmdclass = cmdutil.build_cmdclass(
         postinstall=build_configdir,
-        post_args=[install_path, configs],
-        post_kwargs={"exists_skip": True},
+        post_args=[install_path],
+        post_kwargs={"configs": configs, "exists_skip": True},
     )
 
     # customise the function arguments in "develop" so it can dynamically identify the package directory to write to
-    delattr(configdir_cmdclass["develop"], "postinstall_args")
 
-    @property
-    def postinstall_args(self):
+    def get_postinstall_args(self) -> List[Any]:
         develop_path = os.path.join(
             os.path.dirname(__main__.__file__), "." + package_name
         )
-        return [develop_path, configs]
+        return [develop_path]
 
-    configdir_cmdclass["develop"].postinstall_args = postinstall_args
+    setattr(configdir_cmdclass["develop"], "get_postinstall_args", get_postinstall_args)
 
     return configdir_cmdclass
 
