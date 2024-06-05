@@ -16,6 +16,7 @@ from processor_tools.config_io import (
     read_config,
     write_config,
     build_configdir,
+    find_config
 )
 
 
@@ -277,6 +278,33 @@ class TestBuildConfigDir(unittest.TestCase):
         mock_mdir.assert_not_called()
         mock_copy.assert_not_called()
         mock_write.assert_not_called()
+
+
+class TestFindConfig(unittest.TestCase):
+
+    def setUp(self):
+        random_string = random.choices(string.ascii_lowercase, k=6)
+        self.tmp_dir = "tmp_" + "".join(random_string)
+        os.makedirs(self.tmp_dir)
+
+        filenames = ["file1.yml", "file2.config", "file3.txt"]
+
+        for filename in filenames:
+            with open(os.path.join(self.tmp_dir, filename), "w") as f:
+                f.write("test")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+    def test_find_config(self):
+        configs = find_config(self.tmp_dir)
+
+        exp_configs = [
+            os.path.join(self.tmp_dir, "file1.yml"),
+            os.path.join(self.tmp_dir, "file2.config")
+        ]
+
+        self.assertCountEqual(configs, exp_configs)
 
 
 if __name__ == "__main__":

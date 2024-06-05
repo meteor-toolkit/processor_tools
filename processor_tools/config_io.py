@@ -5,12 +5,12 @@ import shutil
 import yaml
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, List
 import configparser
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["read_config", "write_config", "build_configdir"]
+__all__ = ["read_config", "write_config", "build_configdir", "find_config"]
 
 
 class BaseConfigReader(ABC):
@@ -206,6 +206,20 @@ class ConfigIOFactory:
     Can be extended to include more file formats in future
     """
 
+    # Configuration file readers by extension - maintain with new readers
+    READER_BY_EXT = {
+        "config": ConfigReader(),
+        "cfg": ConfigReader(),
+        "conf": ConfigReader(),
+        "yml": YAMLReader(),
+        "yaml": YAMLReader()
+    }
+
+    WRITER_BY_EXT = {
+        "yml": YAMLWriter(),
+        "yaml": YAMLWriter()
+    }
+
     def get_reader(self, path: str) -> BaseConfigReader:
         """
         Return config reader for file with given file extension
@@ -216,14 +230,10 @@ class ConfigIOFactory:
 
         ext = self._get_file_extension(path)
 
-        if ext in ["config", "cfg", "conf"]:
-            return ConfigReader()
-
-        elif ext in ["yml", "yaml"]:
-            return YAMLReader()
-
-        else:
+        if ext not in self.READER_BY_EXT.keys():
             raise ValueError("Invalid file extension: " + ext)
+
+        return self.READER_BY_EXT[ext]
 
     def get_writer(self, path: str) -> BaseConfigWriter:
         """
@@ -235,11 +245,10 @@ class ConfigIOFactory:
 
         ext = self._get_file_extension(path)
 
-        if ext in ["yml", "yaml"]:
-            return YAMLWriter()
-
-        else:
+        if ext not in self.WRITER_BY_EXT.keys():
             raise ValueError("Invalid file extension: " + ext)
+
+        return self.WRITER_BY_EXT[ext]
 
     @staticmethod
     def _get_file_extension(path: str) -> str:
@@ -330,6 +339,26 @@ def build_configdir(
 
         elif isinstance(config_def, dict):
             write_config(filepath, config_def)
+
+
+def find_config(path) -> List[str]:
+    """
+    Returns configuration files in directory (i.e. files that can be read by :py:class:`read_config <processor_tools.read_config>`).
+
+    :param path: directory containing configuration files
+    """
+
+    config_paths = []
+
+    conf_fact = ConfigIOFactory()
+
+    for filename in os.listdir(path):
+        filename_ext = conf_fact._get_file_extension(filename)
+
+        if filename_ext in conf_fact.READER_BY_EXT.keys():
+            config_paths.append(os.path.join(path, filename))
+
+    return config_paths
 
 
 if __name__ == "__main__":
