@@ -1,7 +1,10 @@
 """processor.tests.test_context - tests for processor_tools.context"""
-
+import shutil
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
+import os
+import random
+import string
 from processor_tools.context import Context
 
 
@@ -9,20 +12,86 @@ __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
 
 
 class TestContext(unittest.TestCase):
-    def test___init___None(self):
+    def test___init___None_default_None(self):
         context = Context()
         self.assertDictEqual(context._config_values, dict())
 
-    def test___init__dict(self):
+    def test___init__dict_default_None(self):
         input_dict = {"test": "value"}
         context = Context(input_dict)
         self.assertDictEqual(context._config_values, input_dict)
 
     @patch("processor_tools.context.read_config", return_value={"test": "value"})
-    def test___init__path(self, mock_read_config):
+    def test___init__filepath_default_None(self, mock_read_config):
         context = Context("path")
         self.assertDictEqual(context._config_values, {"test": "value"})
         mock_read_config.assert_called_once_with("path")
+
+    @patch("processor_tools.context.Context.update_config_from_file")
+    def test___init__filepath_default_filepath(self, mock_update):
+        Context.default_config = "path2"
+        context = Context("path")
+
+        exp_calls = [
+            call("path2"),
+            call("path")
+        ]
+
+        mock_update.assert_has_calls(exp_calls)
+
+    @patch("processor_tools.context.Context.update_config_from_file")
+    def test___init__filepath_default_list_filepath(self, mock_update):
+        Context.default_config = ["path2", "path3"]
+        context = Context("path")
+
+        exp_calls = [
+            call("path3"),
+            call("path2"),
+            call("path")
+        ]
+
+        mock_update.assert_has_calls(exp_calls)
+
+    @patch("processor_tools.context.find_config", return_value=["found_path"])
+    @patch("processor_tools.context.Context.update_config_from_file")
+    def test___init__filepath_default_dir(self, mock_update, mock_find):
+        random_string = random.choices(string.ascii_lowercase, k=6)
+        tmp_dir = "tmp_" + "".join(random_string)
+        os.makedirs(tmp_dir)
+
+        Context.default_config = tmp_dir
+        context = Context("path")
+
+        exp_calls = [
+            call("found_path"),
+            call("path")
+        ]
+
+        mock_find.assert_called_once_with(tmp_dir)
+        mock_update.assert_has_calls(exp_calls)
+
+        shutil.rmtree(tmp_dir)
+
+    @patch("processor_tools.context.find_config", return_value=["found_path"])
+    @patch("processor_tools.context.Context.update_config_from_file")
+    def test___init__filepath_default_default_list_mixed(self, mock_update, mock_find):
+        random_string = random.choices(string.ascii_lowercase, k=6)
+        tmp_dir = "tmp_" + "".join(random_string)
+        os.makedirs(tmp_dir)
+
+        Context.default_config = [tmp_dir, "path2"]
+        context = Context("path")
+
+        exp_calls = [
+            call("path2"),
+            call("found_path"),
+            call("path")
+        ]
+
+        mock_find.assert_called_once_with(tmp_dir)
+        mock_update.assert_has_calls(exp_calls)
+
+        shutil.rmtree(tmp_dir)
 
     def test_get_config_names(self):
         context = Context()
