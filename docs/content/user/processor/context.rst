@@ -33,6 +33,10 @@ They can also be built from an equivalent configuration file (of a format readab
    path = "context_file.yaml"
    write_config(path, config_vals)
 
+   from processor_tools.config_io import write_config
+   path2 = "context_file2.yaml"
+   write_config(path2, config_vals)
+
 So if you define the configuration file `"context_file.yaml"`, with the content:
 
 .. code-block:: YAML
@@ -47,7 +51,26 @@ This can be loaded into a :py:class:`Context <processor_tools.context.Context>` 
    path = "context_file.yaml"
    context = Context(path)
 
-Providing a list of configuration file paths loads the values from each of the configuration files. In the case where multiple input configuration files provide the same value, earlier in the list overwrites later in the list.
+The path can also be to directory containing set of configuration files. Providing a list of configuration paths loads the values from each of the configuration files/directories of files.
+
+In the case where multiple input configuration files provide the same value, earlier in the list overwrites later in the list. So in the example,
+
+.. ipython:: python
+
+   path1 = "context_file.yaml"
+   path2 = "context_file2.yaml"
+   context = Context([path1, path2])
+
+if the same configuration value is defined in both of these files, the value in `"context_file1.yaml"` overwrites that in `"context_file2.yaml"`.
+
+The :py:class:`Context <processor_tools.context.Context>` class variable `default_config` enables you to set configuration file(s)/directory(ies) of files that are loaded every time the class is initialised. Configuration values from these files come lower in the priority list than those defined at initialisation.
+
+Therefore, the following has the same effect as the previous example:
+
+.. ipython:: python
+
+   Context.default_config = path2
+   context = Context(path1)
 
 Interfacing with the Context object
 ===================================
@@ -73,3 +96,4 @@ Configuration values can be accessed by indexing:
 
    import os
    os.remove(path)
+   os.remove(path2)
