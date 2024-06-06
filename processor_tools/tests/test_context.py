@@ -37,6 +37,7 @@ class TestContext(unittest.TestCase):
             call("path")
         ]
 
+        Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
 
     @patch("processor_tools.context.Context.update_config_from_file")
@@ -50,6 +51,7 @@ class TestContext(unittest.TestCase):
             call("path")
         ]
 
+        Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
 
     @patch("processor_tools.context.find_config", return_value=["found_path"])
@@ -67,6 +69,7 @@ class TestContext(unittest.TestCase):
             call("path")
         ]
 
+        Context.default_config = None
         mock_find.assert_called_once_with(tmp_dir)
         mock_update.assert_has_calls(exp_calls)
 
@@ -91,6 +94,7 @@ class TestContext(unittest.TestCase):
         mock_find.assert_called_once_with(tmp_dir)
         mock_update.assert_has_calls(exp_calls)
 
+        Context.default_config = None
         shutil.rmtree(tmp_dir)
 
     def test_get_config_names(self):
