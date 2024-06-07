@@ -161,10 +161,10 @@ class CustomCmdClassUtils:
 
 def build_configdir_cmdclass(package_name, configs):
     """
-    Build a cmdclass argument for `setuptools.setup` that initialises a directory of configuration files on after package installation.
+    Build a cmdclass argument for `setuptools.setup` that initialises a directory of configuration files after package installation.
 
-    * For the standard `"install"` mode the configuration directory is `~/.<packagename>`
-    * For develop mode (i.e. editable mode with `-e` flag) mode the configuration directory is `<package_project_directory>/.<packagename>`
+    * For the standard `"install"` mode the configuration directory is located at `~/.<packagename>`
+    * For "develop" mode (i.e. editable mode with `-e` flag) mode the configuration directory is located at `<package_project_directory>/.<packagename>`
 
     Skips running if directory already exists (for example if package has previously been installed).
 
