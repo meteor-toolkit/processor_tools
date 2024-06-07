@@ -169,7 +169,7 @@ def build_configdir_cmdclass(package_name, configs):
     Skips running if directory already exists (for example if package has previously been installed).
 
     :param package_name: package name
-    :param configs:
+    :param configs: as defined for :py:func:`build_configdir <processor_tools.config_io.build_configdir>`
     :return: cmdclass argument for `setuptools.setup` that initialises configuration directory post-install
     """
 
