@@ -21,10 +21,10 @@ class CustomCmdClassUtils:
         self,
         preinstall: Optional[Callable] = None,
         postinstall: Optional[Callable] = None,
-        pre_args: Optional[List[Any]] = None,
-        pre_kwargs: Optional[Dict[str, Any]] = None,
-        post_args: Optional[List[Any]] = None,
-        post_kwargs: Optional[Dict[str, Any]] = None,
+        pre_args: Optional[List[Any]] = [],
+        pre_kwargs: Optional[Dict[str, Any]] = {},
+        post_args: Optional[List[Any]] = [],
+        post_kwargs: Optional[Dict[str, Any]] = {},
     ) -> Dict[str, Type[Union[install, develop]]]:
         """
         Function to build the cmdclass argument for `setuptools.setup` so that a custom function is ran before or after package installation
@@ -66,10 +66,10 @@ class CustomCmdClassUtils:
         cmd: Union[Type[install], Type[develop]],
         preinstall: Optional[Callable] = None,
         postinstall: Optional[Callable] = None,
-        pre_args: Optional[List[Any]] = None,
-        pre_kwargs: Optional[Dict[str, Any]] = None,
-        post_args: Optional[List[Any]] = None,
-        post_kwargs: Optional[Dict[str, Any]] = None,
+        pre_args: Optional[List[Any]] = [],
+        pre_kwargs: Optional[Dict[str, Any]] = {},
+        post_args: Optional[List[Any]] = [],
+        post_kwargs: Optional[Dict[str, Any]] = {},
     ) -> Type[Union[install, develop]]:
         """
         Function to build custom setuptools commands, such that they can run defined functions before or after package installation
@@ -97,7 +97,6 @@ class CustomCmdClassUtils:
                 """
                 Overriding the standard setuptools command run method, adding preinstall and postinstall functions
                 """
-
                 # if preinstall defined run first
                 if preinstall is not None:
                     preinstall(

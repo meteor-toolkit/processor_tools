@@ -57,6 +57,8 @@ Provide your `custom_cmdclass` to the `setup() <https://setuptools.pypa.io/en/la
     )
 
 For this example, `"hello"` will now get printed at the start of the installation and `"goodbye"` will get printed at the end.
+Note that for this output to be displayed during the pip installation, the `-v` flag needs to be added; e.g. `pip install -v -e .
+
 
 Pre-defined custom setup cmdclasses
 ===================================
