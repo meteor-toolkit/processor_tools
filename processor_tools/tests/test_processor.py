@@ -205,10 +205,6 @@ class Test4(BaseProcessor):
         self.mod1_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod1"])
         self.mod2_name = ".".join(["processor_tools", "tests", self.tmp_mod, "mod2"])
 
-        self.test_factory = ProcessorFactory(
-            module_name=[self.mod1_name, self.mod2_name]
-        )
-
     @patch("processor_tools.processor.ProcessorFactory.add_processor")
     def test_init_with_processors(self, mock_pf):
         p = ProcessorFactory(["a", "b"])
@@ -216,15 +212,25 @@ class Test4(BaseProcessor):
         mock_pf.assert_has_calls([call("a"), call("b")])
 
     def test__find_processors_1mod(self):
-        classes = self.test_factory._find_processors(self.mod1_name)
+        test_factory = ProcessorFactory(
+            module_name=[self.mod1_name, self.mod2_name]
+        )
+        classes = test_factory._find_processors(self.mod1_name)
         self.assertCountEqual(classes.keys(), ["Test2", "NullProcessor"])
 
     def test__find_processors_2mod(self):
-        classes = self.test_factory._find_processors([self.mod1_name, self.mod2_name])
+        test_factory = ProcessorFactory(
+            module_name=[self.mod1_name, self.mod2_name]
+        )
+        classes = test_factory._find_processors([self.mod1_name, self.mod2_name])
         self.assertCountEqual(classes.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_keys(self):
-        self.assertEqual(self.test_factory.keys(), ["Test2", "Test4", "NullProcessor"])
+        test_factory = ProcessorFactory(
+            module_name=[self.mod1_name, self.mod2_name]
+        )
+
+        self.assertEqual(test_factory.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_add_processor(self):
         class Test5(BaseProcessor):
@@ -240,7 +246,10 @@ class Test4(BaseProcessor):
         self.assertTrue(("Test2" not in test_factory._processors))
 
     def test___getitem__(self):
-        self.assertEqual(self.test_factory["Test2"].__name__, "Test2")
+        test_factory = ProcessorFactory(
+            module_name=[self.mod1_name, self.mod2_name]
+        )
+        self.assertEqual(test_factory["Test2"].__name__, "Test2")
 
     def tearDown(self):
         shutil.rmtree(self.tmp_mod_dir)
