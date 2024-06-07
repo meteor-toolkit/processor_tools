@@ -57,7 +57,7 @@ In the case where multiple input configuration files provide the same value, ear
 
 .. ipython:: python
 
-   path1 = "context_file.yaml"
+   path1 = "context_file1.yaml"
    path2 = "context_file2.yaml"
    context = Context([path1, path2])
 

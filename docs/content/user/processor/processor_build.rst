@@ -145,7 +145,7 @@ So ``mod_algo_factory`` would now contain all :py:class:`BaseProcessor <processo
 Defining processor class default subprocessors
 ----------------------------------------------
 
-In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the defintion of such processors, the class subprocessors can be defined as a class attribute at the defintion of the class.
+In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the definition of such processors, the class subprocessors can be defined as a class attribute at the definition of the class.
 
 .. ipython:: python
 
