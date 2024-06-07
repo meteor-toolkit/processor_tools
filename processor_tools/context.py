@@ -29,11 +29,10 @@ class Context:
         self._config_values: Dict[str, Any] = {}
 
         # init default config path
-        if self.default_config is None:
-            default_config_paths = []
-        elif isinstance(self.default_config, str):
+        default_config_paths: List[str] = []
+        if isinstance(self.default_config, str):
             default_config_paths = [self.default_config]
-        else:
+        elif isinstance(self.default_config, list):
             default_config_paths = self.default_config
 
         # init user config paths
