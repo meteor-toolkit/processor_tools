@@ -91,7 +91,6 @@ def uninstall_package(package_name: str):
 
 
 class TestCustomCmdClassUtils(unittest.TestCase):
-
     def test__build_setuptools_cmd_install_preinstall_postinstall(self):
 
         # this is the key test that proves custom command classes are working, everything else mocks this use
@@ -368,7 +367,6 @@ class TestCustomCmdClassUtils(unittest.TestCase):
 
 
 class TestBuildConfigDirCmdClass(unittest.TestCase):
-
     @patch("processor_tools.config_io.os.path.expanduser", return_value="test")
     @patch(
         "processor_tools.setup_utils.CustomCmdClassUtils._build_setuptools_cmd",

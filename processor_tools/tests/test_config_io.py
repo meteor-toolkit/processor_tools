@@ -281,7 +281,6 @@ class TestBuildConfigDir(unittest.TestCase):
 
 
 class TestFindConfig(unittest.TestCase):
-
     def setUp(self):
         random_string = random.choices(string.ascii_lowercase, k=6)
         self.tmp_dir = "tmp_" + "".join(random_string)
