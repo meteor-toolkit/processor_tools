@@ -16,7 +16,7 @@ from processor_tools.config_io import (
     read_config,
     write_config,
     build_configdir,
-    find_config
+    find_config,
 )
 
 
@@ -301,7 +301,7 @@ class TestFindConfig(unittest.TestCase):
 
         exp_configs = [
             os.path.join(self.tmp_dir, "file1.yml"),
-            os.path.join(self.tmp_dir, "file2.config")
+            os.path.join(self.tmp_dir, "file2.config"),
         ]
 
         self.assertCountEqual(configs, exp_configs)

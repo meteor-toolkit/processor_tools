@@ -212,23 +212,17 @@ class Test4(BaseProcessor):
         mock_pf.assert_has_calls([call("a"), call("b")])
 
     def test__find_processors_1mod(self):
-        test_factory = ProcessorFactory(
-            module_name=[self.mod1_name, self.mod2_name]
-        )
+        test_factory = ProcessorFactory(module_name=[self.mod1_name, self.mod2_name])
         classes = test_factory._find_processors(self.mod1_name)
         self.assertCountEqual(classes.keys(), ["Test2", "NullProcessor"])
 
     def test__find_processors_2mod(self):
-        test_factory = ProcessorFactory(
-            module_name=[self.mod1_name, self.mod2_name]
-        )
+        test_factory = ProcessorFactory(module_name=[self.mod1_name, self.mod2_name])
         classes = test_factory._find_processors([self.mod1_name, self.mod2_name])
         self.assertCountEqual(classes.keys(), ["Test2", "Test4", "NullProcessor"])
 
     def test_keys(self):
-        test_factory = ProcessorFactory(
-            module_name=[self.mod1_name, self.mod2_name]
-        )
+        test_factory = ProcessorFactory(module_name=[self.mod1_name, self.mod2_name])
 
         self.assertEqual(test_factory.keys(), ["Test2", "Test4", "NullProcessor"])
 
@@ -246,9 +240,7 @@ class Test4(BaseProcessor):
         self.assertTrue(("Test2" not in test_factory._processors))
 
     def test___getitem__(self):
-        test_factory = ProcessorFactory(
-            module_name=[self.mod1_name, self.mod2_name]
-        )
+        test_factory = ProcessorFactory(module_name=[self.mod1_name, self.mod2_name])
         self.assertEqual(test_factory["Test2"].__name__, "Test2")
 
     def tearDown(self):

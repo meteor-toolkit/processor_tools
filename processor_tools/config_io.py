@@ -212,13 +212,10 @@ class ConfigIOFactory:
         "cfg": ConfigReader(),
         "conf": ConfigReader(),
         "yml": YAMLReader(),
-        "yaml": YAMLReader()
+        "yaml": YAMLReader(),
     }
 
-    WRITER_BY_EXT = {
-        "yml": YAMLWriter(),
-        "yaml": YAMLWriter()
-    }
+    WRITER_BY_EXT = {"yml": YAMLWriter(), "yaml": YAMLWriter()}
 
     def get_reader(self, path: str) -> BaseConfigReader:
         """

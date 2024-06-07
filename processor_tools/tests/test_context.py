@@ -1,4 +1,5 @@
 """processor.tests.test_context - tests for processor_tools.context"""
+
 import shutil
 import unittest
 from unittest.mock import patch, call
@@ -32,10 +33,7 @@ class TestContext(unittest.TestCase):
         Context.default_config = "path2"
         context = Context("path")
 
-        exp_calls = [
-            call("path2"),
-            call("path")
-        ]
+        exp_calls = [call("path2"), call("path")]
 
         Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
@@ -45,11 +43,7 @@ class TestContext(unittest.TestCase):
         Context.default_config = ["path2", "path3"]
         context = Context("path")
 
-        exp_calls = [
-            call("path3"),
-            call("path2"),
-            call("path")
-        ]
+        exp_calls = [call("path3"), call("path2"), call("path")]
 
         Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
@@ -64,10 +58,7 @@ class TestContext(unittest.TestCase):
         Context.default_config = tmp_dir
         context = Context("path")
 
-        exp_calls = [
-            call("found_path"),
-            call("path")
-        ]
+        exp_calls = [call("found_path"), call("path")]
 
         Context.default_config = None
         mock_find.assert_called_once_with(tmp_dir)
@@ -85,11 +76,7 @@ class TestContext(unittest.TestCase):
         Context.default_config = [tmp_dir, "path2"]
         context = Context("path")
 
-        exp_calls = [
-            call("path2"),
-            call("found_path"),
-            call("path")
-        ]
+        exp_calls = [call("path2"), call("found_path"), call("path")]
 
         mock_find.assert_called_once_with(tmp_dir)
         mock_update.assert_has_calls(exp_calls)

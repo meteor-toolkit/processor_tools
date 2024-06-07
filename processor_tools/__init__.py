@@ -10,12 +10,17 @@ __all__ = [
     "build_configdir",
     "Context",
     "CustomCmdClassUtils",
-    "find_config"
+    "find_config",
 ]
 
 from ._version import get_versions
 from processor_tools.processor import BaseProcessor, ProcessorFactory, NullProcessor
-from processor_tools.config_io import read_config, write_config, build_configdir, find_config
+from processor_tools.config_io import (
+    read_config,
+    write_config,
+    build_configdir,
+    find_config,
+)
 from processor_tools.context import Context
 from processor_tools.setup_utils import CustomCmdClassUtils
 
