@@ -124,10 +124,10 @@ class TestCustomCmdClassUtils(unittest.TestCase):
             "\n\t\t'install': cmd_utils._build_setuptools_cmd("
             "\n\t\t\tinstall,"
             "\n\t\t\tpreinstall=test_func,"
-            "\n\t\t\tpre_args=['" + file1_path + "'],"
+            "\n\t\t\tpre_args=[r'" + file1_path + "'],"
             "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
             "\n\t\t\tpostinstall=test_func,"
-            "\n\t\t\tpost_args=['" + file2_path + "'],"
+            "\n\t\t\tpost_args=[r'" + file2_path + "'],"
             "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
             "\n\t\t)"
             "\n\t},"
@@ -187,7 +187,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
             "\n\t\t'install': cmd_utils._build_setuptools_cmd("
             "\n\t\t\tinstall,"
             "\n\t\t\tpreinstall=test_func,"
-            "\n\t\t\tpre_args=['" + file1_path + "'],"
+            "\n\t\t\tpre_args=[r'" + file1_path + "'],"
             "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
             "\n\t\t)"
             "\n\t},"
@@ -241,7 +241,7 @@ class TestCustomCmdClassUtils(unittest.TestCase):
             "\n\t\t'install': cmd_utils._build_setuptools_cmd("
             "\n\t\t\tinstall,"
             "\n\t\t\tpostinstall=test_func,"
-            "\n\t\t\tpost_args=['" + file2_path + "'],"
+            "\n\t\t\tpost_args=[r'" + file2_path + "'],"
             "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
             "\n\t\t)"
             "\n\t},"
@@ -298,10 +298,10 @@ class TestCustomCmdClassUtils(unittest.TestCase):
             "\n\t\t'develop': cmd_utils._build_setuptools_cmd("
             "\n\t\t\tdevelop,"
             "\n\t\t\tpreinstall=test_func,"
-            "\n\t\t\tpre_args=['" + file1_path + "'],"
+            "\n\t\t\tpre_args=[r'" + file1_path + "'],"
             "\n\t\t\tpre_kwargs={'content': '" + file1_content + "'},"
             "\n\t\t\tpostinstall=test_func,"
-            "\n\t\t\tpost_args=['" + file2_path + "'],"
+            "\n\t\t\tpost_args=[r'" + file2_path + "'],"
             "\n\t\t\tpost_kwargs={'content': '" + file2_content + "'},"
             "\n\t\t)"
             "\n\t},"
@@ -386,8 +386,8 @@ class TestBuildConfigDirCmdClass(unittest.TestCase):
                 cmd=install,
                 preinstall=None,
                 postinstall=build_configdir,
-                pre_args=None,
-                pre_kwargs=None,
+                pre_args=[],
+                pre_kwargs={},
                 post_args=[os.path.join("test", "." + package_name)],
                 post_kwargs={"configs": configs, "exists_skip": True},
             ),
@@ -395,8 +395,8 @@ class TestBuildConfigDirCmdClass(unittest.TestCase):
                 cmd=develop,
                 preinstall=None,
                 postinstall=build_configdir,
-                pre_args=None,
-                pre_kwargs=None,
+                pre_args=[],
+                pre_kwargs={},
                 post_args=[os.path.join("test", "." + package_name)],
                 post_kwargs={"configs": configs, "exists_skip": True},
             ),
@@ -425,7 +425,7 @@ class TestBuildConfigDirCmdClass(unittest.TestCase):
             "\n\n\ncmdclass = build_configdir_cmdclass('"
             + package_name
             + "', {'file1.yaml': {'entry1': 'value1'}})"
-            "\ncmdclass['install'].postinstall_args[0]= '" + config_dir + "'"
+            "\ncmdclass['install'].postinstall_args[0]= r'" + config_dir + "'"
             "\n\n\nsetup("
             "\n\tname='" + package_name + "',"
             "\n\tcmdclass=cmdclass,"
