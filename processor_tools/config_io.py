@@ -50,6 +50,16 @@ class BaseConfigReader(ABC):
         if (val.lower() == "true") or (val.lower() == "false"):
             return bool
 
+        # Check int
+        is_int = True
+        try:
+            int(val)
+        except:
+            is_int = False
+
+        if is_int:
+            return int
+
         # Check float
         is_float = True
         try:

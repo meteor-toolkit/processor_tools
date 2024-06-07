@@ -46,8 +46,12 @@ class TestBaseConfigReader(unittest.TestCase):
         dtype = BaseConfigReader._infer_dtype("11.7")
         self.assertEqual(dtype, float)
 
+    def test__infer_dtype_int(self):
+        dtype = BaseConfigReader._infer_dtype("1")
+        self.assertEqual(dtype, int)
+
     def test__infer_dtype_bool_True(self):
-        dtype = BaseConfigReader._infer_dtype("False")
+        dtype = BaseConfigReader._infer_dtype("True")
         self.assertEqual(dtype, bool)
 
     def test__infer_dtype_bool_False(self):
@@ -82,7 +86,7 @@ class TestConfigReader(unittest.TestCase):
         val = ConfigReader._extract_config_value(config, "section", "key", dtype=bool)
         self.assertEqual(val, False)
 
-    def test__extract_config_value_dtype_None(self):
+    def test__extract_config_value(self):
         config = RawConfigParser()
         config["section"] = {"key": "val"}
 
