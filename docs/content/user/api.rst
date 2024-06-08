@@ -12,11 +12,28 @@ documentation.
 
 .. add package's API's functions, classes, methods etc. to the below toctree
 
-Processor
+Processors
+==========
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   processor.BaseProcessor
+   processor.ProcessorFactory
+   processor.NullProcessor
+   context.Context
+
+Utilities
 =========
 
 .. autosummary::
    :toctree: generated/
    :nosignatures:
 
-   processor
+   config_io.read_config
+   config_io.write_config
+   config_io.build_configdir
+   config_io.find_config
+   setup_utils.CustomCmdClassUtils
+   setup_utils.build_configdir_cmdclass

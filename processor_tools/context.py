@@ -1,8 +1,8 @@
 """processor.context - customer container from processing state"""
 
-
+import os.path
 from typing import Optional, Dict, Any, List, Union
-from processor_tools import read_config
+from processor_tools import read_config, find_config
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -16,29 +16,44 @@ class Context:
     :param config: processing configuration data, either:
 
     * dictionary of configuration data
-    * path of configuration file, or list of paths (earlier in the list overwrites later in the list
+    * path of configuration file or directory containing set of configuration files
+    * list of paths (earlier in the list overwrites later in the list)
     """
 
-    DEFAULT_CONFIG_PATH: Optional[str] = None
+    # default_config class variable enables you to set configuration file(s)/directory(ies) of files that are
+    # loaded every time the class is initialised. Configuration values from these files come lower in the priority
+    # list than those defined at init.
+    default_config: Optional[Union[str, List[str]]] = None
 
     def __init__(self, config: Optional[Union[str, List[str], dict]] = None) -> None:
         self._config_values: Dict[str, Any] = {}
 
-        # open default config values
-        if self.DEFAULT_CONFIG_PATH is not None:
-            self.update_config_from_file(self.DEFAULT_CONFIG_PATH)
+        # init default config path
+        default_config_paths: List[str] = []
+        if isinstance(self.default_config, str):
+            default_config_paths = [self.default_config]
+        elif isinstance(self.default_config, list):
+            default_config_paths = self.default_config
 
-        # update default config with user defined values
-        if config is not None:
-            if isinstance(config, dict):
-                self._config_values.update(config)
+        # init user config paths
+        if isinstance(config, str):
+            config_paths = [config] + default_config_paths
+        elif isinstance(config, list):
+            config_paths = config + default_config_paths
+        else:
+            config_paths = default_config_paths
 
-            elif isinstance(config, str):
-                config = [config]
+        # open config paths
+        for config_path in reversed(config_paths):
+            if os.path.isdir(config_path):
+                for p in find_config(config_path):
+                    self.update_config_from_file(p)
 
-            if isinstance(config, list):
-                for c in reversed(config):
-                    self.update_config_from_file(c)
+            else:
+                self.update_config_from_file(config_path)
+
+        if isinstance(config, dict):
+            self._config_values.update(config)
 
     def update_config_from_file(self, path: str) -> None:
         """
