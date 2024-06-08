@@ -9,10 +9,14 @@ Building a Processor Object
 
    import processor_tools
 
+The core of **processor_tools** functionality involves building `Processor` classes that are subclasses of :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>`. This section of user guide provides information for how to build and use your own `Processor` classes.
+
 Creating a Processor Class
 ==========================
 
-Processor classes are defined as subclasses of the :py:class:`~processor_tools.processor.BaseProcessor` class. The processor's processing algorithm should be defined in the :py:meth:`run` method.
+Processor classes are defined by subclassing the :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>` class. The processor's processing algorithm should be defined by overriding :py:meth:`BaseProcessor.run <processor_tools.processor.BaseProcessor.run>` method.
+
+In this example we define a processor class for multiplying input values together.
 
 .. ipython:: python
 
@@ -27,6 +31,9 @@ Defining Configuration Values
 =============================
 
 Configuration values can be provided when the processor class is initialised with a ``context`` object. The context object should be a container (such as a :py:class:`dict`) with the necessary values defined. Within an initialised processor object, the ``context`` object can be accessed as an instance attribute.
+
+
+:ref:`more <context>`
 
 .. ipython:: python
 
@@ -62,7 +69,7 @@ Processor classes may be related to other processor classes as "subprocessors". 
 Appending subprocessors to a processor object
 ---------------------------------------------
 
-A processor may be added to another processor class's subprocessors using the :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` method. Subprocessors may be added as instantiated processor objects, processor classes, or processor factories (more of which below). :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` stores an instantiated processor object for any of these options.
+A processor may be added to another processor class's subprocessors using the :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` method. Subprocessors may be added as instantiated processor objects, processor classes, or processor factories (more of which below). :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` stores an instantiated processor object for any of these options.
 
 A processor object's subprocessors are stored in a dictionary that is accessible via the ``subprocessors`` attribute.
 
@@ -102,7 +109,7 @@ Configuring subprocessor options with processor factories
 
 In many cases subprocessor elements within a processing chain may be completed by several different processor implementations, the choice of which may depend on the circumstance.
 
-``processor_tools`` processors handle this with a :py:class:`~processor_tools.processor.ProcessorFactory`. Processor factories are effectively containers which can store a set of processors.
+``processor_tools`` processors handle this with a :py:class:`ProcessorFactory <processor_tools.processor.ProcessorFactory>`. Processor factories are effectively containers which can store a set of processors.
 
 .. ipython:: python
 
@@ -118,7 +125,7 @@ In many cases subprocessor elements within a processing chain may be completed b
 
    print(algo_factory["algorithm2"])
 
-These factories can be used to define the set of optional implementations for a subprocessor. As before, they can be appended to a processor's subprocessors using the the :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` method. The choice of processor implementation is set by the user in the processor :ref:`context <context>`. The context object should define an entry for the :ref:`subprocessor path <path>` that is defined by the factory with a value of the :ref:`processor name <name>` of choice.
+These factories can be used to define the set of optional implementations for a subprocessor. As before, they can be appended to a processor's subprocessors using the the :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` method. The choice of processor implementation is set by the user in the processor :ref:`context <context>`. The context object should define an entry for the :ref:`subprocessor path <path>` that is defined by the factory with a value of the :ref:`processor name <name>` of choice.
 
 .. ipython:: python
 
@@ -133,12 +140,12 @@ If all the processors required for a factory are in one or more package modules,
 
    mod_algo_factory = processor_tools.ProcessorFactory("package.subpackage.module")
 
-So ``mod_algo_factory`` would now contain all ``BaseProcessor`` subclasses in the module ``package.subpackage.module``.
+So ``mod_algo_factory`` would now contain all :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>` subclasses in the module ``package.subpackage.module``.
 
 Defining processor class default subprocessors
 ----------------------------------------------
 
-In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the defintion of such processors, the class subprocessors can be defined as a class attribute at the defintion of the class.
+In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the definition of such processors, the class subprocessors can be defined as a class attribute at the definition of the class.
 
 .. ipython:: python
 
