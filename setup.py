@@ -37,7 +37,7 @@ setup(
             "sphinx_automodapi",
             "ipython",
             "pickleshare",
-            "types-PyYAML"
+            "types-PyYAML",
         ]
     },
     classifiers=[
