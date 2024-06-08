@@ -32,8 +32,8 @@ They can also be built from an equivalent configuration file (of a format readab
    from processor_tools.config_io import write_config
    path = "context_file.yaml"
    write_config(path, config_vals)
-
-   from processor_tools.config_io import write_config
+   path1 = "context_file1.yaml"
+   write_config(path1, config_vals)
    path2 = "context_file2.yaml"
    write_config(path2, config_vals)
 
