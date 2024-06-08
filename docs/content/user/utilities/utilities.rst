@@ -9,3 +9,4 @@ This section describes the additional utilities **processor_tools** offers to pr
 
    config_io
    setup_utils
+   db
