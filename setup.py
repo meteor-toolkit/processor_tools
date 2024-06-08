@@ -43,7 +43,8 @@ setup(
             "sphinx_design",
             "sphinx_automodapi",
             "ipython",
-            "types-PyYAML",
+            "pickleshare",
+            "types-PyYAML"
         ]
     },
     classifiers=[
