@@ -13,6 +13,8 @@ __all__ = [
     "find_config",
 ]
 
+GLOBAL_SUPERCONTEXT = []
+
 from ._version import get_versions
 from processor_tools.processor import BaseProcessor, ProcessorFactory, NullProcessor
 from processor_tools.config_io import (

@@ -1,7 +1,8 @@
 """processor.context - customer container from processing state"""
 
 import os.path
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List, Union, Type, Tuple
+from processor_tools import GLOBAL_SUPERCONTEXT
 from processor_tools import read_config, find_config
 
 
@@ -18,6 +19,18 @@ class Context:
     * dictionary of configuration data
     * path of configuration file or directory containing set of configuration files
     * list of paths (earlier in the list overwrites later in the list)
+
+    :param supercontext: context supercontext, configuration values of which override those defined in the context. Defined as context object or tuple of:
+
+    * `supercontext` (*Context*) - supercontext object
+    * `subsection` (*str*) -  name of subsection of supercontext to apply as supercontext
+
+    For example:
+
+    .. code-block:: python
+
+       supercontext = Context({"section": {"val1": 1 , "val2", 2}})
+       (supercontext, "section")
     """
 
     # default_config class variable enables you to set configuration file(s)/directory(ies) of files that are
@@ -25,8 +38,18 @@ class Context:
     # list than those defined at init.
     default_config: Optional[Union[str, List[str]]] = None
 
-    def __init__(self, config: Optional[Union[str, List[str], dict]] = None) -> None:
+    def __init__(
+        self,
+        config: Optional[Union[str, List[str], dict]] = None,
+        supercontext: Optional[Union["Context", Tuple["Context", str]]] = None
+    ) -> None:
+
+        # initialise attributes
         self._config_values: Dict[str, Any] = {}
+        self._supercontext: Optional[Union["Context", Tuple["Context", str]]] = None
+
+        if supercontext is not None:
+            self.supercontext = supercontext
 
         # init default config path
         default_config_paths: List[str] = []
@@ -54,6 +77,59 @@ class Context:
 
         if isinstance(config, dict):
             self._config_values.update(config)
+
+    @property
+    def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
+        """
+        Return context supercontext - including any global supercontext
+
+        :return: supercontext
+        """
+
+        if self._supercontext is None:
+            return GLOBAL_SUPERCONTEXT
+
+        else:
+            instance_supercontext = self._supercontext
+            if not isinstance(self._supercontext, list):
+                instance_supercontext = [self._supercontext]
+            return GLOBAL_SUPERCONTEXT + instance_supercontext
+
+    @supercontext.setter
+    def supercontext(self, supercontext: Union[Tuple["Context", str], "Context"]):
+        """
+        Sets context supercontext, configuration values of which override those defined in the context
+
+        :param supercontext: context object or tuple of:
+
+        * `supercontext` (*Context*) - supercontext object
+        * `subsection` (*str*) -  name of subsection of supercontext to apply as supercontext
+
+        For example:
+
+        .. code-block:: python
+
+           supercontext = Context({"section": {"val1": 1 , "val2", 2}})
+           (supercontext, "section")
+
+        """
+
+        if isinstance(supercontext, tuple) or isinstance(supercontext, list):
+            self._supercontext = supercontext
+
+        elif isinstance(supercontext, self.__class__):
+            self._supercontext = (supercontext, None)
+
+        else:
+            raise ValueError("supercontext must either be tuple or context object")
+
+    @supercontext.deleter
+    def supercontext(self):
+        """
+        Deletes context supercontext
+        """
+
+        self._supercontext = None
 
     def update_config_from_file(self, path: str) -> None:
         """
@@ -92,6 +168,25 @@ class Context:
         :param default: default value to return if name not defined in config
         :return: config value if defined, else return default
         """
+
+        supercontext_val = None
+
+        for supercontext_tuple in reversed(self.supercontext):
+            supercontext = supercontext_tuple[0]
+            section = supercontext_tuple[1]
+
+            # get value from supercontext if available
+            if section is not None:
+                supercontext_val_i = supercontext.get(section, None).get(name, None)
+
+            else:
+                supercontext_val_i = supercontext.get(name, None)
+
+            if supercontext_val_i is not None:
+                supercontext_val = supercontext_val_i
+
+        if supercontext_val is not None:
+            return supercontext_val
 
         return self._config_values[name] if name in self.get_config_names() else default
 
