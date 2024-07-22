@@ -219,5 +219,43 @@ class Context:
         return self.get_config_names()
 
 
+class set_global_supercontext:
+    """
+    Sets a context object to become a global supercontext for other context objects
+
+    :param context: Processor state definition object
+
+    Can be run with a `with` statement, as follows
+
+    .. code-block: python
+
+       from processor_tools import Context, set_global_supercontext
+
+       my_context = Context()
+
+       with set_global_supercontext:
+           run_process()
+
+    In this example, `my_context` is set as the global supercontext within the scope of the `with` statement and then removed after.
+    """
+
+    def __init__(self, context: Context):
+        self(context)
+
+    def __call__(self, context: Context):
+
+        if isinstance(context, Context):
+            GLOBAL_SUPERCONTEXT.append(context)
+
+        else:
+            raise TypeError("Argument 'context' must be of type 'processor_tools.Context'")
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        del GLOBAL_SUPERCONTEXT[-1]
+
+
 if __name__ == "__main__":
     pass

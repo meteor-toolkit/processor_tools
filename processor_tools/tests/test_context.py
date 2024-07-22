@@ -6,7 +6,8 @@ from unittest.mock import patch, call, PropertyMock
 import os
 import random
 import string
-from processor_tools.context import Context
+from processor_tools import GLOBAL_SUPERCONTEXT
+from processor_tools.context import Context, set_global_supercontext
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -318,6 +319,61 @@ class TestContext(unittest.TestCase):
         context["entry5"] = "value5"
 
         self.assertEqual(context._config_values["entry5"], "value5")
+
+
+class TestSetGlobalSupercontext(unittest.TestCase):
+
+    def test_function_call(self):
+
+        context = Context({"val": 1})
+        set_global_supercontext(context)
+
+        self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
+        self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], Context))
+        self.assertDictEqual(GLOBAL_SUPERCONTEXT[0]._config_values, {"val": 1})
+
+    def test_function_call_invalid(self):
+
+        self.assertRaises(TypeError, set_global_supercontext, "hello")
+
+    def test_with(self):
+
+        context = Context({"val": 1})
+
+        self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
+        with set_global_supercontext(context):
+
+            self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
+            self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], Context))
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0]._config_values, {"val": 1})
+
+        self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
+
+    def test_with_nested(self):
+
+        context1 = Context({"val1": 1})
+        context2 = Context({"val2": 2})
+
+        self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
+        with set_global_supercontext(context1):
+
+            self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
+            self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], Context))
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0]._config_values, {"val1": 1})
+
+            with set_global_supercontext(context2):
+
+                self.assertEqual(len(GLOBAL_SUPERCONTEXT), 2)
+                self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], Context))
+                self.assertDictEqual(GLOBAL_SUPERCONTEXT[0]._config_values, {"val1": 1})
+                self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[1], Context))
+                self.assertDictEqual(GLOBAL_SUPERCONTEXT[1]._config_values, {"val2": 2})
+
+            self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
+            self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], Context))
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0]._config_values, {"val1": 1})
+
+        self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
 
 
 if __name__ == "__main__":
