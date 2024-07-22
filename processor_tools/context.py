@@ -244,7 +244,7 @@ class set_global_supercontext:
 
     def __call__(self, context: Context):
 
-        if isinstance(context, Context):
+        if isinstance(context, Context) or isinstance(context, tuple):
             GLOBAL_SUPERCONTEXT.append(context)
 
         else:
