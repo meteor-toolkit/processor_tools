@@ -2,7 +2,7 @@
 
 import shutil
 import unittest
-from unittest.mock import patch, call, PropertyMock
+from unittest.mock import patch, call
 import os
 import random
 import string
