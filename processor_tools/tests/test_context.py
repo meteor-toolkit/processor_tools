@@ -159,6 +159,23 @@ class TestContext(unittest.TestCase):
         self.assertDictEqual(context.supercontext[0][0]._config_values, {"val1": 1, "val2": 2})
         self.assertIsNone(context.supercontext[0][1])
 
+    def test_is_global_supercontext(self):
+        context1 = Context()
+        context2 = Context()
+
+        self.assertFalse(context1.is_global_supercontext)
+        self.assertFalse(context2.is_global_supercontext)
+
+        GLOBAL_SUPERCONTEXT.append(context1)
+
+        self.assertTrue(context1.is_global_supercontext)
+        self.assertFalse(context2.is_global_supercontext)
+
+        GLOBAL_SUPERCONTEXT.pop(0)
+
+        self.assertFalse(context1.is_global_supercontext)
+        self.assertFalse(context2.is_global_supercontext)
+
     def test___init___supercontext_context(self):
         supercontext = Context({"section": {"val1": 1, "val2": 2}})
 

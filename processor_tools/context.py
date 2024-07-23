@@ -7,7 +7,7 @@ from processor_tools import read_config, find_config
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["Context"]
+__all__ = ["Context", "set_global_supercontext"]
 
 
 class Context:
@@ -23,7 +23,7 @@ class Context:
     :param supercontext: context supercontext, configuration values of which override those defined in the context. Defined as context object or tuple of:
 
     * `supercontext` (*Context*) - supercontext object
-    * `subsection` (*str*) -  name of subsection of supercontext to apply as supercontext
+    * `section` (*str*) -  name of section of supercontext to apply as supercontext
 
     For example:
 
@@ -103,7 +103,7 @@ class Context:
         :param supercontext: context object or tuple of:
 
         * `supercontext` (*Context*) - supercontext object
-        * `subsection` (*str*) -  name of subsection of supercontext to apply as supercontext
+        * `section` (*str*) -  name of section of supercontext to apply as supercontext
 
         For example:
 
@@ -130,6 +130,18 @@ class Context:
         """
 
         self._supercontext = None
+
+    @property
+    def is_global_supercontext(self) -> bool:
+        """
+        Returns `True` if context object has been set as a global supercontext, else `False`
+
+        :return: global supercontext flag
+        """
+        if self in GLOBAL_SUPERCONTEXT:
+            return True
+        else:
+            return False
 
     def update_config_from_file(self, path: str) -> None:
         """
