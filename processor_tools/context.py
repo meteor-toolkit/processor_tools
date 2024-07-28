@@ -22,7 +22,7 @@ class Context:
     * path of configuration file or directory containing set of configuration files
     * list of paths (earlier in the list overwrites later in the list)
 
-    :param supercontext: context supercontext or list of supercontexts, configuration values of which override those defined in the context. Each defined as context object or tuple of:
+    :param supercontext: context supercontext or list of supercontexts (earlier in the list overwrites later in the list), configuration values of which override those defined in the context. Each defined as context object or tuple of:
 
     * `supercontext` (*Context*) - supercontext object
     * `section` (*str*) -  name of section of supercontext to apply as supercontext
@@ -88,7 +88,7 @@ class Context:
         :return: supercontexts
         """
 
-        return self._supercontext
+        return self._supercontext if self._supercontext != [] else None
 
     @supercontext.setter
     def supercontext(self, supercontext: Union[Tuple["Context", str], "Context"]):
@@ -136,18 +136,6 @@ class Context:
 
         self._supercontext = []
 
-    @property
-    def is_global_supercontext(self) -> bool:
-        """
-        Returns `True` if context object has been set as a global supercontext, else `False`
-
-        :return: global supercontext flag
-        """
-        if self in GLOBAL_SUPERCONTEXT:
-            return True
-        else:
-            return False
-
     def update_config_from_file(self, path: str) -> None:
         """
         Update config values from file
@@ -166,7 +154,54 @@ class Context:
         :return: configuration values
         """
 
-        return self._config_values
+        config_values = self._config_values
+
+        if (self.supercontext is not None) or (GLOBAL_SUPERCONTEXT != []):
+            config_values = deepcopy(self._config_values)
+
+        if self.supercontext is not None:
+            config_values = self._update_with_supercontexts(config_values, self.supercontext)
+
+        if GLOBAL_SUPERCONTEXT != []:
+            config_values = self._update_with_supercontexts(config_values, GLOBAL_SUPERCONTEXT)
+
+        return config_values
+
+    def _update_with_supercontexts(self, config_values, supercontexts):
+
+        for supercontext_tuple_i in reversed(supercontexts):
+            supercontext_i = supercontext_tuple_i[0]
+            section_i = supercontext_tuple_i[1]
+
+            # get value from supercontext if available
+            if section_i is not None:
+                supercontext_values_i = supercontext_i.get(section_i, None)
+
+            else:
+                supercontext_values_i = supercontext_i._config_values
+
+            if supercontext_values_i is not None:
+                config_values = Context._nested_update(config_values, supercontext_values_i)
+
+            if supercontext_i.supercontext is not None:
+                config_values = self._update_with_supercontexts(config_values, supercontext_i.supercontext)
+
+        return config_values
+
+    @staticmethod
+    def _nested_update(dict1: dict, dict2: dict):
+        """
+        Returns d
+        :param d:
+        :param u:
+        :return:
+        """
+        for k, v in dict2.items():
+            if isinstance(v, collections.abc.Mapping):
+                dict1[k] = Context._nested_update(dict1.get(k, {}), v)
+            else:
+                dict1[k] = v
+        return dict1
 
     def set(self, name: str, value: Any):
         """
@@ -231,7 +266,17 @@ class set_global_supercontext:
     """
     Sets a context object to become a global supercontext for other context objects
 
-    :param context: Processor state definition object
+    :param context: supercontext defined as context object or tuple of:
+
+        * `supercontext` (*Context*) - supercontext object
+        * `section` (*str*) -  name of section of supercontext to apply as supercontext
+
+    For example:
+
+    .. code-block:: python
+
+       supercontext = Context({"section": {"val1": 1 , "val2", 2}})
+       (supercontext, "section")
 
     Can be run with a `with` statement, as follows
 
@@ -250,10 +295,18 @@ class set_global_supercontext:
     def __init__(self, context: Context):
         self(context)
 
-    def __call__(self, context: Context):
+    def __call__(self, supercontext: Union[Tuple[Context, str], Context]):
 
-        if isinstance(context, Context) or isinstance(context, tuple):
-            GLOBAL_SUPERCONTEXT.append(context)
+        if isinstance(supercontext, Context):
+            supercontext = (supercontext, None)
+
+        elif isinstance(supercontext, tuple):
+            if not (isinstance(supercontext[0], Context) and (
+                    isinstance(supercontext[1], str) or (supercontext[1] is None))):
+                raise TypeError("supercontext tuple must be of type `(processor_tools.Context, str | None)`")
+
+        if isinstance(supercontext, tuple):
+            GLOBAL_SUPERCONTEXT.append(supercontext)
 
         else:
             raise TypeError("Argument 'context' must be of type 'processor_tools.Context'")
@@ -263,6 +316,14 @@ class set_global_supercontext:
 
     def __exit__(self, type, value, traceback):
         del GLOBAL_SUPERCONTEXT[-1]
+
+
+def clear_global_supercontext():
+    """
+    Unsets all global supercontexts
+    """
+
+    GLOBAL_SUPERCONTEXT.clear()
 
 
 if __name__ == "__main__":
