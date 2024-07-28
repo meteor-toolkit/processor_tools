@@ -225,20 +225,24 @@ class TestContext(unittest.TestCase):
 
         context = Context(supercontext=supercontext)
 
-        self.assertTrue(isinstance(context._supercontext, tuple))
-        self.assertTrue(isinstance(context._supercontext[0], Context))
-        self.assertDictEqual(context._supercontext[0]._config_values, supercontext._config_values)
-        self.assertIsNone(context._supercontext[1])
+        self.assertTrue(isinstance(context._supercontext, list))
+
+        self.assertTrue(isinstance(context._supercontext[0], tuple))
+        self.assertTrue(isinstance(context._supercontext[0][0], Context))
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
+        self.assertIsNone(context._supercontext[0][1])
 
     def test___init___supercontext_tuple(self):
         supercontext = Context({"section": {"val1": 1, "val2": 2}})
 
         context = Context(supercontext=(supercontext, "section"))
 
-        self.assertTrue(isinstance(context._supercontext, tuple))
-        self.assertTrue(isinstance(context._supercontext[0], Context))
-        self.assertDictEqual(context._supercontext[0]._config_values, supercontext._config_values)
-        self.assertEqual(context._supercontext[1], "section")
+        self.assertTrue(isinstance(context._supercontext, list))
+
+        self.assertTrue(isinstance(context._supercontext[0], tuple))
+        self.assertTrue(isinstance(context._supercontext[0][0], Context))
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
+        self.assertEqual(context._supercontext[0][1], "section")
 
     def test_get_config_names(self):
         context = Context()
