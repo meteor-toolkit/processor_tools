@@ -214,6 +214,17 @@ class TestContext(unittest.TestCase):
         self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertEqual(context._supercontext[0][1], "section")
 
+    def test_config_values(self):
+        context = Context()
+        context._config_values = {
+            "entry1": "value1",
+            "entry2": "value2",
+            "entry3": "value3",
+            "entry4": "value4",
+        }
+
+        self.assertDictEqual(context._config_values, context.config_values)
+
     @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
         "entry1": "value1",
         "entry2": "value2",
