@@ -97,3 +97,67 @@ Configuration values can be accessed by indexing:
    import os
    os.remove(path)
    os.remove(path2)
+   Context.default_config = None
+
+Inheriting values between context objects
+=========================================
+
+
+One :py:class:`Context <processor_tools.context.Context>` object can inherit configuration values from another, by setting it's "supercontext".
+
+This can be done when a context object is initialised:
+
+.. ipython:: python
+
+   context1 = Context()
+   context2 = Context(supercontext=context1)
+
+Or when the context object is already initialised with the :py:class:`supercontext <processor_tools.context.Context.supercontext>` property.
+
+.. ipython:: python
+
+   context1 = Context()
+   context2 = Context()
+   context2.supercontext = context1
+
+Values in a context object are overridden by those in its supercontext.
+
+.. ipython:: python
+
+   context1 = Context({"val1": 1})
+   context2 = Context({"val1": 2})
+   print(context2["val1"])
+   context2.supercontext = context1
+   print(context2["val1"])
+
+Inheritance between a context object and its supercontext may be limited to a single section of the supercontext, by defining a tuple of:
+
+* `supercontext` (*Context*) - supercontext object
+* `section` (*str*) -  name of section of supercontext to apply as supercontext
+
+.. ipython:: python
+
+   context1 = Context({
+       "section1": {
+           "val1": "super"
+       },
+       "section2": {
+           "val2": "super"
+       }
+   })
+   context2 = Context({"val1": 1, "val2": 2})
+   context2.supercontext = (context1, "section1")
+   print(context2["val1"], context2["val2"])
+
+Setting a Global Supercontext
+=============================
+
+To inherit configuration values between packages and processes a global supercontext may be set, using the :py:func:`set_global_supercontext <processor_tools.context.set_global_supercontext>` function. The configuration values override those set in any instantiated context object.
+
+.. ipython:: python
+
+   from processor_tools import set_global_supercontext
+   context1 = Context({"val1": 1})
+   set_global_supercontext(context1)
+   context2 = Context({"val1": 2})
+   print(context2["val1"])
