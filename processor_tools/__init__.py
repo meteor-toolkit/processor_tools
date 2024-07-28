@@ -10,11 +10,14 @@ __all__ = [
     "build_configdir",
     "Context",
     "set_global_supercontext",
+    "clear_global_supercontext",
     "CustomCmdClassUtils",
     "find_config",
 ]
 
-GLOBAL_SUPERCONTEXT = []
+from typing import List, Tuple, Union
+
+GLOBAL_SUPERCONTEXT: List[Tuple["Context", Union[None, str]]] = []
 
 from ._version import get_versions
 from processor_tools.processor import BaseProcessor, ProcessorFactory, NullProcessor
@@ -24,7 +27,7 @@ from processor_tools.config_io import (
     build_configdir,
     find_config,
 )
-from processor_tools.context import Context, set_global_supercontext
+from processor_tools.context import Context, set_global_supercontext, clear_global_supercontext
 from processor_tools.setup_utils import CustomCmdClassUtils
 
 __version__ = get_versions()["version"]

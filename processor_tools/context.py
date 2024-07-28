@@ -9,7 +9,7 @@ from processor_tools import read_config, find_config
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
-__all__ = ["Context", "set_global_supercontext"]
+__all__ = ["Context", "set_global_supercontext", "clear_global_supercontext"]
 
 
 class Context:
