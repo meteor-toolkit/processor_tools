@@ -2,7 +2,7 @@
 
 import shutil
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch, call, PropertyMock
 import os
 import random
 import string
@@ -17,19 +17,19 @@ class TestContext(unittest.TestCase):
     def test___init___None_default_None(self):
         context = Context()
         self.assertDictEqual(context._config_values, dict())
-        self.assertIsNone(context._supercontext)
+        self.assertEqual(context._supercontext, [])
 
     def test___init__dict_default_None(self):
         input_dict = {"test": "value"}
         context = Context(input_dict)
         self.assertDictEqual(context._config_values, input_dict)
-        self.assertIsNone(context._supercontext)
+        self.assertEqual(context._supercontext, [])
 
     @patch("processor_tools.context.read_config", return_value={"test": "value"})
     def test___init__filepath_default_None(self, mock_read_config):
         context = Context("path")
         self.assertDictEqual(context._config_values, {"test": "value"})
-        self.assertIsNone(context._supercontext)
+        self.assertEqual(context._supercontext, [])
         mock_read_config.assert_called_once_with("path")
 
     @patch("processor_tools.context.Context.update_config_from_file")
@@ -160,48 +160,18 @@ class TestContext(unittest.TestCase):
 
         del context.supercontext
 
-        self.assertIsNone(context._supercontext)
+        self.assertEqual(context._supercontext, [])
 
     def test_supercontext_getter(self):
         context = Context()
-        context._supercontext = (Context({"section": {"val1": 1, "val2": 2}}), "section")
+        context._supercontext = [(Context({"section": {"val1": 1, "val2": 2}}), "section")]
 
         self.assertTrue(isinstance(context.supercontext, list))
         self.assertEqual(len(context.supercontext), 1)
         self.assertTrue(isinstance(context.supercontext[0], tuple))
         self.assertTrue(isinstance(context.supercontext[0][0], Context))
-        self.assertDictEqual(context.supercontext[0][0]._config_values, context._supercontext[0]._config_values)
+        self.assertDictEqual(context.supercontext[0][0]._config_values, context._supercontext[0][0]._config_values)
         self.assertEqual(context.supercontext[0][1], "section")
-
-    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": 1, "val2": 2}), None)])
-    def test_supercontext_getter_global(self):
-        context = Context()
-        context._supercontext = (Context({"section": {"val1": 1, "val2": 2}}), "section")
-
-        self.assertTrue(isinstance(context.supercontext, list))
-        self.assertEqual(len(context.supercontext), 2)
-
-        self.assertTrue(isinstance(context.supercontext[0], tuple))
-        self.assertTrue(isinstance(context.supercontext[0][0], Context))
-        self.assertDictEqual(context.supercontext[0][0]._config_values, {"val1": 1, "val2": 2})
-        self.assertIsNone(context.supercontext[0][1])
-
-        self.assertTrue(isinstance(context.supercontext[1], tuple))
-        self.assertTrue(isinstance(context.supercontext[1][0], Context))
-        self.assertDictEqual(context.supercontext[1][0]._config_values, context._supercontext[0]._config_values)
-        self.assertEqual(context.supercontext[1][1], "section")
-
-    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": 1, "val2": 2}), None)])
-    def test_supercontext_getter_global_only(self):
-        context = Context()
-
-        self.assertTrue(isinstance(context.supercontext, list))
-        self.assertEqual(len(context.supercontext), 1)
-
-        self.assertTrue(isinstance(context.supercontext[0], tuple))
-        self.assertTrue(isinstance(context.supercontext[0][0], Context))
-        self.assertDictEqual(context.supercontext[0][0]._config_values, {"val1": 1, "val2": 2})
-        self.assertIsNone(context.supercontext[0][1])
 
     def test_is_global_supercontext(self):
         context1 = Context()
@@ -244,14 +214,14 @@ class TestContext(unittest.TestCase):
         self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertEqual(context._supercontext[0][1], "section")
 
-    def test_get_config_names(self):
+    @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
+        "entry1": "value1",
+        "entry2": "value2",
+        "entry3": "value3",
+        "entry4": "value4",
+    }))
+    def test_get_config_names(self, mock_config):
         context = Context()
-        context._config_values = {
-            "entry1": "value1",
-            "entry2": "value2",
-            "entry3": "value3",
-            "entry4": "value4",
-        }
 
         entry_list = context.get_config_names()
 
@@ -272,109 +242,45 @@ class TestContext(unittest.TestCase):
         self.assertCountEqual(entry_list, mock_get_config_names.return_value)
         mock_get_config_names.assert_called_once()
 
-    def test_get(self):
-        context = Context()
-        context._config_values = {
+    @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
             "entry1": "value1",
             "entry2": "value2",
             "entry3": "value3",
             "entry4": "value4",
-        }
-
-        value = context.get("entry2")
-
-        self.assertCountEqual(value, "value2")
-
-    def test_get_super_instance(self):
+        }))
+    def test_get(self, mock_config_values):
         context = Context()
-        context.supercontext = Context({"entry2": 2})
+        self.assertEqual(context.get("entry2"), "value2")
 
-        context._config_values = {
-            "entry1": "value1",
-            "entry2": "value2",
-            "entry3": "value3",
-            "entry4": "value4",
-        }
-
-        value = context.get("entry2")
-
-        self.assertEqual(value, 2)
-
-    def test_get_super_instance_section(self):
+    @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
+        "entry1": "value1",
+        "entry2": "value2",
+        "entry3": "value3",
+        "entry4": "value4",
+    }))
+    def test_get_missing(self, mock_config_values):
         context = Context()
-        context.supercontext = (Context({"section": {"entry2": 2}}), "section")
+        self.assertIsNone(context.get("entry5"))
 
-        context._config_values = {
-            "entry1": "value1",
-            "entry2": "value2",
-            "entry3": "value3",
-            "entry4": "value4",
-        }
-
-        value = context.get("entry2")
-
-        self.assertEqual(value, 2)
-
-    def test_get_super_instance_2(self):
+    @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
+        "entry1": "value1",
+        "entry2": "value2",
+        "entry3": "value3",
+        "entry4": "value4",
+    }))
+    def test_get_missing_with_default(self, mock_config_values):
         context = Context()
-        context._config_values = {
-            "entry1": "value1",
-            "entry2": "value2",
-            "entry3": "value3",
-            "entry4": "value4",
-        }
+        self.assertEqual(context.get("entry5", "hello"), "hello")
 
-        context._supercontext = [
-            (Context({"section": {"entry1": 1}}), "section"),
-            (Context({"section": {"entry2": 2}}), "section")
-        ]
-
-        self.assertEqual(context.get("entry1"), 1)
-        self.assertEqual(context.get("entry2"), 2)
-
-    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global"}), None)])
-    def test_get_with_super_global_and_instance(self):
+    @patch("processor_tools.context.Context.config_values", new_callable=PropertyMock(return_value={
+        "entry1": "value1",
+        "entry2": {"subentry2a": "value2a"},
+        "entry3": "value3",
+        "entry4": "value4",
+    }))
+    def test_get_sub(self, mock_config_values):
         context = Context()
-        context.supercontext = Context({"val1": "instance", "val2": "instance"})
-
-        context._config_values = {
-            "val1": "value1",
-            "val2": "value2",
-            "val3": "value3",
-        }
-
-        self.assertEqual(context.get("val1"), "global")
-        self.assertEqual(context.get("val2"), "instance")
-        self.assertEqual(context.get("val3"), "value3")
-
-    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global1"}), None), (Context({"val1": "global2", "val2": "global2"}), None)])
-    def test_get_with_super_global2_and_instance(self):
-        context = Context()
-        context.supercontext = Context({"val1": "instance", "val2": "instance", "val3": "instance"})
-
-        context._config_values = {
-            "val1": "value1",
-            "val2": "value2",
-            "val3": "value3",
-            "val4": "value4",
-        }
-
-        self.assertEqual(context.get("val1"), "global1")
-        self.assertEqual(context.get("val2"), "global2")
-        self.assertEqual(context.get("val3"), "instance")
-        self.assertEqual(context.get("val4"), "value4")
-
-    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global"}), None)])
-    def test_get_with_super_global_only(self):
-        context = Context()
-
-        context._config_values = {
-            "val1": "value1",
-            "val2": "value2",
-        }
-
-        self.assertEqual(context.get("val1"), "global")
-        self.assertEqual(context.get("val2"), "value2")
+        self.assertDictEqual(context.get("entry2"), {"subentry2a": "value2a"})
 
     @patch("processor_tools.context.Context.get")
     def test___getitem__(self, mock_get):

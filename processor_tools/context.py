@@ -158,6 +158,16 @@ class Context:
         config = read_config(path)
         self._config_values.update(config)
 
+    @property
+    def config_values(self) -> Any:
+        """
+        Returns defined configuration values
+
+        :return: configuration values
+        """
+
+        return self._config_values
+
     def set(self, name: str, value: Any):
         """
         Sets config data
@@ -186,26 +196,7 @@ class Context:
         :return: config value if defined, else return default
         """
 
-        supercontext_val = None
-
-        for supercontext_tuple in reversed(self.supercontext):
-            supercontext = supercontext_tuple[0]
-            section = supercontext_tuple[1]
-
-            # get value from supercontext if available
-            if section is not None:
-                supercontext_val_i = supercontext.get(section, None).get(name, None)
-
-            else:
-                supercontext_val_i = supercontext.get(name, None)
-
-            if supercontext_val_i is not None:
-                supercontext_val = supercontext_val_i
-
-        if supercontext_val is not None:
-            return supercontext_val
-
-        return self._config_values[name] if name in self.get_config_names() else default
+        return self.config_values[name] if name in self.get_config_names() else default
 
     def __getitem__(self, name: str) -> Any:
         """
@@ -224,7 +215,7 @@ class Context:
         :return: config value names
         """
 
-        return list(self._config_values.keys())
+        return list(self.config_values.keys())
 
     def keys(self) -> List[str]:
         """
