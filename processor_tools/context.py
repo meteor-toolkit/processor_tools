@@ -43,7 +43,7 @@ class Context:
     def __init__(
         self,
         config: Optional[Union[str, List[str], dict]] = None,
-        supercontext: Optional[Union["Context", Tuple["Context", str]]] = None
+        supercontext: Optional[Union["Context", Tuple["Context", str]]] = None,
     ) -> None:
 
         # initialise attributes
@@ -113,18 +113,30 @@ class Context:
             supercontext = [supercontext]
 
         if not isinstance(supercontext, list):
-            raise TypeError("'supercontext' must be defined as one of type [`processor_tools.Context`, `tuple`, `list`]")
+            raise TypeError(
+                "'supercontext' must be defined as one of type [`processor_tools.Context`, `tuple`, `list`]"
+            )
 
         for i, supercontext_i in enumerate(supercontext):
             if isinstance(supercontext_i, self.__class__):
                 supercontext[i] = (supercontext_i, None)
 
             elif isinstance(supercontext_i, tuple):
-                if not (isinstance(supercontext_i[0], self.__class__) and (isinstance(supercontext_i[1], str) or (supercontext_i[1] is None))):
-                    raise TypeError("supercontext tuple must be of type `(processor_tools.Context, str | None)`")
+                if not (
+                    isinstance(supercontext_i[0], self.__class__)
+                    and (
+                        isinstance(supercontext_i[1], str)
+                        or (supercontext_i[1] is None)
+                    )
+                ):
+                    raise TypeError(
+                        "supercontext tuple must be of type `(processor_tools.Context, str | None)`"
+                    )
 
             else:
-                raise TypeError("supercontext definition must be either `processor_tools.Context` or  `(processor_tools.Context, str | None)`")
+                raise TypeError(
+                    "supercontext definition must be either `processor_tools.Context` or  `(processor_tools.Context, str | None)`"
+                )
 
         self._supercontext = supercontext
 
@@ -160,10 +172,14 @@ class Context:
             config_values = deepcopy(self._config_values)
 
         if self.supercontext is not None:
-            config_values = self._update_with_supercontexts(config_values, self.supercontext)
+            config_values = self._update_with_supercontexts(
+                config_values, self.supercontext
+            )
 
         if GLOBAL_SUPERCONTEXT != []:
-            config_values = self._update_with_supercontexts(config_values, GLOBAL_SUPERCONTEXT)
+            config_values = self._update_with_supercontexts(
+                config_values, GLOBAL_SUPERCONTEXT
+            )
 
         return config_values
 
@@ -181,10 +197,14 @@ class Context:
                 supercontext_values_i = supercontext_i._config_values
 
             if supercontext_values_i is not None:
-                config_values = Context._nested_update(config_values, supercontext_values_i)
+                config_values = Context._nested_update(
+                    config_values, supercontext_values_i
+                )
 
             if supercontext_i.supercontext is not None:
-                config_values = self._update_with_supercontexts(config_values, supercontext_i.supercontext)
+                config_values = self._update_with_supercontexts(
+                    config_values, supercontext_i.supercontext
+                )
 
         return config_values
 
@@ -301,15 +321,21 @@ class set_global_supercontext:
             supercontext = (supercontext, None)
 
         elif isinstance(supercontext, tuple):
-            if not (isinstance(supercontext[0], Context) and (
-                    isinstance(supercontext[1], str) or (supercontext[1] is None))):
-                raise TypeError("supercontext tuple must be of type `(processor_tools.Context, str | None)`")
+            if not (
+                isinstance(supercontext[0], Context)
+                and (isinstance(supercontext[1], str) or (supercontext[1] is None))
+            ):
+                raise TypeError(
+                    "supercontext tuple must be of type `(processor_tools.Context, str | None)`"
+                )
 
         if isinstance(supercontext, tuple):
             GLOBAL_SUPERCONTEXT.append(supercontext)
 
         else:
-            raise TypeError("Argument 'context' must be of type 'processor_tools.Context'")
+            raise TypeError(
+                "Argument 'context' must be of type 'processor_tools.Context'"
+            )
 
     def __enter__(self):
         pass
