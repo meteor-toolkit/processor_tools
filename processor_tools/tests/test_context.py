@@ -94,10 +94,65 @@ class TestContext(unittest.TestCase):
         context = Context()
         context.supercontext = supercontext
 
-        self.assertTrue(isinstance(context._supercontext, tuple))
-        self.assertTrue(isinstance(context._supercontext[0], Context))
-        self.assertDictEqual(context._supercontext[0]._config_values, supercontext._config_values)
-        self.assertIsNone(context._supercontext[1])
+        self.assertTrue(isinstance(context._supercontext, list))
+        self.assertTrue(isinstance(context._supercontext[0], tuple))
+        self.assertTrue(isinstance(context._supercontext[0][0], Context))
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
+        self.assertIsNone(context._supercontext[0][1])
+
+    def test_supercontext_setter_tuple(self):
+        supercontext = Context({"section": {"val1": 1, "val2": 2}})
+
+        context = Context()
+        context.supercontext = (supercontext, "section")
+
+        self.assertTrue(isinstance(context._supercontext, list))
+        self.assertTrue(isinstance(context._supercontext[0], tuple))
+        self.assertTrue(isinstance(context._supercontext[0][0], Context))
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
+        self.assertEqual(context._supercontext[0][1], "section")
+
+    def test_supercontext_setter_bad_tuple(self):
+        supercontext = Context({"section": {"val1": 1, "val2": 2}})
+
+        context = Context()
+
+        with self.assertRaises(TypeError):
+            context.supercontext = (supercontext, 1)
+
+    def test_supercontext_setter_invalidtype(self):
+        supercontext = "hello"
+
+        context = Context()
+
+        with self.assertRaises(TypeError):
+            context.supercontext = supercontext
+
+    def test_supercontext_setter_list(self):
+        supercontext = Context({"section": {"val1": 1, "val2": 2}})
+
+        context = Context()
+        context.supercontext = [(supercontext, "section"), supercontext]
+
+        self.assertTrue(isinstance(context._supercontext, list))
+
+        self.assertTrue(isinstance(context._supercontext[0], tuple))
+        self.assertTrue(isinstance(context._supercontext[0][0], Context))
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
+        self.assertEqual(context._supercontext[0][1], "section")
+
+        self.assertTrue(isinstance(context._supercontext[1], tuple))
+        self.assertTrue(isinstance(context._supercontext[1][0], Context))
+        self.assertDictEqual(context._supercontext[1][0]._config_values, supercontext._config_values)
+        self.assertIsNone(context._supercontext[1][1])
+
+    def test_supercontext_setter_list_invalidtype(self):
+        supercontext = ["hello"]
+
+        context = Context()
+
+        with self.assertRaises(TypeError):
+            context.supercontext = supercontext
 
     def test_supercontext_del(self):
         context = Context()
@@ -106,17 +161,6 @@ class TestContext(unittest.TestCase):
         del context.supercontext
 
         self.assertIsNone(context._supercontext)
-
-    def test_supercontext_setter_tuple(self):
-        supercontext = Context({"section": {"val1": 1, "val2": 2}})
-
-        context = Context()
-        context.supercontext = (supercontext, "section")
-
-        self.assertTrue(isinstance(context._supercontext, tuple))
-        self.assertTrue(isinstance(context._supercontext[0], Context))
-        self.assertDictEqual(context._supercontext[0]._config_values, supercontext._config_values)
-        self.assertEqual(context._supercontext[1], "section")
 
     def test_supercontext_getter(self):
         context = Context()
@@ -237,7 +281,7 @@ class TestContext(unittest.TestCase):
 
         self.assertCountEqual(value, "value2")
 
-    def test_get_super1(self):
+    def test_get_super_instance(self):
         context = Context()
         context.supercontext = Context({"entry2": 2})
 
@@ -252,7 +296,7 @@ class TestContext(unittest.TestCase):
 
         self.assertEqual(value, 2)
 
-    def test_get_super1_section(self):
+    def test_get_super_instance_section(self):
         context = Context()
         context.supercontext = (Context({"section": {"entry2": 2}}), "section")
 
@@ -267,7 +311,7 @@ class TestContext(unittest.TestCase):
 
         self.assertEqual(value, 2)
 
-    def test_get_super2(self):
+    def test_get_super_instance_2(self):
         context = Context()
         context._config_values = {
             "entry1": "value1",
@@ -283,6 +327,50 @@ class TestContext(unittest.TestCase):
 
         self.assertEqual(context.get("entry1"), 1)
         self.assertEqual(context.get("entry2"), 2)
+
+    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global"}), None)])
+    def test_get_with_super_global_and_instance(self):
+        context = Context()
+        context.supercontext = Context({"val1": "instance", "val2": "instance"})
+
+        context._config_values = {
+            "val1": "value1",
+            "val2": "value2",
+            "val3": "value3",
+        }
+
+        self.assertEqual(context.get("val1"), "global")
+        self.assertEqual(context.get("val2"), "instance")
+        self.assertEqual(context.get("val3"), "value3")
+
+    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global1"}), None), (Context({"val1": "global2", "val2": "global2"}), None)])
+    def test_get_with_super_global2_and_instance(self):
+        context = Context()
+        context.supercontext = Context({"val1": "instance", "val2": "instance", "val3": "instance"})
+
+        context._config_values = {
+            "val1": "value1",
+            "val2": "value2",
+            "val3": "value3",
+            "val4": "value4",
+        }
+
+        self.assertEqual(context.get("val1"), "global1")
+        self.assertEqual(context.get("val2"), "global2")
+        self.assertEqual(context.get("val3"), "instance")
+        self.assertEqual(context.get("val4"), "value4")
+
+    @patch("processor_tools.context.GLOBAL_SUPERCONTEXT", [(Context({"val1": "global"}), None)])
+    def test_get_with_super_global_only(self):
+        context = Context()
+
+        context._config_values = {
+            "val1": "value1",
+            "val2": "value2",
+        }
+
+        self.assertEqual(context.get("val1"), "global")
+        self.assertEqual(context.get("val2"), "value2")
 
     @patch("processor_tools.context.Context.get")
     def test___getitem__(self, mock_get):

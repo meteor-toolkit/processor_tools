@@ -1,7 +1,9 @@
 """processor.context - customer container from processing state"""
 
 import os.path
-from typing import Optional, Dict, Any, List, Union, Type, Tuple
+from typing import Optional, Dict, Any, List, Union, Tuple
+from copy import deepcopy
+import collections.abc
 from processor_tools import GLOBAL_SUPERCONTEXT
 from processor_tools import read_config, find_config
 
@@ -20,7 +22,7 @@ class Context:
     * path of configuration file or directory containing set of configuration files
     * list of paths (earlier in the list overwrites later in the list)
 
-    :param supercontext: context supercontext, configuration values of which override those defined in the context. Defined as context object or tuple of:
+    :param supercontext: context supercontext or list of supercontexts, configuration values of which override those defined in the context. Each defined as context object or tuple of:
 
     * `supercontext` (*Context*) - supercontext object
     * `section` (*str*) -  name of section of supercontext to apply as supercontext
@@ -46,7 +48,7 @@ class Context:
 
         # initialise attributes
         self._config_values: Dict[str, Any] = {}
-        self._supercontext: Optional[Union["Context", Tuple["Context", str]]] = None
+        self._supercontext: List[Tuple["Context", Union[None, str]]] = []
 
         if supercontext is not None:
             self.supercontext = supercontext
@@ -81,26 +83,19 @@ class Context:
     @property
     def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
         """
-        Return context supercontext - including any global supercontext
+        Return context supercontexts
 
-        :return: supercontext
+        :return: supercontexts
         """
 
-        if self._supercontext is None:
-            return GLOBAL_SUPERCONTEXT
-
-        else:
-            instance_supercontext = self._supercontext
-            if not isinstance(self._supercontext, list):
-                instance_supercontext = [self._supercontext]
-            return GLOBAL_SUPERCONTEXT + instance_supercontext
+        return self._supercontext
 
     @supercontext.setter
     def supercontext(self, supercontext: Union[Tuple["Context", str], "Context"]):
         """
         Sets context supercontext, configuration values of which override those defined in the context
 
-        :param supercontext: context object or tuple of:
+        :param supercontext: supercontext or list of supercontexts - defined as context object or tuple of:
 
         * `supercontext` (*Context*) - supercontext object
         * `section` (*str*) -  name of section of supercontext to apply as supercontext
@@ -114,22 +109,32 @@ class Context:
 
         """
 
-        if isinstance(supercontext, tuple) or isinstance(supercontext, list):
-            self._supercontext = supercontext
+        if isinstance(supercontext, tuple) or isinstance(supercontext, self.__class__):
+            supercontext = [supercontext]
 
-        elif isinstance(supercontext, self.__class__):
-            self._supercontext = (supercontext, None)
+        if not isinstance(supercontext, list):
+            raise TypeError("'supercontext' must be defined as one of type [`processor_tools.Context`, `tuple`, `list`]")
 
-        else:
-            raise ValueError("supercontext must either be tuple or context object")
+        for i, supercontext_i in enumerate(supercontext):
+            if isinstance(supercontext_i, self.__class__):
+                supercontext[i] = (supercontext_i, None)
+
+            elif isinstance(supercontext_i, tuple):
+                if not (isinstance(supercontext_i[0], self.__class__) and (isinstance(supercontext_i[1], str) or (supercontext_i[1] is None))):
+                    raise TypeError("supercontext tuple must be of type `(processor_tools.Context, str | None)`")
+
+            else:
+                raise TypeError("supercontext definition must be either `processor_tools.Context` or  `(processor_tools.Context, str | None)`")
+
+        self._supercontext = supercontext
 
     @supercontext.deleter
     def supercontext(self):
         """
-        Deletes context supercontext
+        Deletes context supercontexts
         """
 
-        self._supercontext = None
+        self._supercontext = []
 
     @property
     def is_global_supercontext(self) -> bool:
