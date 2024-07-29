@@ -23,6 +23,8 @@ Processors
    processor.ProcessorFactory
    processor.NullProcessor
    context.Context
+   context.set_global_supercontext
+   context.clear_global_supercontext
 
 Utilities
 =========
