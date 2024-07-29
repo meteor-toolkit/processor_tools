@@ -384,6 +384,23 @@ class TestContext(unittest.TestCase):
                 },
             )
 
+    def test_update(self):
+        context = Context()
+        context._config_values = {
+            "entry1": "value1",
+            "entry2": {"subentry2a": "value2a", "subentry2b": "value2b"}
+        }
+
+        context.update({"entry2": {"subentry2a": "update"}})
+
+        self.assertDictEqual(
+            context._config_values,
+            {
+                "entry1": "value1",
+                "entry2": {"subentry2a": "update", "subentry2b": "value2b"}
+            }
+        )
+
     @patch(
         "processor_tools.context.Context.config_values",
         new_callable=PropertyMock(

@@ -78,7 +78,7 @@ class Context:
                 self.update_from_file(config_path)
 
         if isinstance(config, dict):
-            self._config_values.update(config)
+            self.update(config)
 
     @property
     def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
@@ -158,7 +158,14 @@ class Context:
         config = read_config(path)
         self._config_values = deep_update(self._config_values, config)
 
+    def update(self, config: dict) -> None:
+        """
+        Update config values
 
+        :param config: dictionary of configuration data
+        """
+
+        self._config_values = deep_update(self._config_values, config)
 
     @property
     def config_values(self) -> Any:
