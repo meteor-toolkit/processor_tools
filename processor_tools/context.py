@@ -96,6 +96,9 @@ class Context:
             elif isinstance(config_i, dict):
                 self.update(config_i)
 
+            else:
+                raise TypeError("config definition must be of type [`str`, `dict`]")
+
     @property
     def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
         """
