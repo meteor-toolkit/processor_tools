@@ -294,8 +294,8 @@ class set_global_supercontext:
     In this example, `my_context` is set as the global supercontext within the scope of the `with` statement and then removed after.
     """
 
-    def __init__(self, context: Context):
-        self(context)
+    def __init__(self, supercontext: Union[Tuple[Context, str], Context]):
+        self(supercontext)
 
     def __call__(self, supercontext: Union[Tuple[Context, str], Context]):
 
