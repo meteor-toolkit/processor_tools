@@ -91,11 +91,20 @@ Configuration values can be accessed by indexing:
    context["entry3"] = "value3"
    print(context.keys())
 
+The :py:meth:`update <processor_tools.context.Context.update>` method allows the updating of multiple items (as a `deep update <https://github.com/pydantic/pydantic/blob/fd2991fe6a73819b48c906e3c3274e8e47d0f761/pydantic/utils.py#L200>`_) as follows:
+
+.. ipython:: python
+
+   print(context.config_values)
+   context.update({"entry1": "new1", "entry2": "new2"})
+   print(context.config_values)
+
 .. ipython:: python
    :suppress:
 
    import os
    os.remove(path)
+   os.remove(path1)
    os.remove(path2)
    Context.default_config = None
 

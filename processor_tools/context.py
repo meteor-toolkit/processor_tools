@@ -72,13 +72,13 @@ class Context:
         for config_path in reversed(config_paths):
             if os.path.isdir(config_path):
                 for p in find_config(config_path):
-                    self.update_config_from_file(p)
+                    self.update_from_file(p)
 
             else:
-                self.update_config_from_file(config_path)
+                self.update_from_file(config_path)
 
         if isinstance(config, dict):
-            self._config_values.update(config)
+            self.update(config)
 
     @property
     def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
@@ -148,7 +148,7 @@ class Context:
 
         self._supercontext = []
 
-    def update_config_from_file(self, path: str) -> None:
+    def update_from_file(self, path: str) -> None:
         """
         Update config values from file
 
@@ -156,7 +156,16 @@ class Context:
         """
 
         config = read_config(path)
-        self._config_values.update(config)
+        self._config_values = deep_update(self._config_values, config)
+
+    def update(self, config: dict) -> None:
+        """
+        Update config values
+
+        :param config: dictionary of configuration data
+        """
+
+        self._config_values = deep_update(self._config_values, config)
 
     @property
     def config_values(self) -> Any:
