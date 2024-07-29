@@ -20,7 +20,7 @@ class Context:
 
     * dictionary of configuration data
     * path of configuration file or directory containing set of configuration files
-    * list of paths (earlier in the list overwrites later in the list)
+    * list of dicts/paths (earlier in the list overwrites later in the list)
 
     :param supercontext: context supercontext or list of supercontexts (earlier in the list overwrites later in the list), configuration values of which override those defined in the context. Each defined as context object or tuple of:
 
@@ -56,13 +56,17 @@ class Context:
         # init default config definitions
         if self.default_config is None:
             default_config = []
-        elif isinstance(self.default_config, str) or isinstance(self.default_config, dict):
+        elif isinstance(self.default_config, str) or isinstance(
+            self.default_config, dict
+        ):
             default_config = [self.default_config]
         else:
             default_config = self.default_config
 
         if not isinstance(default_config, list):
-            raise TypeError("class attribute `default_config` must be one of types [`str`, `dict`, `list[str | dict]`]")
+            raise TypeError(
+                "class attribute `default_config` must be one of types [`str`, `dict`, `list[str | dict]`]"
+            )
 
         # init user config definitions
         if config is None:
@@ -73,7 +77,9 @@ class Context:
             init_config = config
 
         if not isinstance(init_config, list):
-            raise TypeError("argument `config` must be one of types [`str`, `dict`, `list[str | dict]`]")
+            raise TypeError(
+                "argument `config` must be one of types [`str`, `dict`, `list[str | dict]`]"
+            )
 
         configs = init_config + default_config
 

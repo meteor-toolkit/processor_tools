@@ -43,7 +43,10 @@ class TestContext(unittest.TestCase):
         Context.default_config = "path2"
         context = Context("path")
 
-        exp_calls = [call("path2", skip_if_not_exists=True), call("path", skip_if_not_exists=True)]
+        exp_calls = [
+            call("path2", skip_if_not_exists=True),
+            call("path", skip_if_not_exists=True),
+        ]
 
         Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
@@ -54,7 +57,11 @@ class TestContext(unittest.TestCase):
         Context.default_config = ["path2", "path3"]
         context = Context("path")
 
-        exp_calls = [call("path3", skip_if_not_exists=True), call("path2", skip_if_not_exists=True), call("path", skip_if_not_exists=True)]
+        exp_calls = [
+            call("path3", skip_if_not_exists=True),
+            call("path2", skip_if_not_exists=True),
+            call("path", skip_if_not_exists=True),
+        ]
 
         Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
@@ -62,12 +69,17 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.Context.update")
     @patch("processor_tools.context.Context.update_from_file")
     @patch("processor_tools.context.os.path.exists", return_value=True)
-    def test___init__filepath_default_list_filepath_dict(self, mock_exists, mock_updatef, mock_update):
+    def test___init__filepath_default_list_filepath_dict(
+        self, mock_exists, mock_updatef, mock_update
+    ):
         Context.default_config = ["path2", "path3", {"entry": "val"}]
         context = Context("path")
 
-        exp_calls = [call("path3", skip_if_not_exists=True), call("path2", skip_if_not_exists=True),
-                     call("path", skip_if_not_exists=True)]
+        exp_calls = [
+            call("path3", skip_if_not_exists=True),
+            call("path2", skip_if_not_exists=True),
+            call("path", skip_if_not_exists=True),
+        ]
 
         Context.default_config = None
         mock_updatef.assert_has_calls(exp_calls)
@@ -84,7 +96,10 @@ class TestContext(unittest.TestCase):
         Context.default_config = tmp_dir
         context = Context("path")
 
-        exp_calls = [call("found_path", skip_if_not_exists=True), call("path", skip_if_not_exists=True)]
+        exp_calls = [
+            call("found_path", skip_if_not_exists=True),
+            call("path", skip_if_not_exists=True),
+        ]
 
         Context.default_config = None
         mock_find.assert_called_once_with(tmp_dir)
@@ -95,7 +110,9 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.find_config", return_value=["found_path"])
     @patch("processor_tools.context.Context.update_from_file")
     @patch("processor_tools.context.os.path.exists", return_value=True)
-    def test___init__filepath_default_default_list_mixed(self, mock_exists, mock_update, mock_find):
+    def test___init__filepath_default_default_list_mixed(
+        self, mock_exists, mock_update, mock_find
+    ):
         random_string = random.choices(string.ascii_lowercase, k=6)
         tmp_dir = "tmp_" + "".join(random_string)
         os.makedirs(tmp_dir)
@@ -103,7 +120,11 @@ class TestContext(unittest.TestCase):
         Context.default_config = [tmp_dir, "path2"]
         context = Context("path")
 
-        exp_calls = [call("path2", skip_if_not_exists=True), call("found_path", skip_if_not_exists=True), call("path", skip_if_not_exists=True)]
+        exp_calls = [
+            call("path2", skip_if_not_exists=True),
+            call("found_path", skip_if_not_exists=True),
+            call("path", skip_if_not_exists=True),
+        ]
 
         mock_find.assert_called_once_with(tmp_dir)
         mock_update.assert_has_calls(exp_calls)
@@ -407,7 +428,7 @@ class TestContext(unittest.TestCase):
         context = Context()
         context._config_values = {
             "entry1": "value1",
-            "entry2": {"subentry2a": "value2a", "subentry2b": "value2b"}
+            "entry2": {"subentry2a": "value2a", "subentry2b": "value2b"},
         }
 
         context.update({"entry2": {"subentry2a": "update"}})
@@ -416,8 +437,8 @@ class TestContext(unittest.TestCase):
             context._config_values,
             {
                 "entry1": "value1",
-                "entry2": {"subentry2a": "update", "subentry2b": "value2b"}
-            }
+                "entry2": {"subentry2a": "update", "subentry2b": "value2b"},
+            },
         )
 
     @patch(
