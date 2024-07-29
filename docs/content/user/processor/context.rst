@@ -157,7 +157,26 @@ To inherit configuration values between packages and processes a global supercon
 .. ipython:: python
 
    from processor_tools import set_global_supercontext
-   context1 = Context({"val1": 1})
-   set_global_supercontext(context1)
-   context2 = Context({"val1": 2})
-   print(context2["val1"])
+   context = Context({"val1": 1})
+   print(context["val1"])
+   global_supercontext = Context({"val1": "global"})
+   set_global_supercontext(global_supercontext)
+   print(context["val1"])
+
+You can clear all the set global supercontexts with :py:func:`clear_global_supercontext <processor_tools.context.clear_global_supercontext>` function.
+
+.. ipython:: python
+
+   from processor_tools import clear_global_supercontext
+   clear_global_supercontext()
+   print(context["val1"])
+
+A convenient way to implement this is with a `with` statement, as follows
+
+.. ipython:: python
+
+   from processor_tools import set_global_supercontext
+   print(context["val1"])
+   with set_global_supercontext(global_supercontext):
+       print(context["val1"])
+   print(context["val1"])
