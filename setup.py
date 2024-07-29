@@ -38,6 +38,7 @@ setup(
             "ipython",
             "pickleshare",
             "types-PyYAML",
+            "pydantic"
         ]
     },
     classifiers=[
