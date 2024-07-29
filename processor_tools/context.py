@@ -72,10 +72,10 @@ class Context:
         for config_path in reversed(config_paths):
             if os.path.isdir(config_path):
                 for p in find_config(config_path):
-                    self.update_config_from_file(p)
+                    self.update_from_file(p)
 
             else:
-                self.update_config_from_file(config_path)
+                self.update_from_file(config_path)
 
         if isinstance(config, dict):
             self._config_values.update(config)
@@ -148,7 +148,7 @@ class Context:
 
         self._supercontext = []
 
-    def update_config_from_file(self, path: str) -> None:
+    def update_from_file(self, path: str) -> None:
         """
         Update config values from file
 

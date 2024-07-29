@@ -36,7 +36,7 @@ class TestContext(unittest.TestCase):
         self.assertEqual(context._supercontext, [])
         mock_read_config.assert_called_once_with("path")
 
-    @patch("processor_tools.context.Context.update_config_from_file")
+    @patch("processor_tools.context.Context.update_from_file")
     def test___init__filepath_default_filepath(self, mock_update):
         Context.default_config = "path2"
         context = Context("path")
@@ -46,7 +46,7 @@ class TestContext(unittest.TestCase):
         Context.default_config = None
         mock_update.assert_has_calls(exp_calls)
 
-    @patch("processor_tools.context.Context.update_config_from_file")
+    @patch("processor_tools.context.Context.update_from_file")
     def test___init__filepath_default_list_filepath(self, mock_update):
         Context.default_config = ["path2", "path3"]
         context = Context("path")
@@ -57,7 +57,7 @@ class TestContext(unittest.TestCase):
         mock_update.assert_has_calls(exp_calls)
 
     @patch("processor_tools.context.find_config", return_value=["found_path"])
-    @patch("processor_tools.context.Context.update_config_from_file")
+    @patch("processor_tools.context.Context.update_from_file")
     def test___init__filepath_default_dir(self, mock_update, mock_find):
         random_string = random.choices(string.ascii_lowercase, k=6)
         tmp_dir = "tmp_" + "".join(random_string)
@@ -75,7 +75,7 @@ class TestContext(unittest.TestCase):
         shutil.rmtree(tmp_dir)
 
     @patch("processor_tools.context.find_config", return_value=["found_path"])
-    @patch("processor_tools.context.Context.update_config_from_file")
+    @patch("processor_tools.context.Context.update_from_file")
     def test___init__filepath_default_default_list_mixed(self, mock_update, mock_find):
         random_string = random.choices(string.ascii_lowercase, k=6)
         tmp_dir = "tmp_" + "".join(random_string)
