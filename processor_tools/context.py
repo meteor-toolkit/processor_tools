@@ -197,9 +197,7 @@ class Context:
                 supercontext_values_i = supercontext_i._config_values
 
             if supercontext_values_i is not None:
-                config_values = deep_update(
-                    config_values, supercontext_values_i
-                )
+                config_values = deep_update(config_values, supercontext_values_i)
 
             if supercontext_i.supercontext is not None:
                 config_values = self._update_with_supercontexts(

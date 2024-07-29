@@ -532,7 +532,6 @@ class TestContext(unittest.TestCase):
 
 
 class TestSetGlobalSupercontext(unittest.TestCase):
-
     def tearDown(self):
 
         clear_global_supercontext()
