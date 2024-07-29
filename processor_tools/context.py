@@ -3,7 +3,7 @@
 import os.path
 from typing import Optional, Dict, Any, List, Union, Tuple
 from copy import deepcopy
-import collections.abc
+from pydantic.utils import deep_update
 from processor_tools import GLOBAL_SUPERCONTEXT
 from processor_tools import read_config, find_config
 
@@ -43,7 +43,7 @@ class Context:
     def __init__(
         self,
         config: Optional[Union[str, List[str], dict]] = None,
-        supercontext: Optional[Union["Context", Tuple["Context", str]]] = None,
+        supercontext: Optional[List[Union["Context", Tuple["Context", str]]]] = None,
     ) -> None:
 
         # initialise attributes
@@ -197,7 +197,7 @@ class Context:
                 supercontext_values_i = supercontext_i._config_values
 
             if supercontext_values_i is not None:
-                config_values = Context._nested_update(
+                config_values = deep_update(
                     config_values, supercontext_values_i
                 )
 
@@ -207,21 +207,6 @@ class Context:
                 )
 
         return config_values
-
-    @staticmethod
-    def _nested_update(dict1: dict, dict2: dict):
-        """
-        Returns d
-        :param d:
-        :param u:
-        :return:
-        """
-        for k, v in dict2.items():
-            if isinstance(v, collections.abc.Mapping):
-                dict1[k] = Context._nested_update(dict1.get(k, {}), v)
-            else:
-                dict1[k] = v
-        return dict1
 
     def set(self, name: str, value: Any):
         """
