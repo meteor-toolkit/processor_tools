@@ -27,7 +27,11 @@ from processor_tools.config_io import (
     build_configdir,
     find_config,
 )
-from processor_tools.context import Context, set_global_supercontext, clear_global_supercontext
+from processor_tools.context import (
+    Context,
+    set_global_supercontext,
+    clear_global_supercontext,
+)
 from processor_tools.setup_utils import CustomCmdClassUtils
 
 __version__ = get_versions()["version"]
