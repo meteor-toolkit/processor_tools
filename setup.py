@@ -25,7 +25,7 @@ setup(
     description="Tools to support the developing of processing pipelines",
     long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=["numpy", "pyyaml"],
+    install_requires=["numpy", "pyyaml", "pydantic"],
     extras_require={
         "dev": [
             "numpy",
@@ -38,7 +38,6 @@ setup(
             "ipython",
             "pickleshare",
             "types-PyYAML",
-            "pydantic"
         ]
     },
     classifiers=[
