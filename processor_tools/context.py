@@ -300,13 +300,12 @@ class set_global_supercontext:
 
     Can be run with a `with` statement, as follows
 
-    .. code-block: python
+    .. code-block:: python
 
        from processor_tools import Context, set_global_supercontext
 
        my_context = Context()
-
-       with set_global_supercontext:
+       with set_global_supercontext(my_context):
            run_process()
 
     In this example, `my_context` is set as the global supercontext within the scope of the `with` statement and then removed after.
