@@ -156,7 +156,9 @@ class Context:
         """
 
         config = read_config(path)
-        self._config_values.update(config)
+        self._config_values = deep_update(self._config_values, config)
+
+
 
     @property
     def config_values(self) -> Any:
