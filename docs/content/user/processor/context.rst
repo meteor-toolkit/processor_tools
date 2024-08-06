@@ -51,7 +51,9 @@ This can be loaded into a :py:class:`Context <processor_tools.context.Context>` 
    path = "context_file.yaml"
    context = Context(path)
 
-The path can also be to directory containing set of configuration files. Providing a list of configuration paths loads the values from each of the configuration files/directories of files.
+The path can also be to directory containing set of configuration files.
+
+Providing a list of configuration paths or dictionaries loads the values from each of the configuration files/directories/dictionaries.
 
 In the case where multiple input configuration files provide the same value, earlier in the list overwrites later in the list. So in the example,
 
@@ -59,17 +61,18 @@ In the case where multiple input configuration files provide the same value, ear
 
    path1 = "context_file1.yaml"
    path2 = "context_file2.yaml"
-   context = Context([path1, path2])
+   dict1 = {"entry3": "value3"}
+   context = Context([path1, path2, dict1])
 
-if the same configuration value is defined in both of these files, the value in `"context_file1.yaml"` overwrites that in `"context_file2.yaml"`.
+If the same configuration value is defined multiple times, the value in `"context_file1.yaml"` overwrites that in `"context_file2.yaml"` which overwrites that in `dict1`.
 
-The :py:class:`Context <processor_tools.context.Context>` class variable `default_config` enables you to set configuration file(s)/directory(ies) of files that are loaded every time the class is initialised. Configuration values from these files come lower in the priority list than those defined at initialisation.
+The :py:class:`Context <processor_tools.context.Context>` class variable `default_config` enables you to set configuration file(s)/directory(ies)/dictionaries that are loaded every time the class is initialised. These configuration values come lower in the priority list than those defined at initialisation.
 
 Therefore, the following has the same effect as the previous example:
 
 .. ipython:: python
 
-   Context.default_config = path2
+   Context.default_config = [path2, dict1]
    context = Context(path1)
 
 Interfacing with the Context object
@@ -88,7 +91,7 @@ Configuration values can be accessed by indexing:
 .. ipython:: python
 
    print(context["entry1"])
-   context["entry3"] = "value3"
+   context["entry4"] = "value4"
    print(context.keys())
 
 The :py:meth:`update <processor_tools.context.Context.update>` method allows the updating of multiple items (as a `deep update <https://github.com/pydantic/pydantic/blob/fd2991fe6a73819b48c906e3c3274e8e47d0f761/pydantic/utils.py#L200>`_) as follows:

@@ -20,7 +20,7 @@ class Context:
 
     * dictionary of configuration data
     * path of configuration file or directory containing set of configuration files
-    * list of paths (earlier in the list overwrites later in the list)
+    * list of dicts/paths (earlier in the list overwrites later in the list)
 
     :param supercontext: context supercontext or list of supercontexts (earlier in the list overwrites later in the list), configuration values of which override those defined in the context. Each defined as context object or tuple of:
 
@@ -36,7 +36,7 @@ class Context:
     """
 
     # default_config class variable enables you to set configuration file(s)/directory(ies) of files that are
-    # loaded every time the class is initialised. Configuration values from these files come lower in the priority
+    # loaded every time the class is initialised. Configuration values from these files/dicts come lower in the priority
     # list than those defined at init.
     default_config: Optional[Union[str, List[str]]] = None
 
@@ -53,32 +53,51 @@ class Context:
         if supercontext is not None:
             self.supercontext = supercontext
 
-        # init default config path
-        default_config_paths: List[str] = []
-        if isinstance(self.default_config, str):
-            default_config_paths = [self.default_config]
-        elif isinstance(self.default_config, list):
-            default_config_paths = self.default_config
-
-        # init user config paths
-        if isinstance(config, str):
-            config_paths = [config] + default_config_paths
-        elif isinstance(config, list):
-            config_paths = config + default_config_paths
+        # init default config definitions
+        if self.default_config is None:
+            default_config = []
+        elif isinstance(self.default_config, str) or isinstance(
+            self.default_config, dict
+        ):
+            default_config = [self.default_config]
         else:
-            config_paths = default_config_paths
+            default_config = self.default_config
+
+        if not isinstance(default_config, list):
+            raise TypeError(
+                "class attribute `default_config` must be one of types [`str`, `dict`, `list[str | dict]`]"
+            )
+
+        # init user config definitions
+        if config is None:
+            init_config = []
+        elif isinstance(config, str) or isinstance(config, dict):
+            init_config = [config]
+        else:
+            init_config = config
+
+        if not isinstance(init_config, list):
+            raise TypeError(
+                "argument `config` must be one of types [`str`, `dict`, `list[str | dict]`]"
+            )
+
+        configs = init_config + default_config
 
         # open config paths
-        for config_path in reversed(config_paths):
-            if os.path.isdir(config_path):
-                for p in find_config(config_path):
-                    self.update_from_file(p)
+        for config_i in reversed(configs):
+            if isinstance(config_i, str):
+                if os.path.isdir(config_i):
+                    for p in find_config(config_i):
+                        self.update_from_file(p, skip_if_not_exists=True)
+
+                else:
+                    self.update_from_file(config_i, skip_if_not_exists=True)
+
+            elif isinstance(config_i, dict):
+                self.update(config_i)
 
             else:
-                self.update_from_file(config_path)
-
-        if isinstance(config, dict):
-            self.update(config)
+                raise TypeError("config definition must be of type [`str`, `dict`]")
 
     @property
     def supercontext(self) -> List[Tuple["Context", Union[None, str]]]:
@@ -148,15 +167,23 @@ class Context:
 
         self._supercontext = []
 
-    def update_from_file(self, path: str) -> None:
+    def update_from_file(self, path: str, skip_if_not_exists: bool = False) -> None:
         """
         Update config values from file
 
         :param path: config file path
+        :param skip_if_not_exists: skips running if file at path doesn't exist
         """
 
-        config = read_config(path)
-        self._config_values = deep_update(self._config_values, config)
+        if os.path.exists(path):
+            config = read_config(path)
+            self._config_values = deep_update(self._config_values, config)
+
+        else:
+            if skip_if_not_exists:
+                pass
+            else:
+                raise ValueError("no such file: " + path)
 
     def update(self, config: dict) -> None:
         """
@@ -164,7 +191,6 @@ class Context:
 
         :param config: dictionary of configuration data
         """
-
         self._config_values = deep_update(self._config_values, config)
 
     @property
