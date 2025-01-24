@@ -171,5 +171,5 @@ def txt_to_dict(txt_filepath):
     return list_to_dict(elements)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

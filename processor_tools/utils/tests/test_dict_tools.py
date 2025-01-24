@@ -10,7 +10,9 @@ from processor_tools.utils.dict_tools import *
 class MyDictTools(unittest.TestCase):
     def test_key_exists_any(self):
         input_dict = {"name": "filename", "age": 9}
-        with mock.patch("processor_tools.utils.dict_tools.key_present", return_value=True):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_present", return_value=True
+        ):
             self.assertEqual(key_exists(input_dict, "name"), True)
 
     def test_key_exists_all(self):
@@ -121,7 +123,9 @@ class MyDictTools(unittest.TestCase):
 
         output_dict = {"A": "a", "B": "b"}
 
-        with mock.patch("processor_tools.utils.dict_tools.key_in_dict", return_value=False):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_in_dict", return_value=False
+        ):
             self.assertEqual(dict_merge([input_1, input_2]), output_dict)
 
     def test_dict_merge_common_keys_level_1(self):
@@ -151,7 +155,9 @@ class MyDictTools(unittest.TestCase):
 
         output_dict_3 = {"Ground_Floor": ["A1", "A2", "B1", "B2", "G1"]}
 
-        with mock.patch("processor_tools.utils.dict_tools.key_in_dict", return_value=True):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_in_dict", return_value=True
+        ):
             self.assertEqual(dict_merge([input_1, input_2]), output_dict)
             self.assertEqual(dict_merge([input_3, input_4]), output_dict_1)
             self.assertEqual(dict_merge([output_dict_1, input_5]), output_dict_2)
@@ -170,7 +176,9 @@ class MyDictTools(unittest.TestCase):
             ]
         }
 
-        with mock.patch("processor_tools.utils.dict_tools.key_in_dict", return_value=True):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_in_dict", return_value=True
+        ):
             self.assertEqual(dict_merge([input_3, input_4, input_5]), output_dict_2)
 
     def test_dict_merge_common_keys_level_2(self):
@@ -192,7 +200,9 @@ class MyDictTools(unittest.TestCase):
 
         output_dict_2 = {"Rooms": {"Ground_Floor": ["A1", "A2", "B1"]}}
 
-        with mock.patch("processor_tools.utils.dict_tools.key_in_dict", return_value=True):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_in_dict", return_value=True
+        ):
             self.assertEqual(dict_merge([input_1, input_2]), output_dict)
             self.assertEqual(dict_merge([input_3, input_4]), output_dict_1)
             self.assertEqual(dict_merge([output_dict, input_5]), output_dict_2)
@@ -202,7 +212,9 @@ class MyDictTools(unittest.TestCase):
 
         output_dict = {"Rooms": {"Ground_Floor": ["A1", "A1"]}}
 
-        with mock.patch("processor_tools.utils.dict_tools.key_in_dict", return_value=True):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.key_in_dict", return_value=True
+        ):
             self.assertEqual(dict_merge([input_1, input_1]), input_1)
             self.assertEqual(dict_merge([input_1, input_1], True), output_dict)
 
@@ -379,7 +391,9 @@ class MyDictTools(unittest.TestCase):
         input_1 = {"Numbers": "1 2"}
         output_1 = {"Numbers": [1, 2]}
 
-        with mock.patch("processor_tools.utils.dict_tools.val_format", return_value=[1, 2]):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.val_format", return_value=[1, 2]
+        ):
             change_type(input_1)
             self.assertEqual(input_1, output_1)
 
@@ -435,7 +449,9 @@ class MyDictTools(unittest.TestCase):
             }
         }
 
-        with mock.patch("processor_tools.utils.dict_tools.val_format", side_effect=["G1", "F1"]):
+        with mock.patch(
+            "processor_tools.utils.dict_tools.val_format", side_effect=["G1", "F1"]
+        ):
             change_type(input_2)
             self.assertEqual(input_2, output_2)
 
@@ -477,7 +493,9 @@ class MyDictTools(unittest.TestCase):
         remove_tag(input_1, "Height")
         self.assertEqual(input_1, {"Main_Building": "5 m", "Indoor": "5 m"})
 
-    @mock.patch("processor_tools.utils.dict_tools.key_in_dict", side_effect=[True, False])
+    @mock.patch(
+        "processor_tools.utils.dict_tools.key_in_dict", side_effect=[True, False]
+    )
     def test_remove_tag_key_in_dict(self, key_in_dict_mock):
         input_1 = {"Main_Building": {"Height": "5 m"}, "Height": {"Indoor": "5 m"}}
         remove_tag(input_1, "Main_Building")
