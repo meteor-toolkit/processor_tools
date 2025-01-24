@@ -95,10 +95,14 @@ class BaseProcessor:
         # handle subprocessor depending on how it is defined:
         # * factory - class selected from factory and instantiated, with resultant object added subprocessors
         if isinstance(sp_obj, ProcessorFactory):
-            self.subprocessors[sp_name] = sp_obj[self.context[sp_path]](
-                context=self.context, processor_path=sp_path
-            )
-
+            try:
+                self.subprocessors[sp_name] = sp_obj[self.context['processor'][sp_path]](
+                    context=self.context, processor_path=sp_path
+                )
+            except:
+                self.subprocessors[sp_name] = sp_obj[self.context[sp_path]](
+                    context=self.context, processor_path=sp_path
+                )
         # * if object - processor object add to subprocessors
         elif isinstance(sp_obj, BaseProcessor):
             sp_obj._prepend_processor_path(sp_path)
