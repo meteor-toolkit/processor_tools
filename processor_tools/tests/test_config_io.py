@@ -11,8 +11,12 @@ from processor_tools.config_io import (
     BaseConfigReader,
     ConfigReader,
     YAMLReader,
-    ConfigReaderFactory,
+    YAMLWriter,
+    ConfigIOFactory,
     read_config,
+    write_config,
+    build_configdir,
+    find_config,
 )
 
 
@@ -42,8 +46,12 @@ class TestBaseConfigReader(unittest.TestCase):
         dtype = BaseConfigReader._infer_dtype("11.7")
         self.assertEqual(dtype, float)
 
+    def test__infer_dtype_int(self):
+        dtype = BaseConfigReader._infer_dtype("1")
+        self.assertEqual(dtype, int)
+
     def test__infer_dtype_bool_True(self):
-        dtype = BaseConfigReader._infer_dtype("False")
+        dtype = BaseConfigReader._infer_dtype("True")
         self.assertEqual(dtype, bool)
 
     def test__infer_dtype_bool_False(self):
@@ -78,7 +86,7 @@ class TestConfigReader(unittest.TestCase):
         val = ConfigReader._extract_config_value(config, "section", "key", dtype=bool)
         self.assertEqual(val, False)
 
-    def test__extract_config_value_dtype_None(self):
+    def test__extract_config_value(self):
         config = RawConfigParser()
         config["section"] = {"key": "val"}
 
@@ -156,30 +164,63 @@ class TestYAMLReaderFactory(unittest.TestCase):
         shutil.rmtree(self.tmp_dir)
 
 
-class TestConfigReaderFactory(unittest.TestCase):
+class TestYAMLWriter(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        os.makedirs(self.tmp_dir)
+
+    def test_write(self):
+        yml_path = os.path.join(self.tmp_dir, "test.yaml")
+        config_dict = {"test": {"entry1": "value1", "entry2": False, "entry3": 1.2}}
+
+        writer = YAMLWriter()
+        writer.write(yml_path, config_dict)
+
+        self.assertTrue(os.path.exists(yml_path))
+
+        with open(yml_path, "r") as f:
+            yml_str = f.read()
+
+        exp_yml_str = (
+            "test:\n" "  entry1: value1\n" "  entry2: false\n" "  entry3: 1.2\n"
+        )
+
+        self.assertEqual(yml_str, exp_yml_str)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+
+class TestConfigIOFactory(unittest.TestCase):
     def test_get_reader_config(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.config")), type(ConfigReader())
         )
 
     def test_get_reader_yaml(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertEqual(
             type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
         )
 
+    def test_get_writer_yaml(self):
+        crf = ConfigIOFactory()
+        self.assertEqual(
+            type(crf.get_writer("test/file/path.yaml")), type(YAMLWriter())
+        )
+
     def test_get_reader_invalid(self):
-        crf = ConfigReaderFactory()
+        crf = ConfigIOFactory()
         self.assertRaises(ValueError, crf.get_reader, "test/file/path.invalid")
 
     def test_get_file_extension(self):
         path = "test/file/path.extension"
-        self.assertEqual(ConfigReaderFactory._get_file_extension(path), "extension")
+        self.assertEqual(ConfigIOFactory._get_file_extension(path), "extension")
 
 
-class ReadConfFactory(unittest.TestCase):
-    @patch("processor_tools.config_io.ConfigReaderFactory")
+class TestReadConfig(unittest.TestCase):
+    @patch("processor_tools.config_io.ConfigIOFactory")
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
         mock_reader.return_value.get_reader.assert_called_once_with("test.path")
@@ -190,6 +231,83 @@ class ReadConfFactory(unittest.TestCase):
         self.assertEqual(
             cfg, mock_reader.return_value.get_reader.return_value.read.return_value
         )
+
+
+class TestWriteConfig(unittest.TestCase):
+    @patch("processor_tools.config_io.ConfigIOFactory")
+    def test_write_config(self, mock_reader):
+        write_config("test.path", "dict")
+        mock_reader.return_value.get_writer.assert_called_once_with("test.path")
+        mock_reader.return_value.get_writer.return_value.write.assert_called_once_with(
+            "test.path", "dict"
+        )
+
+
+class TestBuildConfigDir(unittest.TestCase):
+    @patch("processor_tools.config_io.write_config")
+    @patch("processor_tools.config_io.shutil.copyfile")
+    @patch("processor_tools.config_io.os.makedirs")
+    def test_build_configdir(self, mock_mdir, mock_copy, mock_write):
+
+        configs = {
+            "copied_config.yaml": "path/to/old_config.yaml",
+            "new_config.yaml": {"entry1": "value1"},
+        }
+
+        build_configdir("test", configs)
+
+        mock_mdir.assert_called_once_with("test", exist_ok=True)
+        mock_copy.assert_called_once_with(
+            "path/to/old_config.yaml", os.path.join("test", "copied_config.yaml")
+        )
+        mock_write.assert_called_once_with(
+            os.path.join("test", "new_config.yaml"), {"entry1": "value1"}
+        )
+
+    @patch("processor_tools.config_io.write_config")
+    @patch("processor_tools.config_io.shutil.copyfile")
+    @patch("processor_tools.config_io.os.makedirs")
+    @patch("processor_tools.config_io.os.path.isdir", return_value=True)
+    def test_build_configdir_exists_skip(
+        self, mock_exists, mock_mdir, mock_copy, mock_write
+    ):
+
+        configs = {
+            "copied_config.yaml": "path/to/old_config.yaml",
+            "new_config.yaml": {"entry1": "value1"},
+        }
+
+        build_configdir("test", configs, exists_skip=True)
+
+        mock_mdir.assert_not_called()
+        mock_copy.assert_not_called()
+        mock_write.assert_not_called()
+
+
+class TestFindConfig(unittest.TestCase):
+    def setUp(self):
+        random_string = random.choices(string.ascii_lowercase, k=6)
+        self.tmp_dir = "tmp_" + "".join(random_string)
+        os.makedirs(self.tmp_dir)
+
+        filenames = ["file1.yml", "file2.config", "file3.txt"]
+
+        for filename in filenames:
+            with open(os.path.join(self.tmp_dir, filename), "w") as f:
+                f.write("test")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+    def test_find_config(self):
+        configs = find_config(self.tmp_dir)
+
+        exp_configs = [
+            os.path.join(self.tmp_dir, "file1.yml"),
+            os.path.join(self.tmp_dir, "file2.config"),
+        ]
+
+        self.assertCountEqual(configs, exp_configs)
 
 
 if __name__ == "__main__":

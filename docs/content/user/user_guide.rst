@@ -11,4 +11,5 @@ In this user guide, you will find detailed descriptions and examples that descri
    :maxdepth: 2
 
    quickstart
-   processor_build
+   processor/processor
+   utilities/utilities

@@ -9,10 +9,14 @@ Building a Processor Object
 
    import processor_tools
 
+The core of **processor_tools** functionality involves building `Processor` classes that are subclasses of :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>`. This section of the user guide provides information for how to build and use your own `Processor` classes.
+
 Creating a Processor Class
 ==========================
 
-Processor classes are defined as subclasses of the :py:class:`~processor_tools.processor.BaseProcessor` class. The processor's processing algorithm should be defined in the :py:meth:`run` method.
+Processor classes are defined by subclassing the :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>` class. The processor's processing algorithm should be defined by overriding :py:meth:`BaseProcessor.run <processor_tools.processor.BaseProcessor.run>` method.
+
+In this example we define a processor class for multiplying input values together.
 
 .. ipython:: python
 
@@ -26,7 +30,11 @@ Processor classes are defined as subclasses of the :py:class:`~processor_tools.p
 Defining Configuration Values
 =============================
 
-Configuration values can be provided when the processor class is initialised with a ``context`` object. The context object should be a container (such as a :py:class:`dict`) with the necessary values defined. Within an initialised processor object, the ``context`` object can be accessed as an instance attribute.
+Configuration values can be provided when the processor class is initialised with a ``context`` object. The `context` object should be a container with the necessary configuration values defined - this may be as a simple :py:class:`dict`.
+
+**processor_tools** also provides the :py:class:`Context <processor_tools.context.Context>` object, which has useful extra functionality for handling `Processor` state/configuration. For more information on using the :py:class:`Context <processor_tools.context.Context>` object for storing processor state, see the :ref:`relevant section <context>` of the user guide.
+
+Within an initialised processor object, the ``context`` object can be accessed as an instance attribute.
 
 .. ipython:: python
 
@@ -62,7 +70,7 @@ Processor classes may be related to other processor classes as "subprocessors". 
 Appending subprocessors to a processor object
 ---------------------------------------------
 
-A processor may be added to another processor class's subprocessors using the :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` method. Subprocessors may be added as instantiated processor objects, processor classes, or processor factories (more of which below). :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` stores an instantiated processor object for any of these options.
+A processor may be added to another processor class's subprocessors using the :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` method. Subprocessors may be added as instantiated processor objects, processor classes, or processor factories (more of which below). :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` stores an instantiated processor object for any of these options.
 
 A processor object's subprocessors are stored in a dictionary that is accessible via the ``subprocessors`` attribute.
 
@@ -102,7 +110,7 @@ Configuring subprocessor options with processor factories
 
 In many cases subprocessor elements within a processing chain may be completed by several different processor implementations, the choice of which may depend on the circumstance.
 
-``processor_tools`` processors handle this with a :py:class:`~processor_tools.processor.ProcessorFactory`. Processor factories are effectively containers which can store a set of processors.
+**processor_tools** processors handle this with a :py:class:`ProcessorFactory <processor_tools.processor.ProcessorFactory>`. Processor factories are effectively containers which can store a set of processors.
 
 .. ipython:: python
 
@@ -118,11 +126,15 @@ In many cases subprocessor elements within a processing chain may be completed b
 
    print(algo_factory["algorithm2"])
 
-These factories can be used to define the set of optional implementations for a subprocessor. As before, they can be appended to a processor's subprocessors using the the :py:meth:`~processor_tools.processor.BaseProcessor.append_subprocessor` method. The choice of processor implementation is set by the user in the processor :ref:`context <context>`. The context object should define an entry for the :ref:`subprocessor path <path>` that is defined by the factory with a value of the :ref:`processor name <name>` of choice.
+These factories can be used to define the set of optional implementations for a subprocessor. As before, they can be appended to a processor's subprocessors using the the :py:meth:`append_subprocessor <processor_tools.processor.BaseProcessor.append_subprocessor>` method.
+
+The choice of processor implementation is set by the user in the processor :ref:`context <context>`. The context object should define a top level entry called `"processor"`, the value for which defines a set of entries - one for each subprocessor.
+
+Each subprocessor entry is named by the :ref:`subprocessor path <path>` for the factory, with a value of the :ref:`processor name <name>` of choice.
 
 .. ipython:: python
 
-   context = {"opt_algo": "algorithm1"}
+   context = {"processor": {"opt_algo": "algorithm1"}}
    proc_with_opts = MyProcessor(context=context)
    proc_with_opts.append_subprocessor("opt_algo", algo_factory)
    print(proc_with_opts.subprocessors)
@@ -133,18 +145,18 @@ If all the processors required for a factory are in one or more package modules,
 
    mod_algo_factory = processor_tools.ProcessorFactory("package.subpackage.module")
 
-So ``mod_algo_factory`` would now contain all ``BaseProcessor`` subclasses in the module ``package.subpackage.module``.
+So ``mod_algo_factory`` would now contain all :py:class:`BaseProcessor <processor_tools.processor.BaseProcessor>` subclasses in the module ``package.subpackage.module``.
 
 Defining processor class default subprocessors
 ----------------------------------------------
 
-In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the defintion of such processors, the class subprocessors can be defined as a class attribute at the defintion of the class.
+In defining a processor class, it is usually clear what subprocessor steps and options are required. To simplify the definition of such processors, the class subprocessors can be defined as a class attribute at the definition of the class.
 
 .. ipython:: python
 
    class ProcessingChain(processor_tools.BaseProcessor):
        cls_subprocessors = {"sub1": MyProcessor, "sub2": algo_factory}
-   context = {"sub2": "algorithm2"}
+   context = {"processor": {"sub2": "algorithm2"}}
    proc_cls_sps = ProcessingChain(context=context)
    print(proc_cls_sps.subprocessors)
 
