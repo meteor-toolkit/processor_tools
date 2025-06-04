@@ -32,6 +32,7 @@ class BaseProcessor:
         self,
         context: Optional[Any] = None,
         processor_path: Optional[str] = None,
+        **kwargs
     ):
         """
         Constructor method
@@ -46,6 +47,8 @@ class BaseProcessor:
         if self.cls_subprocessors is not None:
             for sp_name, sp_obj in self.cls_subprocessors.items():
                 self.append_subprocessor(sp_name, sp_obj)
+
+        super().__init__(**kwargs)
 
     def __str__(self):
         """Custom __str__"""
