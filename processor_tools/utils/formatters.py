@@ -15,6 +15,7 @@ __all__ = [
     "list_to_dict",
     "txt_to_dict",
     "convert_datetime",
+    "datetime_from_yearday",
 ]
 
 
