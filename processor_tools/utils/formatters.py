@@ -91,7 +91,7 @@ def convert_datetime(
     """
     if isinstance(date_time, np.ndarray):
         date_time_out = np.array([convert_datetime(date_time_i) for date_time_i in date_time])
-    elif isinstance(date_time, dt.datetime):
+    elif isinstance(date_time, (dt.datetime, dt.time)):
         date_time_out = date_time
     elif isinstance(date_time, dt.date):
         date_time_out = dt.datetime.combine(date_time, dt.time())
