@@ -117,7 +117,9 @@ class TestBaseProcessor(unittest.TestCase):
         )
 
     def test_append_subprocessor_factory(self):
-        test_processor = self.TestProcessor(context={"processor": {"subprocessor": "option1"}})
+        test_processor = self.TestProcessor(
+            context={"processor": {"subprocessor": "option1"}}
+        )
 
         test_processor.append_subprocessor("subprocessor", self.test_factory)
 

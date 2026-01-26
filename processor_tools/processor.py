@@ -32,7 +32,7 @@ class BaseProcessor:
         self,
         context: Optional[Any] = None,
         processor_path: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Constructor method
@@ -99,9 +99,9 @@ class BaseProcessor:
         # * factory - class selected from factory and instantiated, with resultant object added subprocessors
         if isinstance(sp_obj, ProcessorFactory):
             try:
-                self.subprocessors[sp_name] = sp_obj[self.context['processor'][sp_path]](
-                    context=self.context, processor_path=sp_path
-                )
+                self.subprocessors[sp_name] = sp_obj[
+                    self.context["processor"][sp_path]
+                ](context=self.context, processor_path=sp_path)
             except:
                 self.subprocessors[sp_name] = sp_obj[self.context[sp_path]](
                     context=self.context, processor_path=sp_path

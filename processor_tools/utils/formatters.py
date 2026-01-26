@@ -80,6 +80,7 @@ def str2datetime(s):
                     )
     return val
 
+
 def convert_datetime(
     date_time: Union[dt.datetime, dt.date, str, float, int, np.ndarray],
 ) -> dt.datetime:
@@ -90,7 +91,9 @@ def convert_datetime(
     :return: datetime object corresponding to input date_time
     """
     if isinstance(date_time, np.ndarray):
-        date_time_out = np.array([convert_datetime(date_time_i) for date_time_i in date_time])
+        date_time_out = np.array(
+            [convert_datetime(date_time_i) for date_time_i in date_time]
+        )
     elif isinstance(date_time, (dt.datetime, dt.time)):
         date_time_out = date_time
     elif isinstance(date_time, dt.date):
@@ -99,14 +102,18 @@ def convert_datetime(
         unix_epoch = np.datetime64(0, "s")
         one_second = np.timedelta64(1, "s")
         seconds_since_epoch = (date_time - unix_epoch) / one_second
-        date_time_out = dt.datetime.fromtimestamp(seconds_since_epoch,tz=dt.timezone.utc)
+        date_time_out = dt.datetime.fromtimestamp(
+            seconds_since_epoch, tz=dt.timezone.utc
+        )
     elif isinstance(date_time, (float, int, np.unsignedinteger, np.floating)):
-        date_time_out = dt.datetime.fromtimestamp(float(date_time),tz=dt.timezone.utc)
+        date_time_out = dt.datetime.fromtimestamp(float(date_time), tz=dt.timezone.utc)
     elif isinstance(date_time, str):
         date_time_out = str2datetime(date_time).replace(tzinfo=dt.timezone.utc)
     else:
         raise ValueError(
-            "Unable to discern datetime '{}' of type: '{}'".format(date_time, type(date_time))
+            "Unable to discern datetime '{}' of type: '{}'".format(
+                date_time, type(date_time)
+            )
         )
     if isinstance(date_time_out, np.ndarray):
         for i in range(len(date_time_out)):
@@ -117,25 +124,31 @@ def convert_datetime(
 
     return date_time_out
 
+
 def datetime_from_yearday(year, doy, utc):
-    """
-    """
+    """ """
 
     if isinstance(utc, str):
-        if ':' in utc:
+        if ":" in utc:
             utc = utc.replace(":", "")
         try:
             utc = dt.datetime.strptime(utc, "%H%M")
         except ValueError:
             import warnings
-            warnings.warn(f"seconds provided {utc} - slicing to hours/minutes f{utc[0:4]}")
+
+            warnings.warn(
+                f"seconds provided {utc} - slicing to hours/minutes f{utc[0:4]}"
+            )
             utc = dt.datetime.strptime(utc[0:4], "%H%M")
 
-    elif isinstance(utc, float):  # if the time is float we must convert to string and remove the ".0"
+    elif isinstance(
+        utc, float
+    ):  # if the time is float we must convert to string and remove the ".0"
         utc = dt.datetime.strptime(str(utc).split(".")[0], "%H%M")
     doyDelta = dt.timedelta(days=int(doy) - 1)
 
     return dt.datetime(int(year), 1, 1, utc.hour, utc.minute) + doyDelta
+
 
 def val_format(s):
     """

@@ -78,5 +78,5 @@ def get_value(test_dict, key, multiple=False):
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

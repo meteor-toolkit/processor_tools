@@ -142,14 +142,16 @@ class TestFormatters(unittest.TestCase):
         combined = convert_datetime(date)
         assert combined == dt.datetime(2022, 6, 15, 10, 30, tzinfo=dt.timezone.utc)
 
-        # test various string formats 
+        # test various string formats
         date_str = "2022-06-15"
         combined_str = convert_datetime(date_str)
         assert combined_str == dt.datetime(2022, 6, 15, tzinfo=dt.timezone.utc)
 
         date_str_time = "2022-06-15T10:30:00Z"
         combined_str_time = convert_datetime(date_str_time)
-        assert combined_str_time == dt.datetime(2022, 6, 15, 10, 30, tzinfo=dt.timezone.utc )
+        assert combined_str_time == dt.datetime(
+            2022, 6, 15, 10, 30, tzinfo=dt.timezone.utc
+        )
 
         # test various numpy formats
         date_np = np.datetime64("2022-06-15T10:30:00+10:00")
@@ -163,7 +165,10 @@ class TestFormatters(unittest.TestCase):
 
         date_float = 1655251800.5
         combined_float = convert_datetime(date_float)
-        assert combined_float == dt.datetime(2022, 6, 15, 0, 10, 0, 500000, tzinfo=dt.timezone.utc)
+        assert combined_float == dt.datetime(
+            2022, 6, 15, 0, 10, 0, 500000, tzinfo=dt.timezone.utc
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

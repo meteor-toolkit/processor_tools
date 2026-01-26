@@ -78,7 +78,6 @@ class MyDictTools(unittest.TestCase):
         mm.side_effect = fake
         self.assertEqual(get_value(input_1, "Storage"), None)
 
-
     def test_get_value_gen(self):
         input_1 = {"Rooms": {"Ground_Floor": "A1"}}
         output_1 = [("Ground_Floor", "A1")]
