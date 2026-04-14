@@ -11,8 +11,8 @@ import sys
 import shutil
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from processor_tools.config_io import build_configdir
-from processor_tools.setup_utils import CustomCmdClassUtils, build_configdir_cmdclass
+from processor_tools.config.config_io import build_configdir
+from processor_tools.config.setup_utils import CustomCmdClassUtils, build_configdir_cmdclass
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"

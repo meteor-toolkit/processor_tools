@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from typing import Callable, List, Dict, Any, Type, Union, Optional
 import __main__
-from processor_tools.config_io import build_configdir
+from processor_tools.config.config_io import build_configdir
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"

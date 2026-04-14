@@ -7,7 +7,7 @@ import shutil
 from unittest.mock import patch
 import os
 from configparser import RawConfigParser
-from processor_tools.config_io import (
+from processor_tools.config.config_io import (
     BaseConfigReader,
     ConfigReader,
     YAMLReader,
