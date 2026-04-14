@@ -8,4 +8,4 @@ This section describes the additional utilities **processor_tools** offers to pr
    :maxdepth: 2
 
    config_io
-   setup_utils
+   init_config

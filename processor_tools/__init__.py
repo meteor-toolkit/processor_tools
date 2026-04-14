@@ -11,7 +11,6 @@ __all__ = [
     "Context",
     "set_global_supercontext",
     "clear_global_supercontext",
-    "CustomCmdClassUtils",
     "find_config",
 ]
 
@@ -32,7 +31,6 @@ from processor_tools.context import (
     set_global_supercontext,
     clear_global_supercontext,
 )
-from processor_tools.config.setup_utils import CustomCmdClassUtils
 
 __version__ = get_versions()["version"]
 del get_versions
