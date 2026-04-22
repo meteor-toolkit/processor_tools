@@ -48,9 +48,50 @@ class ConfigInit:
         config_init.init("/explicit/path")                    # -> /explicit/path/
     """
 
-    def __init__(self, package_name: str, configs: Dict[str, Union[str, dict, Callable]]):
+    def __init__(self, package_name: str, configs: Dict[str, Union[str, dict, Callable]], config_directory: str = None, config_directory_file_path: str = None):
+        """
+        Initialise the ConfigInit instance.
+        :param package_name: package name, used to derive the standard config directory
+        :param configs: dict mapping config filename to its template. Template can be:
+            * ``dict`` — written as a new config file with those values
+            * ``str`` — path to an existing file that is copied to the target location
+            * ``callable`` — called at init time with no arguments, must return a ``dict``
+        :param config_directory: optional config directory path (i.e. path where the config files will be stored). If not provided, defaults to the path string stored in the config_directory_file_path.
+        :param config_directory_file_path: optional path to the config directory file (i.e. path to the file which stores the config_directory path). If not provided, defaults to ``~/.<processor_tools>/config_directory_<package_name>.txt``."""
         self.package_name = package_name
         self.configs = configs
+        if config_directory_file_path is not None:
+            self.config_directory_file_path = config_directory_file_path
+        else:
+            self.config_directory_file_path = os.path.join(os.path.expanduser("~"), f".{processor_tools}", f"config_directory_{self.package_name}.txt")
+        self.set_config_directory(config_directory_file_path=self.config_directory_file_path, config_directory=config_directory) 
+    
+    def get_config_directory(self, config_directory_file_path) -> str:
+        """
+        Get the config directory path from the config directory file, or return the default home directory if the file does not exist.
+
+        :param config_directory_file_path: path to the config directory file
+        :return: config directory path
+        """
+
+        if os.path.exists(config_directory_file_path):
+            with open(config_directory_file_path, "r") as f:
+                return f.read().strip()
+        else:
+            return self.home_dir()
+        
+    def set_config_directory(self, config_directory_file_path, config_directory):
+        """
+        Set the config directory path in the config directory file.
+
+        :param config_directory_file_path: path to the config directory file
+        :param config_directory: config directory path to set
+        """
+        if not os.path.exists(os.path.dirname(config_directory_file_path)):
+            os.makedirs(os.path.dirname(config_directory_file_path), exist_ok=True)
+        
+        with open(config_directory_file_path, "w") as f:
+            f.write(config_directory)
 
     def home_dir(self) -> str:
         """
@@ -82,21 +123,16 @@ class ConfigInit:
 
         return os.path.join(base, f".{self.package_name}")
 
-    def init(self, path: str = None, exists_skip: bool = True):
+    def init(self, exists_skip: bool = True):
         """
         Create all defined config files in the given directory.
 
         The directory is created automatically if it does not exist.
 
-        :param path: config directory to write files into. Defaults to
-            :py:meth:`home_dir`.
         :param exists_skip: if ``True`` (default), skip any file that already exists,
             preserving user edits. Set to ``False`` to overwrite.
         """
-
-        if path is None:
-            path = self.home_dir()
-
+        path = self.get_config_directory(self.config_directory_file_path)
         os.makedirs(path, exist_ok=True)
 
         for filename, template in self.configs.items():
@@ -113,15 +149,13 @@ class ConfigInit:
             elif isinstance(template, dict):
                 write_config(filepath, template)
 
-    def missing(self, path: str = None) -> List[str]:
+    def missing(self, ) -> List[str]:
         """
         Return a list of config filenames not present in the given directory.
 
-        :param path: config directory to check. Defaults to :py:meth:`home_dir`.
         """
 
-        if path is None:
-            path = self.home_dir()
+        path = self.get_config_directory(self.config_directory_file_path)
 
         return [
             filename
@@ -129,12 +163,12 @@ class ConfigInit:
             if not os.path.exists(os.path.join(path, filename))
         ]
 
-    def is_initialised(self, path: str = None) -> bool:
+    def is_initialised(self,) -> bool:
         """
         Return ``True`` if all defined config files are present in the given directory.
 
-        :param path: config directory to check. Defaults to :py:meth:`home_dir`.
         """
+        path = self.get_config_directory(self.config_directory_file_path)
 
         return len(self.missing(path)) == 0
 
@@ -188,14 +222,17 @@ class ConfigInit:
 
         args = parser.parse_args()
 
-        if args.path:
-            path = args.path
-        elif args.project:
-            path = self.project_dir()
-        else:
-            path = self.home_dir()
 
-        self.init(path=path, exists_skip=not args.overwrite)
+        if args.path:
+            self.set_config_directory(config_directory=args.path)
+        elif args.project:
+            self.set_config_directory(config_directory=self.project_dir())
+        else:
+            self.set_config_directory(config_directory=self.home_dir())
+
+        path = self.get_config_directory(self.config_directory_file_path)
+
+        self.init(exists_skip=not args.overwrite)
         print(f"Config initialised at {path}")
 
 
