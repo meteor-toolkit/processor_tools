@@ -41,11 +41,59 @@ Three template types are supported:
    )
 
 The callable form is useful when default values can only be determined at runtime, such as environment-specific settings.
+Rather than specifying full paths in the ``configs`` dictionary, :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` resolves a config directory at init time.
+By default, this is ``~/.<package_name>`` but it can be customised with the optional parameters described below. The config files are then created within this directory.
+
+Optional configuration directory parameters
+--------------------------------------------
+
+The :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` constructor also accepts two optional parameters to customize config directory handling.
+The first one is the ``config_directory`` — an explicit path where config files will be stored. If not provided, the path defaults to ``~/.<package_name>``.
+When setting this parameter, the provided path is stored in a config directory file for persistence across sessions. By default, the config directory file is located 
+at ``~/.<processor_tools>/config_directory_<package_name>.txt``, but this can be customized with the second parameter, ``config_directory_file_path``. 
+This allows users to choose where the config directory path is stored, which can be useful in environments with specific directory structures or permissions. 
+If neither parameter is provided, the system defaults to using the home directory for config storage, ensuring a sensible default while allowing flexibility for different use cases.
+
+.. ipython:: python
+
+   # Initialize with explicit config directory
+   config_init = ConfigInit(
+       package_name="mypackage",
+       configs={"settings.yaml": {"db_host": "localhost"}},
+       config_directory="/custom/config/path",
+   )
+
+   # Or specify a custom location for the config directory file
+   config_init = ConfigInit(
+       package_name="mypackage",
+       configs={"settings.yaml": {"db_host": "localhost"}},
+       config_directory="/custom/config/path",
+       config_directory_file_path="/custom/path/to/config_directory_file.txt",
+   )
+
+
+Managing config directory location
+===================================
+
+The :py:meth:`get_config_directory <processor_tools.config.init_config.ConfigInit.get_config_directory>` method retrieves the current config directory path. This reads from the config directory file, or returns the default home directory if the file doesn't exist:
+
+.. code-block:: python
+
+   config_dir = config_init.get_config_directory()
+   print(f"Config directory: {config_dir}")
+
+The :py:meth:`set_config_directory <processor_tools.config.init_config.ConfigInit.set_config_directory>` method updates the config directory path. It creates both the config directory and its parent directories as needed, and writes the path to the config directory file:
+
+.. code-block:: python
+
+   # Set config directory to a custom location
+   config_init.set_config_directory(config_directory="/my/custom/config/path")
+
 
 Config directory locations
 ==========================
 
-Rather than specifying full paths in the ``configs`` dictionary, :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` resolves a config directory at init time. Two standard locations are provided.
+Some common config directory locations are provided as methods for convenience. They can be used directly, or as a reference when writing custom directory methods.
 
 User home directory
 -------------------
@@ -88,14 +136,15 @@ By default, ``exists_skip=True`` — existing files are left unchanged so that a
 .. ipython:: python
 
    config_dir = os.path.join(tmp_dir, "config")
-   config_init.init(path=config_dir)
+   config_init.set_config_directory(config_directory=config_dir)  # creates config files in tmp_dir/config
+   config_init.init()
    os.listdir(config_dir)
 
 To overwrite any existing files, pass ``exists_skip=False``:
 
 .. code-block:: python
 
-   config_init.init(path=config_dir, exists_skip=False)
+   config_init.init(exists_skip=False)
 
 Checking initialisation state
 ==============================
@@ -104,15 +153,16 @@ Checking initialisation state
 
 .. ipython:: python
 
-   config_init.is_initialised(path=config_dir)
+   config_init.is_initialised()
 
 :py:meth:`missing <processor_tools.config.init_config.ConfigInit.missing>` returns a list of any filenames that are absent:
 
 .. ipython:: python
 
-   config_init.missing(path=config_dir)
+   config_init.missing()
 
 Both methods default to :py:meth:`home_dir <processor_tools.config.init_config.ConfigInit.home_dir>` when no path is given. They are useful for guarding against missing config at package startup and for writing tests.
+
 
 Recommended usage patterns
 ===========================
@@ -144,10 +194,36 @@ Then import it in the package's ``__init__.py`` and check on startup:
    from mypackage.config import config_init
 
    if not config_init.is_initialised():
-       print(f"Initialising config at {config_init.home_dir()}...")
+       print(f"Initialising config at {config_init.get_config_directory()}...")
        config_init.init()
 
 Because ``exists_skip=True`` by default, this is safe to call on every startup — it only creates files that are genuinely absent.
+
+Integrating with Context objects
+------------------------------
+If your package uses :py:class:`Context <processor_tools.context.Context>` objects, 
+
+.. code-block:: python
+
+   from processor_tools.context import Context
+   from mypackage.config import config_init
+
+   # Create a context and load custom values in addition to all values from config files defined in config_init
+   context = Context({"<section>": {"<key>": "<value>"}}, config_init=config_init)
+
+Or one can subclass :py:class:`Context <processor_tools.context.Context>` and pass a :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` to the constructor. This ensures that config files are initialised and loaded whenever the context is created, without needing to call the CLI entry point or check for initialisation separately.
+
+.. code-block:: python
+
+   from processor_tools.context import Context
+   from mypackage.config import config_init
+
+   class MyContext(Context):
+      default_config: Optional[Union[str, List[str]]] = None
+
+      def __init__(self, *args, **kwargs):
+         self.default_config = ["path/to/default_config.yaml"]  # one or more default config files to load with every context
+         super().__init__(*args, config_init=config_init, **kwargs)
 
 CLI entry point
 ---------------
@@ -181,7 +257,7 @@ After install, users can then run:
 
 .. code-block:: console
 
-   $ mypackage-init                          # initialise in ~/.<package_name>/
+   $ mypackage-init --reset                  # initialise in ~/.<package_name>/
    $ mypackage-init --project                # initialise in <cwd>/.<package_name>/
    $ mypackage-init --path /explicit/path    # initialise at an explicit path
    $ mypackage-init --overwrite              # overwrite any existing files
