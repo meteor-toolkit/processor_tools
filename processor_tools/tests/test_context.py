@@ -637,6 +637,39 @@ class TestContext(unittest.TestCase):
         # Verify that update_from_file was not called since no files exist
         mock_update_from_file.assert_not_called()
 
+    def test_write_config(self):
+        import tempfile
+
+        # Create a temporary file path
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
+        tmp_file.close()  # Close the file so Context can write to it
+
+        try:
+            context = Context()
+            context._config_values = {
+                "entry1": "value1",
+                "entry2": "value2",
+                "entry3": "value3",
+                "entry4": "value4",
+            }
+
+            context.write_config(tmp_file.name)
+
+            with open(tmp_file.name, "r") as f:
+                content = f.read()
+
+            self.assertIn("entry1", content)
+            self.assertIn("value1", content)
+            self.assertIn("entry2", content)
+            self.assertIn("value2", content)
+            self.assertIn("entry3", content)
+            self.assertIn("value3", content)
+            self.assertIn("entry4", content)
+            self.assertIn("value4", content)
+
+        finally:
+            os.remove(tmp_file.name)
+
 
 class TestSetGlobalSupercontext(unittest.TestCase):
     def tearDown(self):

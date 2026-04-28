@@ -7,6 +7,7 @@ from pydantic.utils import deep_update
 from processor_tools import GLOBAL_SUPERCONTEXT
 from processor_tools import read_config, find_config
 from processor_tools.config.init_config import ConfigInit
+from processor_tools.config.config_io import write_config
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -305,6 +306,15 @@ class Context:
         """
 
         return self.get_config_names()
+    
+    def write_config(self, path: str) -> None:
+        """
+        Write config values to file
+
+        :param path: config file path to which to write
+        """
+
+        write_config(path, self.config_values)
 
 
 class set_global_supercontext:
