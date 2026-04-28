@@ -87,7 +87,7 @@ class Context:
             )
         
         if config_init is not None:
-            init_config.extend(config_init.list_config())
+            init_config.extend([os.path.join(config_init.get_config_directory(), f) for f in config_init.list_config()])
 
         configs = init_config + default_config
 
