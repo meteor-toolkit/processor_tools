@@ -111,6 +111,13 @@ The :py:meth:`update <processor_tools.context.Context.update>` method allows the
    os.remove(path2)
    Context.default_config = None
 
+The configuration values in a context object can be written to a file with the :py:meth:`write_config <processor_tools.context.Context.write_config>` method, as follows: 
+
+.. ipython:: python
+
+   output_path = "output_config.yaml"
+   context.write_config(output_path)
+
 Inheriting values between context objects
 =========================================
 

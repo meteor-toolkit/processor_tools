@@ -7,7 +7,7 @@ import shutil
 from unittest.mock import patch
 import os
 from configparser import RawConfigParser
-from processor_tools.config_io import (
+from processor_tools.config.config_io import (
     BaseConfigReader,
     ConfigReader,
     YAMLReader,
@@ -220,7 +220,7 @@ class TestConfigIOFactory(unittest.TestCase):
 
 
 class TestReadConfig(unittest.TestCase):
-    @patch("processor_tools.config_io.ConfigIOFactory")
+    @patch("processor_tools.config.config_io.ConfigIOFactory")
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
         mock_reader.return_value.get_reader.assert_called_once_with("test.path")
@@ -234,7 +234,7 @@ class TestReadConfig(unittest.TestCase):
 
 
 class TestWriteConfig(unittest.TestCase):
-    @patch("processor_tools.config_io.ConfigIOFactory")
+    @patch("processor_tools.config.config_io.ConfigIOFactory")
     def test_write_config(self, mock_reader):
         write_config("test.path", "dict")
         mock_reader.return_value.get_writer.assert_called_once_with("test.path")
@@ -244,9 +244,9 @@ class TestWriteConfig(unittest.TestCase):
 
 
 class TestBuildConfigDir(unittest.TestCase):
-    @patch("processor_tools.config_io.write_config")
-    @patch("processor_tools.config_io.shutil.copyfile")
-    @patch("processor_tools.config_io.os.makedirs")
+    @patch("processor_tools.config.config_io.write_config")
+    @patch("processor_tools.config.config_io.shutil.copyfile")
+    @patch("processor_tools.config.config_io.os.makedirs")
     def test_build_configdir(self, mock_mdir, mock_copy, mock_write):
 
         configs = {
@@ -264,10 +264,10 @@ class TestBuildConfigDir(unittest.TestCase):
             os.path.join("test", "new_config.yaml"), {"entry1": "value1"}
         )
 
-    @patch("processor_tools.config_io.write_config")
-    @patch("processor_tools.config_io.shutil.copyfile")
-    @patch("processor_tools.config_io.os.makedirs")
-    @patch("processor_tools.config_io.os.path.isdir", return_value=True)
+    @patch("processor_tools.config.config_io.write_config")
+    @patch("processor_tools.config.config_io.shutil.copyfile")
+    @patch("processor_tools.config.config_io.os.makedirs")
+    @patch("processor_tools.config.config_io.os.path.isdir", return_value=True)
     def test_build_configdir_exists_skip(
         self, mock_exists, mock_mdir, mock_copy, mock_write
     ):

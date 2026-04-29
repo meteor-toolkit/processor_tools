@@ -587,6 +587,89 @@ class TestContext(unittest.TestCase):
 
         self.assertEqual(context._config_values["entry5"], "value5")
 
+    @patch("processor_tools.context.Context.update_from_file")
+    def test___init___with_config_init(self, mock_update_from_file):
+        """Test that Context properly integrates with ConfigInit to load config files"""
+        import tempfile
+        from processor_tools.config.init_config import ConfigInit
+
+        # Create a temporary directory and config file
+        tmp_dir = tempfile.mkdtemp()
+        config_file = os.path.join(tmp_dir, "test_config.yaml")
+        with open(config_file, "w") as f:
+            f.write("test_key: test_value\n")
+
+        try:
+            # Create ConfigInit with a config file
+            config_init = ConfigInit(
+                package_name="testpkg",
+                configs={"test_config.yaml": {"test_key": "default_value"}}
+            )
+            config_init.set_config_directory(tmp_dir)
+
+            # Initialize the config file
+            config_init.init()
+
+            # Create Context with config_init
+            context = Context(config_init=config_init)
+
+            # Verify that update_from_file was called with the config file path
+            expected_path = "test_config.yaml"
+            mock_update_from_file.assert_called_once_with(expected_path, skip_if_not_exists=True)
+
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    @patch("processor_tools.context.Context.update_from_file")
+    def test___init___with_config_init_no_existing_files(self, mock_update_from_file):
+        """Test that Context handles ConfigInit when no config files exist"""
+        from processor_tools.config.init_config import ConfigInit
+
+        # Create ConfigInit without initializing files
+        config_init = ConfigInit(
+            package_name="testpkg",
+            configs={"test_config.yaml": {"test_key": "default_value"}}
+        )
+
+        # Create Context with config_init
+        context = Context(config_init=config_init)
+
+        # Verify that update_from_file was not called since no files exist
+        mock_update_from_file.assert_not_called()
+
+    def test_write_config(self):
+        import tempfile
+
+        # Create a temporary file path
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
+        tmp_file.close()  # Close the file so Context can write to it
+
+        try:
+            context = Context()
+            context._config_values = {
+                "entry1": "value1",
+                "entry2": "value2",
+                "entry3": "value3",
+                "entry4": "value4",
+            }
+
+            context.write_config(tmp_file.name)
+
+            with open(tmp_file.name, "r") as f:
+                content = f.read()
+
+            self.assertIn("entry1", content)
+            self.assertIn("value1", content)
+            self.assertIn("entry2", content)
+            self.assertIn("value2", content)
+            self.assertIn("entry3", content)
+            self.assertIn("value3", content)
+            self.assertIn("entry4", content)
+            self.assertIn("value4", content)
+
+        finally:
+            os.remove(tmp_file.name)
+
 
 class TestSetGlobalSupercontext(unittest.TestCase):
     def tearDown(self):

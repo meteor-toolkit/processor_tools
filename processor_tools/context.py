@@ -6,6 +6,8 @@ from copy import deepcopy
 from pydantic.utils import deep_update
 from processor_tools import GLOBAL_SUPERCONTEXT
 from processor_tools import read_config, find_config
+from processor_tools.config.init_config import ConfigInit
+from processor_tools.config.config_io import write_config
 
 
 __author__ = "Sam Hunt <sam.hunt@npl.co.uk>"
@@ -27,6 +29,8 @@ class Context:
     * `supercontext` (*Context*) - supercontext object
     * `section` (*str*) -  name of section of supercontext to apply as supercontext
 
+    :param config_init: config initialiser for setting up default config files/directories to be loaded every time the class is initialised, as well as providing methods for generating config file/directory paths. See `processor_tools.config.init_config.ConfigInit` for more details.
+
     For example:
 
     .. code-block:: python
@@ -44,6 +48,7 @@ class Context:
         self,
         config: Optional[Union[str, List[str], dict]] = None,
         supercontext: Optional[List[Union["Context", Tuple["Context", str]]]] = None,
+        config_init: Optional["ConfigInit"] = None,
     ) -> None:
 
         # initialise attributes
@@ -80,6 +85,9 @@ class Context:
             raise TypeError(
                 "argument `config` must be one of types [`str`, `dict`, `list[str | dict]`]"
             )
+        
+        if config_init is not None:
+            init_config.extend([os.path.join(config_init.get_config_directory(), f) for f in config_init.list_config()])
 
         configs = init_config + default_config
 
@@ -298,6 +306,15 @@ class Context:
         """
 
         return self.get_config_names()
+    
+    def write_config(self, path: str) -> None:
+        """
+        Write config values to file
+
+        :param path: config file path to which to write
+        """
+
+        write_config(path, self.config_values)
 
 
 class set_global_supercontext:
