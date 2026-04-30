@@ -146,6 +146,14 @@ To overwrite any existing files, pass ``exists_skip=False``:
 
    config_init.init(exists_skip=False)
 
+It is also possible to set the config directory at init time by passing a path or location keyword to the ``config_directory`` parameter. At this stage it is also possible to set to the home directory with the keyword "home" and the project directory with the keyword "project":
+
+.. ipython:: python
+
+   ConfigInit(package_name="mypackage",
+              configs={"settings.yaml": {"db_host": "localhost"}},
+              config_directory="project")  # creates config files in project directory
+
 Checking initialisation state
 ==============================
 
@@ -257,7 +265,7 @@ After install, users can then run:
 
 .. code-block:: console
 
-   $ mypackage-init --reset                  # initialise in ~/.<package_name>/
+   $ mypackage-init --home                   # initialise in ~/.<package_name>/
    $ mypackage-init --project                # initialise in <cwd>/.<package_name>/
    $ mypackage-init --path /explicit/path    # initialise at an explicit path
    $ mypackage-init --overwrite              # overwrite any existing files
