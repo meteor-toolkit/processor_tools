@@ -614,7 +614,7 @@ class TestContext(unittest.TestCase):
             context = Context(config_init=config_init)
 
             # Verify that update_from_file was called with the config file path
-            expected_path = "test_config.yaml"
+            expected_path = os.path.join(tmp_dir, "test_config.yaml")
             mock_update_from_file.assert_called_once_with(expected_path, skip_if_not_exists=True)
 
         finally:

@@ -66,6 +66,10 @@ class ConfigInit:
             self.config_directory_file_path = os.path.join(os.path.expanduser("~"), ".processor_tools", f"{self.package_name}_config_directory.txt")
         
         config_directory = config_directory if config_directory is not None else self.get_config_directory()
+        if config_directory=="home":
+            config_directory = self.home_dir()
+        if config_directory=="project":
+            config_directory = self.project_dir()        
         self.set_config_directory(config_directory) 
 
     def get_config_directory(self) -> str:
@@ -253,6 +257,11 @@ class ConfigInit:
             "--path",
             metavar="PATH",
             help="write to an explicit directory path",
+        )
+        location.add_argument(
+            "--home",
+            action="store_true",
+            help=f"write to user home config directory (~/.{self.package_name})",
         )
 
         parser.add_argument(
