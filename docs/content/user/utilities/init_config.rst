@@ -98,7 +98,7 @@ Some common config directory locations are provided as methods for convenience. 
 User home directory
 -------------------
 
-:py:meth:`home_dir <processor_tools.config.init_config.ConfigInit.home_dir>` returns ``~/.<package_name>``. This is the default and is appropriate for per-user configuration:
+:py:meth:`home_dir <processor_tools.config.init_config.ConfigInit.home_dir>` returns ``~/.config/<package_name>``. This is the default and is appropriate for per-user configuration:
 
 .. ipython:: python
 
@@ -107,7 +107,7 @@ User home directory
 Project directory
 -----------------
 
-:py:meth:`project_dir <processor_tools.config.init_config.ConfigInit.project_dir>` returns ``<base>/.<package_name>``, placing config alongside the project. By default the base is the current working directory:
+:py:meth:`project_dir <processor_tools.config.init_config.ConfigInit.project_dir>` returns ``<base>/.<package_name>``, placing config alongside the project. By default the base is the current working directory (which is typically the project root where the init gets called from):
 
 .. ipython:: python
 
@@ -265,7 +265,7 @@ After install, users can then run:
 
 .. code-block:: console
 
-   $ mypackage-init --home                   # initialise in ~/.<package_name>/
+   $ mypackage-init --home                   # initialise in ~/.config/<package_name>/
    $ mypackage-init --project                # initialise in <cwd>/.<package_name>/
    $ mypackage-init --path /explicit/path    # initialise at an explicit path
    $ mypackage-init --overwrite              # overwrite any existing files
