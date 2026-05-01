@@ -20,7 +20,7 @@ class TestConfigInitDirs(unittest.TestCase):
 
     @patch("processor_tools.config.init_config.os.path.expanduser", return_value="/home/user")
     def test_home_dir(self, mock_expanduser):
-        self.assertEqual(self.config_init.home_dir(), os.path.join("/home/user", ".testpkg"))
+        self.assertEqual(self.config_init.home_dir(), os.path.join("/home/user", ".config", "testpkg"))
         mock_expanduser.assert_called_once_with("~")
 
     def test_project_dir_default(self):
@@ -137,7 +137,7 @@ class TestConfigInitInit(unittest.TestCase):
              patch("processor_tools.config.init_config.shutil.copyfile"):
             self.config_init.reset_config_directory()
             self.config_init.init()
-            mock_makedirs.assert_called_once_with(os.path.join("/home/user", ".testpkg"), exist_ok=True)
+            mock_makedirs.assert_called_once_with(os.path.join("/home/user", ".config", "testpkg"), exist_ok=True)
 
 
 class TestConfigInitMissing(unittest.TestCase):
@@ -236,9 +236,9 @@ class TestGetConfigDirectory(unittest.TestCase):
         nonexistent_file = os.path.join(self.tmp_dir, "nonexistent_config_file.txt")
         self.config_init.config_directory_file_path = nonexistent_file
         
-        with patch.object(self.config_init, "home_dir", return_value="/home/testuser/.testpkg"):
+        with patch.object(self.config_init, "home_dir", return_value="/home/testuser/.config/testpkg"):
             result = self.config_init.get_config_directory()
-            self.assertEqual(result, "/home/testuser/.testpkg")
+            self.assertEqual(result, "/home/testuser/.config/testpkg")
 
     def test_get_config_directory_uses_default_file_path(self):
         """Test that default config_directory_file_path is used when none provided"""

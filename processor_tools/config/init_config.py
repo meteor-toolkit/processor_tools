@@ -121,10 +121,10 @@ class ConfigInit:
 
     def home_dir(self) -> str:
         """
-        Return the standard user-home config directory: ``~/.<package_name>``.
+        Return the standard user-home config directory: ``~/.config/<package_name>``.
         """
 
-        return os.path.join(os.path.expanduser("~"), f".{self.package_name}")
+        return os.path.join(os.path.expanduser("~"), ".config", f"{self.package_name}")
 
     def project_dir(self, base_file: str = None, project_path: str = None) -> str:
         """
@@ -261,7 +261,7 @@ class ConfigInit:
         location.add_argument(
             "--home",
             action="store_true",
-            help=f"write to user home config directory (~/.{self.package_name})",
+            help=f"write to user home config directory (~/.config/{self.package_name})",
         )
 
         parser.add_argument(
