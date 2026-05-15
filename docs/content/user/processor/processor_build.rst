@@ -26,9 +26,10 @@ In this example we define a processor class for multiplying input values togethe
    mult_proc = Multiplication()
    print(mult_proc.run(2,3))
 
-.. _context:
+.. _processor-context:
+
 Defining Configuration Values
-=============================
+==============================
 
 Configuration values can be provided when the processor class is initialised with a ``context`` object. The `context` object should be a container with the necessary configuration values defined - this may be as a simple :py:class:`dict`.
 
@@ -47,6 +48,7 @@ Within an initialised processor object, the ``context`` object can be accessed a
    print(exp_proc.run(3))
 
 .. _name:
+
 Setting Processor Names
 =======================
 
@@ -95,6 +97,7 @@ This can continue recursively, where a processor class's subprocessor may itself
    print(proc.subprocessors["subprocessor2"].subprocessors)
 
 .. _path:
+
 Subprocessor paths
 ------------------
 

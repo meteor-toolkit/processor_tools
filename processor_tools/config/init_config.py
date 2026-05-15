@@ -57,13 +57,21 @@ class ConfigInit:
     ):
         """
         Initialise the ConfigInit instance.
+
         :param package_name: package name, used to derive the standard config directory
         :param configs: dict mapping config filename to its template. Template can be:
+
             * ``dict`` — written as a new config file with those values
             * ``str`` — path to an existing file that is copied to the target location
             * ``callable`` — called at init time with no arguments, must return a ``dict``
-        :param config_directory: optional config directory path (i.e. path where the config files will be stored). If not provided, defaults to the path string stored in the config_directory_file_path.
-        :param config_directory_file_path: optional path to the config directory file (i.e. path to the file which stores the config_directory path). If not provided, defaults to ``~/.<processor_tools>/config_directory_<package_name>.txt``."""
+
+        :param config_directory: optional config directory path (i.e. path where the config files
+            will be stored). If not provided, defaults to the path string stored in the
+            config_directory_file_path.
+        :param config_directory_file_path: optional path to the config directory file (i.e. path
+            to the file which stores the config_directory path). If not provided, defaults to
+            ``~/.processor_tools/config_directory_<package_name>.txt``.
+        """
         self.package_name = package_name
         self.configs = configs
         if config_directory_file_path is not None:

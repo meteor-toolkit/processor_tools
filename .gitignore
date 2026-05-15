@@ -83,6 +83,7 @@ instance/
 docs/_build/
 docs/content/developer/generated
 docs/content/user/generated
+docs/output_config.yaml
 
 # PyBuilder
 target/

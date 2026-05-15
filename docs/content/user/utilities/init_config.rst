@@ -1,8 +1,8 @@
 .. _init_config:
 
-################################
+#################################
 Initialising Package Config Files
-################################
+#################################
 
 **processor_tools** provides the :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` class to define and initialise a set of configuration files for a package. It is designed to be instantiated once per package, then used to create config files in the appropriate location on first use, or re-run via a CLI entry point.
 
@@ -54,7 +54,7 @@ at ``~/.<processor_tools>/config_directory_<package_name>.txt``, but this can be
 This allows users to choose where the config directory path is stored, which can be useful in environments with specific directory structures or permissions. 
 If neither parameter is provided, the system defaults to using the home directory for config storage, ensuring a sensible default while allowing flexibility for different use cases.
 
-.. ipython:: python
+.. code-block:: python
 
    # Initialize with explicit config directory
    config_init = ConfigInit(
@@ -208,7 +208,7 @@ Then import it in the package's ``__init__.py`` and check on startup:
 Because ``exists_skip=True`` by default, this is safe to call on every startup — it only creates files that are genuinely absent.
 
 Integrating with Context objects
-------------------------------
+--------------------------------
 If your package uses :py:class:`Context <processor_tools.context.Context>` objects, 
 
 .. code-block:: python
