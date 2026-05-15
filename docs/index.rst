@@ -38,7 +38,7 @@ Tools to support the developing of processing pipelines
 Acknowledgements
 ----------------
 
-processor_tools has been developed by `Sam Hunt <sam.hunt@npl.co.uk>`_.
+processor_tools has been developed by the `MetEOR Toolkit Team <team@comet-toolkit.org>`_.
 
 Project status
 --------------
