@@ -2,6 +2,9 @@
 
 Tools to support the developing of processing pipelines.
 
+> **Warning:** This software is in beta. Results should be used with
+> caution. Please share any feedback via the issue tracker.
+
 ## Usage
 
 ### Virtual environment
