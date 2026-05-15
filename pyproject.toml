@@ -43,6 +43,7 @@ docs = [
     "sphinx_design",
     "sphinx_automodapi",
     "myst_parser",
+    "ipython"
 ]
 
 [project.urls]
