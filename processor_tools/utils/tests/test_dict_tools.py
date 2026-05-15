@@ -3,7 +3,7 @@
 import unittest
 import unittest.mock as mock
 
-from processor_tools.utils.dict_tools import *
+from processor_tools.utils.dict_tools import get_value, get_value_gen
 
 
 class MyDictTools(unittest.TestCase):

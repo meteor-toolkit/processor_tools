@@ -53,7 +53,7 @@ class TestBaseProcessor(unittest.TestCase):
         class TestProcessor(BaseProcessor):
             cls_subprocessors = {"sp1": "a", "sp2": "b"}
 
-        p = TestProcessor()
+        TestProcessor()
 
         mock_append.assert_has_calls([call("sp1", "a"), call("sp2", "b")])
 
@@ -73,12 +73,8 @@ class TestBaseProcessor(unittest.TestCase):
         test_processor.append_subprocessor("subprocessor", test_subprocessor)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor"
-        )
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
-        )
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor")
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
 
     def test_append_subsubprocessor_obj(self):
         test_processor = self.TestProcessor()
@@ -97,9 +93,7 @@ class TestBaseProcessor(unittest.TestCase):
             "subprocessor1",
         )
         self.assertEqual(
-            test_processor.subprocessors["subprocessor1"]
-            .subprocessors["subprocessor1a"]
-            .processor_path,
+            test_processor.subprocessors["subprocessor1"].subprocessors["subprocessor1a"].processor_path,
             "subprocessor1.subprocessor1a",
         )
 
@@ -109,27 +103,17 @@ class TestBaseProcessor(unittest.TestCase):
         test_processor.append_subprocessor("subprocessor", self.TestProcessor)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor"
-        )
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
-        )
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "TestProcessor")
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
 
     def test_append_subprocessor_factory(self):
-        test_processor = self.TestProcessor(
-            context={"processor": {"subprocessor": "option1"}}
-        )
+        test_processor = self.TestProcessor(context={"processor": {"subprocessor": "option1"}})
 
         test_processor.append_subprocessor("subprocessor", self.test_factory)
 
         self.assertCountEqual(test_processor.subprocessors.keys(), ["subprocessor"])
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_name, "Option1"
-        )
-        self.assertEqual(
-            test_processor.subprocessors["subprocessor"].processor_path, "subprocessor"
-        )
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_name, "Option1")
+        self.assertEqual(test_processor.subprocessors["subprocessor"].processor_path, "subprocessor")
 
     def test_run_1arg(self):
         test_processor = self.TestProcessor()
@@ -209,7 +193,7 @@ class Test4(BaseProcessor):
 
     @patch("processor_tools.processor.ProcessorFactory.add_processor")
     def test_init_with_processors(self, mock_pf):
-        p = ProcessorFactory(["a", "b"])
+        ProcessorFactory(["a", "b"])
 
         mock_pf.assert_has_calls([call("a"), call("b")])
 
@@ -254,9 +238,7 @@ class TestNullProcessor(unittest.TestCase):
         p = NullProcessor()
         self.assertEqual(p.run(None), (None,))
         self.assertEqual(p.run(None, "test"), (None, "test"))
-        np.testing.assert_array_equal(
-            p.run(np.array([0, 1, 2, 3]))[0], np.array([0, 1, 2, 3])
-        )
+        np.testing.assert_array_equal(p.run(np.array([0, 1, 2, 3]))[0], np.array([0, 1, 2, 3]))
 
 
 if __name__ == "__main__":

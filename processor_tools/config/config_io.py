@@ -54,7 +54,7 @@ class BaseConfigReader(ABC):
         is_int = True
         try:
             int(val)
-        except:
+        except (ValueError, TypeError):
             is_int = False
 
         if is_int:
@@ -64,7 +64,7 @@ class BaseConfigReader(ABC):
         is_float = True
         try:
             float(val)
-        except:
+        except (ValueError, TypeError):
             is_float = False
 
         if is_float:
@@ -100,9 +100,7 @@ class ConfigReader(BaseConfigReader):
         for section in config.sections():
             config_values[section] = dict()
             for key in config[section].keys():
-                config_values[section][key] = self._extract_config_value(
-                    config, section, key
-                )
+                config_values[section][key] = self._extract_config_value(config, section, key)
 
         os.chdir(cwd)
         return config_values
@@ -130,23 +128,23 @@ class ConfigReader(BaseConfigReader):
         dtype = ConfigReader._infer_dtype(val) if dtype is None else dtype
 
         if (val == "") or (val is None):
-            if dtype == bool:
+            if dtype is bool:
                 return False
             return None
 
-        if dtype == str:
+        if dtype is str:
             if Path(val).exists():
                 val = os.path.abspath(val)
 
             return val
 
-        elif dtype == bool:
+        elif dtype is bool:
             return config.getboolean(section, key)
 
-        elif dtype == int:
+        elif dtype is int:
             return config.getint(section, key)
 
-        elif dtype == float:
+        elif dtype is float:
             return config.getfloat(section, key)
 
         else:
@@ -306,9 +304,7 @@ def write_config(path: str, config_dict: dict):
     return writer.write(path, config_dict)
 
 
-def build_configdir(
-    path, configs: Dict[str, Union[str, dict]], exists_skip: bool = False
-):
+def build_configdir(path, configs: Dict[str, Union[str, dict]], exists_skip: bool = False):
     """
     Writes set of configuration files to defined directory
 

@@ -144,7 +144,7 @@ class TestYAMLReaderFactory(unittest.TestCase):
         self.tmp_dir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         os.makedirs(self.tmp_dir)
 
-        yml_str = "test:\n" "   entry1: value1\n" "   entry2: false\n" "   entry3: 1.2"
+        yml_str = "test:\n   entry1: value1\n   entry2: false\n   entry3: 1.2"
 
         self.exp_config = {"test": {"entry1": "value1", "entry2": False, "entry3": 1.2}}
 
@@ -181,9 +181,7 @@ class TestYAMLWriter(unittest.TestCase):
         with open(yml_path, "r") as f:
             yml_str = f.read()
 
-        exp_yml_str = (
-            "test:\n" "  entry1: value1\n" "  entry2: false\n" "  entry3: 1.2\n"
-        )
+        exp_yml_str = "test:\n  entry1: value1\n  entry2: false\n  entry3: 1.2\n"
 
         self.assertEqual(yml_str, exp_yml_str)
 
@@ -194,21 +192,15 @@ class TestYAMLWriter(unittest.TestCase):
 class TestConfigIOFactory(unittest.TestCase):
     def test_get_reader_config(self):
         crf = ConfigIOFactory()
-        self.assertEqual(
-            type(crf.get_reader("test/file/path.config")), type(ConfigReader())
-        )
+        self.assertEqual(type(crf.get_reader("test/file/path.config")), type(ConfigReader()))
 
     def test_get_reader_yaml(self):
         crf = ConfigIOFactory()
-        self.assertEqual(
-            type(crf.get_reader("test/file/path.yaml")), type(YAMLReader())
-        )
+        self.assertEqual(type(crf.get_reader("test/file/path.yaml")), type(YAMLReader()))
 
     def test_get_writer_yaml(self):
         crf = ConfigIOFactory()
-        self.assertEqual(
-            type(crf.get_writer("test/file/path.yaml")), type(YAMLWriter())
-        )
+        self.assertEqual(type(crf.get_writer("test/file/path.yaml")), type(YAMLWriter()))
 
     def test_get_reader_invalid(self):
         crf = ConfigIOFactory()
@@ -224,13 +216,9 @@ class TestReadConfig(unittest.TestCase):
     def test_read_config(self, mock_reader):
         cfg = read_config("test.path")
         mock_reader.return_value.get_reader.assert_called_once_with("test.path")
-        mock_reader.return_value.get_reader.return_value.read.assert_called_once_with(
-            "test.path"
-        )
+        mock_reader.return_value.get_reader.return_value.read.assert_called_once_with("test.path")
 
-        self.assertEqual(
-            cfg, mock_reader.return_value.get_reader.return_value.read.return_value
-        )
+        self.assertEqual(cfg, mock_reader.return_value.get_reader.return_value.read.return_value)
 
 
 class TestWriteConfig(unittest.TestCase):
@@ -238,9 +226,7 @@ class TestWriteConfig(unittest.TestCase):
     def test_write_config(self, mock_reader):
         write_config("test.path", "dict")
         mock_reader.return_value.get_writer.assert_called_once_with("test.path")
-        mock_reader.return_value.get_writer.return_value.write.assert_called_once_with(
-            "test.path", "dict"
-        )
+        mock_reader.return_value.get_writer.return_value.write.assert_called_once_with("test.path", "dict")
 
 
 class TestBuildConfigDir(unittest.TestCase):
@@ -257,20 +243,14 @@ class TestBuildConfigDir(unittest.TestCase):
         build_configdir("test", configs)
 
         mock_mdir.assert_called_once_with("test", exist_ok=True)
-        mock_copy.assert_called_once_with(
-            "path/to/old_config.yaml", os.path.join("test", "copied_config.yaml")
-        )
-        mock_write.assert_called_once_with(
-            os.path.join("test", "new_config.yaml"), {"entry1": "value1"}
-        )
+        mock_copy.assert_called_once_with("path/to/old_config.yaml", os.path.join("test", "copied_config.yaml"))
+        mock_write.assert_called_once_with(os.path.join("test", "new_config.yaml"), {"entry1": "value1"})
 
     @patch("processor_tools.config.config_io.write_config")
     @patch("processor_tools.config.config_io.shutil.copyfile")
     @patch("processor_tools.config.config_io.os.makedirs")
     @patch("processor_tools.config.config_io.os.path.isdir", return_value=True)
-    def test_build_configdir_exists_skip(
-        self, mock_exists, mock_mdir, mock_copy, mock_write
-    ):
+    def test_build_configdir_exists_skip(self, mock_exists, mock_mdir, mock_copy, mock_write):
 
         configs = {
             "copied_config.yaml": "path/to/old_config.yaml",

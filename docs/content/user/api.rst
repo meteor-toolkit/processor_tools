@@ -33,7 +33,8 @@ Utilities
    :toctree: generated/
    :nosignatures:
 
-   config_io.read_config
-   config_io.write_config
-   config_io.build_configdir
-   config_io.find_config
+   config.config_io.read_config
+   config.config_io.write_config
+   config.config_io.build_configdir
+   config.config_io.find_config
+   config.init_config.ConfigInit

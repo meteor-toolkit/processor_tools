@@ -5,7 +5,7 @@ import random
 import shutil
 import string
 import unittest
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 from processor_tools.config.init_config import ConfigInit
 
@@ -34,14 +34,14 @@ class TestConfigInitDirs(unittest.TestCase):
     def test_project_dir_base_file(self):
         base_file = "/some/project/mypackage/config.py"
         result = self.config_init.project_dir(base_file=base_file)
-        self.assertEqual(result, os.path.abspath(os.path.join("/some","project", "mypackage", ".testpkg")))
+        self.assertEqual(result, os.path.abspath(os.path.join("/some", "project", "mypackage", ".testpkg")))
 
     def test_project_dir_base_file_takes_precedence(self):
         result = self.config_init.project_dir(
             base_file="/some/project/mypackage/config.py",
             project_path="/other/path",
         )
-        self.assertEqual(result, os.path.abspath(os.path.join("/some","project", "mypackage", ".testpkg")))
+        self.assertEqual(result, os.path.abspath(os.path.join("/some", "project", "mypackage", ".testpkg")))
 
 
 class TestConfigInitInit(unittest.TestCase):
@@ -60,7 +60,7 @@ class TestConfigInitInit(unittest.TestCase):
                 "from_file.yaml": self.src_yaml,
                 "from_callable.yaml": lambda: {"computed": "result"},
             },
-            config_directory=os.path.join(self.tmp_dir, "config")
+            config_directory=os.path.join(self.tmp_dir, "config"),
         )
 
     def tearDown(self):
@@ -132,9 +132,11 @@ class TestConfigInitInit(unittest.TestCase):
 
     @patch("processor_tools.config.init_config.os.path.expanduser", return_value="/home/user")
     def test_init_defaults_to_home_dir(self, mock_expanduser):
-        with patch("processor_tools.config.init_config.os.makedirs") as mock_makedirs, \
-             patch("processor_tools.config.init_config.write_config"), \
-             patch("processor_tools.config.init_config.shutil.copyfile"):
+        with (
+            patch("processor_tools.config.init_config.os.makedirs") as mock_makedirs,
+            patch("processor_tools.config.init_config.write_config"),
+            patch("processor_tools.config.init_config.shutil.copyfile"),
+        ):
             self.config_init.reset_config_directory()
             self.config_init.init()
             mock_makedirs.assert_called_once_with(os.path.join("/home/user", ".config", "testpkg"), exist_ok=True)
@@ -210,11 +212,11 @@ class TestGetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         os.makedirs(config_dir)
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
-        
+
         self.config_init.config_directory_file_path = config_file
         with open(config_file, "w") as f:
             f.write(config_dir)
-        
+
         result = self.config_init.get_config_directory()
         self.assertEqual(result, config_dir)
 
@@ -222,11 +224,11 @@ class TestGetConfigDirectory(unittest.TestCase):
         """Test getting config directory when file exists but path is invalid"""
         invalid_path = os.path.join(self.tmp_dir, "nonexistent")
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
-        
+
         self.config_init.config_directory_file_path = config_file
         with open(config_file, "w") as f:
             f.write(invalid_path)
-        
+
         with patch("processor_tools.config.init_config.Warning"):
             result = self.config_init.get_config_directory()
             self.assertEqual(result, self.config_init.home_dir())
@@ -235,7 +237,7 @@ class TestGetConfigDirectory(unittest.TestCase):
         """Test getting config directory when file doesn't exist"""
         nonexistent_file = os.path.join(self.tmp_dir, "nonexistent_config_file.txt")
         self.config_init.config_directory_file_path = nonexistent_file
-        
+
         with patch.object(self.config_init, "home_dir", return_value="/home/testuser/.config/testpkg"):
             result = self.config_init.get_config_directory()
             self.assertEqual(result, "/home/testuser/.config/testpkg")
@@ -244,14 +246,14 @@ class TestGetConfigDirectory(unittest.TestCase):
         """Test that default config_directory_file_path is used when none provided"""
         config_dir = os.path.join(self.tmp_dir, "config")
         os.makedirs(config_dir)
-        
+
         # Create the default path structure
         default_parent = os.path.dirname(self.config_init.config_directory_file_path)
         os.makedirs(default_parent, exist_ok=True)
-        
+
         with open(self.config_init.config_directory_file_path, "w") as f:
             f.write(config_dir)
-        
+
         result = self.config_init.get_config_directory()
         self.assertEqual(result, config_dir)
 
@@ -260,11 +262,11 @@ class TestGetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         os.makedirs(config_dir)
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
-        
+
         self.config_init.config_directory_file_path = config_file
         with open(config_file, "w") as f:
             f.write(f"  {config_dir}  \n")
-        
+
         result = self.config_init.get_config_directory()
         self.assertEqual(result, config_dir)
 
@@ -283,9 +285,9 @@ class TestSetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "new_config")
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
         self.config_init.config_directory_file_path = config_file
-        
+
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         self.assertTrue(os.path.exists(config_dir))
         self.assertTrue(os.path.isdir(config_dir))
 
@@ -294,9 +296,9 @@ class TestSetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         config_file = os.path.join(self.tmp_dir, "nested", "dirs", "config_file.txt")
         self.config_init.config_directory_file_path = config_file
-        
+
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         self.assertTrue(os.path.exists(os.path.dirname(config_file)))
 
     def test_set_config_directory_writes_file(self):
@@ -304,9 +306,9 @@ class TestSetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
         self.config_init.config_directory_file_path = config_file
-        
+
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         with open(config_file, "r") as f:
             written_dir = f.read()
         self.assertEqual(written_dir, config_dir)
@@ -315,10 +317,10 @@ class TestSetConfigDirectory(unittest.TestCase):
         """Test that a manually overridden config_directory_file_path is used"""
         config_dir = os.path.join(self.tmp_dir, "config")
         new_config_file = os.path.join(self.tmp_dir, "new_config_file.txt")
-        
+
         self.config_init.config_directory_file_path = new_config_file
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         self.assertEqual(self.config_init.config_directory_file_path, new_config_file)
         with open(new_config_file, "r") as f:
             self.assertEqual(f.read(), config_dir)
@@ -328,14 +330,14 @@ class TestSetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         os.makedirs(config_dir)
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
-        
+
         # Pre-populate the config file with a directory
         with open(config_file, "w") as f:
             f.write(config_dir)
-        
+
         self.config_init.config_directory_file_path = config_file
         self.config_init.set_config_directory(config_directory=None)
-        
+
         with open(config_file, "r") as f:
             written_dir = f.read()
         self.assertEqual(written_dir, config_dir)
@@ -343,13 +345,13 @@ class TestSetConfigDirectory(unittest.TestCase):
     def test_set_config_directory_uses_default_file_path(self):
         """Test that default config_directory_file_path is used when none provided"""
         config_dir = os.path.join(self.tmp_dir, "config")
-        
+
         # Create necessary parent directory
         default_parent = os.path.dirname(self.config_init.config_directory_file_path)
         os.makedirs(default_parent, exist_ok=True)
-        
+
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         with open(self.config_init.config_directory_file_path, "r") as f:
             written_dir = f.read()
         self.assertEqual(written_dir, config_dir)
@@ -359,15 +361,15 @@ class TestSetConfigDirectory(unittest.TestCase):
         config_dir = os.path.join(self.tmp_dir, "config")
         test_file = os.path.join(config_dir, "test.txt")
         config_file = os.path.join(self.tmp_dir, "config_file.txt")
-        
+
         # Create config directory with existing file
         os.makedirs(config_dir)
         with open(test_file, "w") as f:
             f.write("test content")
-        
+
         self.config_init.config_directory_file_path = config_file
         self.config_init.set_config_directory(config_directory=config_dir)
-        
+
         # Verify existing file is preserved
         self.assertTrue(os.path.exists(test_file))
         with open(test_file, "r") as f:

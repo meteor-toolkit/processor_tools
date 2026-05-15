@@ -9,7 +9,7 @@ Handling Configuration Files
 Writing Configuration Files
 ===========================
 
-The :py:func:`write_config <processor_tools.config_io.write_config>` function provides the capability to write a configuration file by defining:
+The :py:func:`write_config <processor_tools.config.config_io.write_config>` function provides the capability to write a configuration file by defining:
 
 * `path` - where the file extension defines the format of file that is written. Currently `".yaml"` files are supported.
 * `config_dict` - a dictionary of configuration values to write to the file.
@@ -34,7 +34,7 @@ This writes the file `"config_file.yaml"` with content:
 Reading configuration files
 ===========================
 
-The :py:func:`write_config <processor_tools.config_io.read_config>` function provides the capability to read configuration files. This is done as follows:
+The :py:func:`write_config <processor_tools.config.config_io.read_config>` function provides the capability to read configuration files. This is done as follows:
 
 .. ipython:: python
 
@@ -57,7 +57,7 @@ This supports file types:
 Writing Configuration Directory
 ===============================
 
-The :py:func:`build_configdir <processor_tools.config_io.build_configdir>` function provides the capability to write a directory of configuration files by defining:
+The :py:func:`build_configdir <processor_tools.config.config_io.build_configdir>` function provides the capability to write a directory of configuration files by defining:
 
 * path - configuration directory path (created if doesn't exist)
 * configs -  definition of configuration files as a dictionary, with an entry per configuration file to write - where the key should be the filename to write and the value should define the file content, either as:

@@ -42,7 +42,7 @@ Three template types are supported:
 
 The callable form is useful when default values can only be determined at runtime, such as environment-specific settings.
 Rather than specifying full paths in the ``configs`` dictionary, :py:class:`ConfigInit <processor_tools.config.init_config.ConfigInit>` resolves a config directory at init time.
-By default, this is ``~/.<package_name>`` but it can be customised with the optional parameters described below. The config files are then created within this directory.
+By default, this is ``~/.config/<package_name>`` but it can be customised with the optional parameters described below. The config files are then created within this directory.
 
 Optional configuration directory parameters
 --------------------------------------------

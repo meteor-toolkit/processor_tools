@@ -99,10 +99,10 @@ class BaseProcessor:
         # * factory - class selected from factory and instantiated, with resultant object added subprocessors
         if isinstance(sp_obj, ProcessorFactory):
             try:
-                self.subprocessors[sp_name] = sp_obj[
-                    self.context["processor"][sp_path]
-                ](context=self.context, processor_path=sp_path)
-            except:
+                self.subprocessors[sp_name] = sp_obj[self.context["processor"][sp_path]](
+                    context=self.context, processor_path=sp_path
+                )
+            except (KeyError, TypeError):
                 self.subprocessors[sp_name] = sp_obj[self.context[sp_path]](
                     context=self.context, processor_path=sp_path
                 )
@@ -113,9 +113,7 @@ class BaseProcessor:
 
         # * if class - class is instantiated, with resultant object added ``subprocessors``
         elif issubclass(sp_obj, BaseProcessor):
-            self.subprocessors[sp_name] = sp_obj(
-                context=self.context, processor_path=sp_path
-            )
+            self.subprocessors[sp_name] = sp_obj(context=self.context, processor_path=sp_path)
 
         else:
             raise TypeError(
@@ -177,9 +175,7 @@ class ProcessorFactory:
     ) -> None:
         self._processors: Dict[str, Type] = {}
         self._module_name: Union[None, str, List[str]] = module_name
-        self._required_baseclass: Type = (
-            required_baseclass if required_baseclass is not None else BaseProcessor
-        )
+        self._required_baseclass: Type = required_baseclass if required_baseclass is not None else BaseProcessor
 
         # add processors
         if processors is not None:
@@ -208,10 +204,7 @@ class ProcessorFactory:
         # find processors per module
         for mod_name in module_name:
             importlib.import_module(mod_name)
-            mod_classes = {
-                cls[0]: cls[1]
-                for cls in inspect.getmembers(sys.modules[mod_name], inspect.isclass)
-            }
+            mod_classes = {cls[0]: cls[1] for cls in inspect.getmembers(sys.modules[mod_name], inspect.isclass)}
 
             # omit factory classes and classes not of required baseclass (if set)
             omit_classes = []
@@ -268,15 +261,9 @@ class ProcessorFactory:
         # check if class of required baseclass (if set)
         if self._required_baseclass is not None:
             if not issubclass(cls, self._required_baseclass):
-                raise ValueError(
-                    str(cls) + "must be subclass of " + str(self._required_baseclass)
-                )
+                raise ValueError(str(cls) + "must be subclass of " + str(self._required_baseclass))
 
-        cls_name = (
-            cls.cls_processor_name
-            if cls.cls_processor_name is not None
-            else cls.__name__
-        )
+        cls_name = cls.cls_processor_name if cls.cls_processor_name is not None else cls.__name__
 
         self._processors[cls_name] = cls
 

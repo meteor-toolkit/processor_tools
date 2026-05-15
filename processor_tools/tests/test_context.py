@@ -41,7 +41,7 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.os.path.exists", return_value=True)
     def test___init__filepath_default_filepath(self, mock_exists, mock_update):
         Context.default_config = "path2"
-        context = Context("path")
+        Context("path")
 
         exp_calls = [
             call("path2", skip_if_not_exists=True),
@@ -55,7 +55,7 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.os.path.exists", return_value=True)
     def test___init__filepath_default_list_filepath(self, mock_exists, mock_update):
         Context.default_config = ["path2", "path3"]
-        context = Context("path")
+        Context("path")
 
         exp_calls = [
             call("path3", skip_if_not_exists=True),
@@ -69,11 +69,9 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.Context.update")
     @patch("processor_tools.context.Context.update_from_file")
     @patch("processor_tools.context.os.path.exists", return_value=True)
-    def test___init__filepath_default_list_filepath_dict(
-        self, mock_exists, mock_updatef, mock_update
-    ):
+    def test___init__filepath_default_list_filepath_dict(self, mock_exists, mock_updatef, mock_update):
         Context.default_config = ["path2", "path3", {"entry": "val"}]
-        context = Context("path")
+        Context("path")
 
         exp_calls = [
             call("path3", skip_if_not_exists=True),
@@ -94,7 +92,7 @@ class TestContext(unittest.TestCase):
         os.makedirs(tmp_dir)
 
         Context.default_config = tmp_dir
-        context = Context("path")
+        Context("path")
 
         exp_calls = [
             call("found_path", skip_if_not_exists=True),
@@ -110,15 +108,13 @@ class TestContext(unittest.TestCase):
     @patch("processor_tools.context.find_config", return_value=["found_path"])
     @patch("processor_tools.context.Context.update_from_file")
     @patch("processor_tools.context.os.path.exists", return_value=True)
-    def test___init__filepath_default_default_list_mixed(
-        self, mock_exists, mock_update, mock_find
-    ):
+    def test___init__filepath_default_default_list_mixed(self, mock_exists, mock_update, mock_find):
         random_string = random.choices(string.ascii_lowercase, k=6)
         tmp_dir = "tmp_" + "".join(random_string)
         os.makedirs(tmp_dir)
 
         Context.default_config = [tmp_dir, "path2"]
-        context = Context("path")
+        Context("path")
 
         exp_calls = [
             call("path2", skip_if_not_exists=True),
@@ -141,9 +137,7 @@ class TestContext(unittest.TestCase):
         self.assertTrue(isinstance(context._supercontext, list))
         self.assertTrue(isinstance(context._supercontext[0], tuple))
         self.assertTrue(isinstance(context._supercontext[0][0], Context))
-        self.assertDictEqual(
-            context._supercontext[0][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertIsNone(context._supercontext[0][1])
 
     def test_supercontext_setter_tuple(self):
@@ -155,9 +149,7 @@ class TestContext(unittest.TestCase):
         self.assertTrue(isinstance(context._supercontext, list))
         self.assertTrue(isinstance(context._supercontext[0], tuple))
         self.assertTrue(isinstance(context._supercontext[0][0], Context))
-        self.assertDictEqual(
-            context._supercontext[0][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertEqual(context._supercontext[0][1], "section")
 
     def test_supercontext_setter_bad_tuple(self):
@@ -186,16 +178,12 @@ class TestContext(unittest.TestCase):
 
         self.assertTrue(isinstance(context._supercontext[0], tuple))
         self.assertTrue(isinstance(context._supercontext[0][0], Context))
-        self.assertDictEqual(
-            context._supercontext[0][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertEqual(context._supercontext[0][1], "section")
 
         self.assertTrue(isinstance(context._supercontext[1], tuple))
         self.assertTrue(isinstance(context._supercontext[1][0], Context))
-        self.assertDictEqual(
-            context._supercontext[1][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[1][0]._config_values, supercontext._config_values)
         self.assertIsNone(context._supercontext[1][1])
 
     def test_supercontext_setter_list_invalidtype(self):
@@ -216,9 +204,7 @@ class TestContext(unittest.TestCase):
 
     def test_supercontext_getter(self):
         context = Context()
-        context._supercontext = [
-            (Context({"section": {"val1": 1, "val2": 2}}), "section")
-        ]
+        context._supercontext = [(Context({"section": {"val1": 1, "val2": 2}}), "section")]
 
         self.assertTrue(isinstance(context.supercontext, list))
         self.assertEqual(len(context.supercontext), 1)
@@ -239,9 +225,7 @@ class TestContext(unittest.TestCase):
 
         self.assertTrue(isinstance(context._supercontext[0], tuple))
         self.assertTrue(isinstance(context._supercontext[0][0], Context))
-        self.assertDictEqual(
-            context._supercontext[0][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertIsNone(context._supercontext[0][1])
 
     def test___init___supercontext_tuple(self):
@@ -253,9 +237,7 @@ class TestContext(unittest.TestCase):
 
         self.assertTrue(isinstance(context._supercontext[0], tuple))
         self.assertTrue(isinstance(context._supercontext[0][0], Context))
-        self.assertDictEqual(
-            context._supercontext[0][0]._config_values, supercontext._config_values
-        )
+        self.assertDictEqual(context._supercontext[0][0]._config_values, supercontext._config_values)
         self.assertEqual(context._supercontext[0][1], "section")
 
     def test_config_values(self):
@@ -341,9 +323,7 @@ class TestContext(unittest.TestCase):
     def test_config_values_2super_super(self):
         supersupercontext = Context({"entry1": "supersuper1"})
         supercontexta = Context({"entry1": "supera1", "entry2": "supera2"})
-        supercontextb = Context(
-            {"entry1": "superb1", "entry2": "superb2", "entry3": "superb3"}
-        )
+        supercontextb = Context({"entry1": "superb1", "entry2": "superb2", "entry3": "superb3"})
 
         supercontexta.supercontext = supersupercontext
 
@@ -372,9 +352,7 @@ class TestContext(unittest.TestCase):
 
         global_supercontexta = Context({"entry1": "globala1"})
         global_supercontextb = Context({"entry1": "globalb1", "entry2": "globalb2"})
-        supersupercontext = Context(
-            {"entry1": "supersuper1", "entry2": "supersuper2", "entry3": "supersuper3"}
-        )
+        supersupercontext = Context({"entry1": "supersuper1", "entry2": "supersuper2", "entry3": "supersuper3"})
         supercontexta = Context(
             {
                 "entry1": "supera1",
@@ -411,7 +389,7 @@ class TestContext(unittest.TestCase):
         with patch(
             "processor_tools.context.GLOBAL_SUPERCONTEXT",
             [(global_supercontexta, None), (global_supercontextb, None)],
-        ) as m:
+        ):
             self.assertDictEqual(
                 context.config_values,
                 {
@@ -602,8 +580,7 @@ class TestContext(unittest.TestCase):
         try:
             # Create ConfigInit with a config file
             config_init = ConfigInit(
-                package_name="testpkg",
-                configs={"test_config.yaml": {"test_key": "default_value"}}
+                package_name="testpkg", configs={"test_config.yaml": {"test_key": "default_value"}}
             )
             config_init.set_config_directory(tmp_dir)
 
@@ -611,7 +588,7 @@ class TestContext(unittest.TestCase):
             config_init.init()
 
             # Create Context with config_init
-            context = Context(config_init=config_init)
+            Context(config_init=config_init)
 
             # Verify that update_from_file was called with the config file path
             expected_path = os.path.join(tmp_dir, "test_config.yaml")
@@ -626,13 +603,10 @@ class TestContext(unittest.TestCase):
         from processor_tools.config.init_config import ConfigInit
 
         # Create ConfigInit without initializing files
-        config_init = ConfigInit(
-            package_name="testpkg",
-            configs={"test_config.yaml": {"test_key": "default_value"}}
-        )
+        config_init = ConfigInit(package_name="testpkg", configs={"test_config.yaml": {"test_key": "default_value"}})
 
         # Create Context with config_init
-        context = Context(config_init=config_init)
+        Context(config_init=config_init)
 
         # Verify that update_from_file was not called since no files exist
         mock_update_from_file.assert_not_called()
@@ -685,9 +659,7 @@ class TestSetGlobalSupercontext(unittest.TestCase):
         self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
         self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
         self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-        self.assertDictEqual(
-            GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values
-        )
+        self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values)
         self.assertIsNone(GLOBAL_SUPERCONTEXT[0][1])
 
     def test_function_call_section(self):
@@ -701,9 +673,7 @@ class TestSetGlobalSupercontext(unittest.TestCase):
         self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
         self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
         self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-        self.assertDictEqual(
-            GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values
-        )
+        self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values)
         self.assertEqual(GLOBAL_SUPERCONTEXT[0][1], "section")
         clear_global_supercontext()
 
@@ -717,14 +687,11 @@ class TestSetGlobalSupercontext(unittest.TestCase):
 
         self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
         with set_global_supercontext(context):
-
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT, list))
             self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-            self.assertDictEqual(
-                GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values
-            )
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context._config_values)
             self.assertIsNone(GLOBAL_SUPERCONTEXT[0][1])
 
         self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)
@@ -740,37 +707,28 @@ class TestSetGlobalSupercontext(unittest.TestCase):
             self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-            self.assertDictEqual(
-                GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values
-            )
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values)
             self.assertIsNone(GLOBAL_SUPERCONTEXT[0][1])
 
             with set_global_supercontext(context2):
-
                 self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT, list))
                 self.assertEqual(len(GLOBAL_SUPERCONTEXT), 2)
 
                 self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
                 self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-                self.assertDictEqual(
-                    GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values
-                )
+                self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values)
                 self.assertIsNone(GLOBAL_SUPERCONTEXT[0][1])
 
                 self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[1], tuple))
                 self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[1][0], Context))
-                self.assertDictEqual(
-                    GLOBAL_SUPERCONTEXT[1][0]._config_values, context2._config_values
-                )
+                self.assertDictEqual(GLOBAL_SUPERCONTEXT[1][0]._config_values, context2._config_values)
                 self.assertIsNone(GLOBAL_SUPERCONTEXT[1][1])
 
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT, list))
             self.assertEqual(len(GLOBAL_SUPERCONTEXT), 1)
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0], tuple))
             self.assertTrue(isinstance(GLOBAL_SUPERCONTEXT[0][0], Context))
-            self.assertDictEqual(
-                GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values
-            )
+            self.assertDictEqual(GLOBAL_SUPERCONTEXT[0][0]._config_values, context1._config_values)
             self.assertIsNone(GLOBAL_SUPERCONTEXT[0][1])
 
         self.assertEqual(len(GLOBAL_SUPERCONTEXT), 0)

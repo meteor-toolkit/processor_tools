@@ -1,1 +1,1 @@
-from processor_tools.config.init_config import ConfigInit
+from processor_tools.config.init_config import ConfigInit as ConfigInit

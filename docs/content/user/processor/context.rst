@@ -24,12 +24,12 @@ Building a Context object
    }
    context = Context(config_vals)
 
-They can also be built from an equivalent configuration file (of a format readable by :py:func:`read_config <processor_tools.config_io.read_config>`), by defining the file path.
+They can also be built from an equivalent configuration file (of a format readable by :py:func:`read_config <processor_tools.config.config_io.read_config>`), by defining the file path.
 
 .. ipython:: python
    :suppress:
 
-   from processor_tools.config_io import write_config
+   from processor_tools.config.config_io import write_config
    path = "context_file.yaml"
    write_config(path, config_vals)
    path1 = "context_file1.yaml"

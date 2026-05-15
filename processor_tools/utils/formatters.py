@@ -75,25 +75,22 @@ def str2datetime(s):
                 try:
                     val = parse(s, fuzzy=False)
                 except ValueError:
-                    raise ValueError(
-                        "Unable to discern datetime requested: '{}'".format(s)
-                    )
+                    raise ValueError("Unable to discern datetime requested: '{}'".format(s))
     return val
 
 
 def convert_datetime(
     date_time: Union[dt.datetime, dt.date, str, float, int, np.ndarray],
-) -> dt.datetime:
+) -> Union[dt.datetime, np.ndarray]:
     """
     Convert input datetimes to a datetime object
 
     :param date_time: date time to convert to a datetime object
     :return: datetime object corresponding to input date_time
     """
+    date_time_out: Union[dt.datetime, np.ndarray]
     if isinstance(date_time, np.ndarray):
-        date_time_out = np.array(
-            [convert_datetime(date_time_i) for date_time_i in date_time]
-        )
+        date_time_out = np.array([convert_datetime(date_time_i) for date_time_i in date_time])
     elif isinstance(date_time, (dt.datetime, dt.time)):
         date_time_out = date_time
     elif isinstance(date_time, dt.date):
@@ -102,19 +99,13 @@ def convert_datetime(
         unix_epoch = np.datetime64(0, "s")
         one_second = np.timedelta64(1, "s")
         seconds_since_epoch = (date_time - unix_epoch) / one_second
-        date_time_out = dt.datetime.fromtimestamp(
-            seconds_since_epoch, tz=dt.timezone.utc
-        )
+        date_time_out = dt.datetime.fromtimestamp(seconds_since_epoch, tz=dt.timezone.utc)
     elif isinstance(date_time, (float, int, np.unsignedinteger, np.floating)):
         date_time_out = dt.datetime.fromtimestamp(float(date_time), tz=dt.timezone.utc)
     elif isinstance(date_time, str):
         date_time_out = str2datetime(date_time).replace(tzinfo=dt.timezone.utc)
     else:
-        raise ValueError(
-            "Unable to discern datetime '{}' of type: '{}'".format(
-                date_time, type(date_time)
-            )
-        )
+        raise ValueError("Unable to discern datetime '{}' of type: '{}'".format(date_time, type(date_time)))
     if isinstance(date_time_out, np.ndarray):
         for i in range(len(date_time_out)):
             if date_time_out[i].tzinfo is None:
@@ -136,14 +127,10 @@ def datetime_from_yearday(year, doy, utc):
         except ValueError:
             import warnings
 
-            warnings.warn(
-                f"seconds provided {utc} - slicing to hours/minutes f{utc[0:4]}"
-            )
+            warnings.warn(f"seconds provided {utc} - slicing to hours/minutes f{utc[0:4]}")
             utc = dt.datetime.strptime(utc[0:4], "%H%M")
 
-    elif isinstance(
-        utc, float
-    ):  # if the time is float we must convert to string and remove the ".0"
+    elif isinstance(utc, float):  # if the time is float we must convert to string and remove the ".0"
         utc = dt.datetime.strptime(str(utc).split(".")[0], "%H%M")
     doyDelta = dt.timedelta(days=int(doy) - 1)
 
@@ -185,9 +172,7 @@ def val_format(s):
                         val[i] = vi
             if all([type(j) for j in val]) is True and type(val[0]) is str:
                 if "=" not in val[0]:
-                    val = " ".join(
-                        [str(k) for k in val]
-                    )  # if all values are string and not key_value pairs .join()
+                    val = " ".join([str(k) for k in val])  # if all values are string and not key_value pairs .join()
                 else:
                     val = {}
                     for vi in v:

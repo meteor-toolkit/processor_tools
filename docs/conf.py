@@ -57,7 +57,6 @@ html_theme = "sphinx_book_theme"
 
 html_title = "processor_tools"
 
-html_static_path = ["_static"]
 
 htmlhelp_basename = "processor_toolsdoc"
 html_theme_options = {

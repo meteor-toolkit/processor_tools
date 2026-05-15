@@ -3,9 +3,15 @@
 import datetime as dt
 import numpy as np
 import unittest
-import unittest.mock as mock
-import datetime as dt
-from processor_tools.utils.formatters import *
+from processor_tools.utils.formatters import (
+    is_number,
+    is_datetime,
+    str2datetime,
+    val_format,
+    list_to_dict,
+    datetime_from_yearday,
+    convert_datetime,
+)
 
 __author__ = "Mattea Goalen <mattea.goalen@npl.co.uk>"
 
@@ -47,12 +53,8 @@ class TestFormatters(unittest.TestCase):
         )
 
     def test_str2datetime_seconds(self):
-        self.assertEqual(
-            str2datetime("2022-09-10T20:23:47Z"), dt.datetime(2022, 9, 10, 20, 23, 47)
-        )
-        self.assertEqual(
-            str2datetime("2022-09-10T20:23:47"), dt.datetime(2022, 9, 10, 20, 23, 47)
-        )
+        self.assertEqual(str2datetime("2022-09-10T20:23:47Z"), dt.datetime(2022, 9, 10, 20, 23, 47))
+        self.assertEqual(str2datetime("2022-09-10T20:23:47"), dt.datetime(2022, 9, 10, 20, 23, 47))
 
     def test_str2datetime_date(self):
         self.assertEqual(str2datetime("2022-09-10"), dt.datetime(2022, 9, 10, 0, 0))
@@ -60,15 +62,11 @@ class TestFormatters(unittest.TestCase):
     def test_str2datetime_time(self):
         self.assertEqual(str2datetime("20:23:47"), dt.time(20, 23, 47))
         self.assertEqual(str2datetime("20:23:47.111356Z"), dt.time(20, 23, 47, 111356))
-        self.assertEqual(
-            str2datetime("20:23:47.11135654Z"), dt.time(20, 23, 47, 111356)
-        )
+        self.assertEqual(str2datetime("20:23:47.11135654Z"), dt.time(20, 23, 47, 111356))
 
     def test_val_format_str(self):
         self.assertEqual(val_format("str"), "str")
-        self.assertEqual(
-            val_format("multiple separated strings"), "multiple separated strings"
-        )
+        self.assertEqual(val_format("multiple separated strings"), "multiple separated strings")
         self.assertEqual(
             val_format("this=text;that=text;other=text"),
             {"this": "text", "that": "text", "other": "text"},
@@ -149,9 +147,7 @@ class TestFormatters(unittest.TestCase):
 
         date_str_time = "2022-06-15T10:30:00Z"
         combined_str_time = convert_datetime(date_str_time)
-        assert combined_str_time == dt.datetime(
-            2022, 6, 15, 10, 30, tzinfo=dt.timezone.utc
-        )
+        assert combined_str_time == dt.datetime(2022, 6, 15, 10, 30, tzinfo=dt.timezone.utc)
 
         # test various numpy formats
         date_np = np.datetime64("2022-06-15T10:30:00+10:00")
@@ -165,9 +161,7 @@ class TestFormatters(unittest.TestCase):
 
         date_float = 1655251800.5
         combined_float = convert_datetime(date_float)
-        assert combined_float == dt.datetime(
-            2022, 6, 15, 0, 10, 0, 500000, tzinfo=dt.timezone.utc
-        )
+        assert combined_float == dt.datetime(2022, 6, 15, 0, 10, 0, 500000, tzinfo=dt.timezone.utc)
 
 
 if __name__ == "__main__":
