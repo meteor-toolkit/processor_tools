@@ -7,7 +7,7 @@ name = "processor_tools"
 dynamic = ["version"]
 description = "Tools to support the developing of processing pipelines"
 readme = "README.md"
-license = {file = "LICENSE"}
+license-files = ["LICENSE"]
 authors = [{name = "MetEOR Toolkit Team", email = "team@comet-toolkit.org"}]
 requires-python = ">=3.11"
 classifiers = [
@@ -47,6 +47,9 @@ docs = [
 
 [project.urls]
 Homepage = "https://comet-toolkit.org/meteor"
+
+[tool.setuptools.packages.find]
+include = ["processor_tools*"]
 
 [tool.setuptools_scm]
 # version inferred from git tags (e.g. v0.1.0); no extra config needed

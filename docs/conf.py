@@ -60,7 +60,9 @@ html_title = "processor_tools"
 html_static_path = ["_static"]
 
 htmlhelp_basename = "processor_toolsdoc"
-
+html_theme_options = {
+    "announcement": "<strong>Beta Version:</strong> This software is a beta version, results should be used with caution. Please share any feedback you have after using the tool.",
+}
 
 # -- Options for LaTeX output ------------------------------------------
 
