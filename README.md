@@ -60,7 +60,7 @@ pytest
 ## Licence
 
 `processor_tools` is released under the GNU Lesser General Public License v3
-(LGPLv3). See the [LICENSE](LICENSE) file for the full licence text.
+(LGPLv3). See the [LICENSE](https://github.com/meteor-toolkit/processor_tools/blob/main/LICENSE) file for the full licence text.
 
 ## Authors
 
